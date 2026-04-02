@@ -6,6 +6,8 @@ import MyVitals from "@/components/vitals/MyVitals";
 import MySkills from "@/components/skills/MySkills";
 import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
+import PeerFeedback from "@/components/peer/PeerFeedback";
+import ProgramOverview from "@/components/hr/ProgramOverview";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
@@ -54,6 +56,8 @@ const Index: React.FC = () => {
       }
       return <MyTeam onSelectGraduate={(id) => setSelectedGraduateId(id)} />;
     }
+    if (activeNav === "peer-feedback") return <PeerFeedback />;
+    if (activeNav === "program-overview") return <ProgramOverview />;
     return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
   };
 
