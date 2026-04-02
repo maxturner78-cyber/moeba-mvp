@@ -219,4 +219,4 @@ const TeamBrief: React.FC = () => {
   );
 };
 
-export default MyCoach;
+export default TeamBrief;
