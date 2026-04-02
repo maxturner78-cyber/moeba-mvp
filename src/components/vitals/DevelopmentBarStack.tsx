@@ -170,11 +170,6 @@ const DevelopmentBarStack: React.FC = () => {
                 {dim.score.toFixed(1)}
               </span>
 
-              {/* Trend */}
-              <Icon size={14} color={trendColor} strokeWidth={2} />
-
-              {/* Sparkline */}
-              <MicroSparkline data={dim.sparkline} color={trendColor} />
             </div>
           );
         })}
