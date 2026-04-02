@@ -28,27 +28,6 @@ const getScoreColor = (score: number) => {
   return "#EF4444";
 };
 
-const getTrendConfig = (trend: Trend) => {
-  if (trend === "up") return { Icon: TrendingUp, color: "#22C55E" };
-  if (trend === "down") return { Icon: TrendingDown, color: "#EF4444" };
-  return { Icon: Minus, color: "#9CA3AF" };
-};
-
-const MicroSparkline: React.FC<{ data: number[]; color: string }> = ({ data, color }) => {
-  const w = 48, h = 18;
-  const min = Math.min(...data) - 0.5;
-  const max = Math.max(...data) + 0.5;
-  const range = max - min || 1;
-  const path = data
-    .map((v, i) => `${i === 0 ? "M" : "L"}${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`)
-    .join(" ");
-
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <path d={path} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-};
 
 const DevelopmentBarStack: React.FC = () => {
   const [animated, setAnimated] = useState(false);
