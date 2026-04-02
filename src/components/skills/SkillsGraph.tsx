@@ -118,18 +118,36 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
     nodeSel.each(function (d) {
       const el = d3.select(this);
       if (d.status === "seed") {
+        // Subtle fill + stronger border so "not started" is clearly visible
         el.append("circle")
           .attr("r", d.radius)
-          .attr("fill", "none")
-          .attr("stroke", "#D1D5DB")
-          .attr("stroke-width", 1.5);
-      } else if (d.status === "promotion") {
-        el.append("circle")
-          .attr("r", d.radius)
-          .attr("fill", "none")
-          .attr("stroke", "#F59E0B")
+          .attr("fill", "#F3F4F6")
+          .attr("stroke", "#9CA3AF")
           .attr("stroke-width", 1.5)
-          .attr("stroke-dasharray", "3 3");
+          .attr("stroke-dasharray", "4 3");
+        // Plus icon to signal "to learn"
+        el.append("line").attr("x1", -4).attr("y1", 0).attr("x2", 4).attr("y2", 0)
+          .attr("stroke", "#9CA3AF").attr("stroke-width", 1.5).attr("stroke-linecap", "round");
+        el.append("line").attr("x1", 0).attr("y1", -4).attr("x2", 0).attr("y2", 4)
+          .attr("stroke", "#9CA3AF").attr("stroke-width", 1.5).attr("stroke-linecap", "round");
+      } else if (d.status === "promotion") {
+        // Amber fill + bold border — these are high-priority learning targets
+        el.append("circle")
+          .attr("r", d.radius)
+          .attr("fill", "#FEF3C7")
+          .attr("stroke", "#F59E0B")
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "5 3");
+        // Star/asterisk to signal "priority"
+        const s = 4;
+        el.append("line").attr("x1", -s).attr("y1", 0).attr("x2", s).attr("y2", 0)
+          .attr("stroke", "#F59E0B").attr("stroke-width", 1.5).attr("stroke-linecap", "round");
+        el.append("line").attr("x1", 0).attr("y1", -s).attr("x2", 0).attr("y2", s)
+          .attr("stroke", "#F59E0B").attr("stroke-width", 1.5).attr("stroke-linecap", "round");
+        el.append("line").attr("x1", -3).attr("y1", -3).attr("x2", 3).attr("y2", 3)
+          .attr("stroke", "#F59E0B").attr("stroke-width", 1.2).attr("stroke-linecap", "round");
+        el.append("line").attr("x1", 3).attr("y1", -3).attr("x2", -3).attr("y2", 3)
+          .attr("stroke", "#F59E0B").attr("stroke-width", 1.2).attr("stroke-linecap", "round");
       } else if (d.status === "developing") {
         el.append("circle")
           .attr("r", d.radius)
@@ -148,16 +166,24 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
       }
     });
 
-    // Labels (only for large nodes)
+    // Labels — always show for seed/promotion nodes (learning targets), size-gated for others
     nodeSel
       .append("text")
       .text((d) => d.label)
       .attr("text-anchor", "middle")
       .attr("dy", (d) => d.radius + 14)
-      .attr("font-size", 11)
+      .attr("font-size", (d) => (d.status === "promotion" ? 11.5 : 11))
+      .attr("font-weight", (d) => (d.status === "promotion" ? 600 : 400))
       .attr("font-family", "Inter, sans-serif")
-      .attr("fill", (d) => (d.radius > 14 ? "#374151" : "#6B7280"))
-      .attr("opacity", (d) => (d.radius > 10 ? 1 : 0))
+      .attr("fill", (d) => {
+        if (d.status === "promotion") return "#B45309";
+        if (d.status === "seed") return "#6B7280";
+        return d.radius > 14 ? "#374151" : "#6B7280";
+      })
+      .attr("opacity", (d) => {
+        if (d.status === "promotion" || d.status === "seed") return 1;
+        return d.radius > 10 ? 1 : 0;
+      })
       .attr("class", "label-text")
       .attr("pointer-events", "none");
 
