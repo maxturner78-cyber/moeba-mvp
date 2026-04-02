@@ -65,7 +65,6 @@ const DevelopmentBarStack: React.FC = () => {
       <div>
         {dimensions.map((dim, i) => {
           const barColor = getScoreColor(dim.score);
-          const { Icon, color: trendColor } = getTrendConfig(dim.trend);
           const isBottomGroup = i >= 6;
 
           return (
