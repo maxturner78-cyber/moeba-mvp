@@ -29,6 +29,7 @@ const navTitles: Record<string, string> = {
 
 const renderPage = (activeNav: string) => {
   if (activeNav === "my-vitals") return <MyVitals />;
+  if (activeNav === "my-skills") return <MySkills />;
   return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
 };
 
