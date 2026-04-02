@@ -1,4 +1,5 @@
 import React from "react";
+import { LucideIcon } from "lucide-react";
 import {
   Activity,
   Sparkles,
@@ -18,7 +19,7 @@ import type { ViewTab } from "./TopBar";
 interface NavItem {
   id: string;
   label: string;
-  icon: React.ComponentType<{ size?: number | string; strokeWidth?: number }>;
+  icon: LucideIcon;
   section?: string;
 }
 
