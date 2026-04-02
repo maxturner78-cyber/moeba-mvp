@@ -6,6 +6,8 @@ import {
   ClipboardCheck,
   Users,
   ClipboardList,
+  MessageSquare,
+  Zap,
 } from "lucide-react";
 import type { ViewTab } from "./TopBar";
 
