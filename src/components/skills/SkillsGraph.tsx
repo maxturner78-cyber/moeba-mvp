@@ -166,16 +166,24 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
       }
     });
 
-    // Labels (only for large nodes)
+    // Labels — always show for seed/promotion nodes (learning targets), size-gated for others
     nodeSel
       .append("text")
       .text((d) => d.label)
       .attr("text-anchor", "middle")
       .attr("dy", (d) => d.radius + 14)
-      .attr("font-size", 11)
+      .attr("font-size", (d) => (d.status === "promotion" ? 11.5 : 11))
+      .attr("font-weight", (d) => (d.status === "promotion" ? 600 : 400))
       .attr("font-family", "Inter, sans-serif")
-      .attr("fill", (d) => (d.radius > 14 ? "#374151" : "#6B7280"))
-      .attr("opacity", (d) => (d.radius > 10 ? 1 : 0))
+      .attr("fill", (d) => {
+        if (d.status === "promotion") return "#B45309";
+        if (d.status === "seed") return "#6B7280";
+        return d.radius > 14 ? "#374151" : "#6B7280";
+      })
+      .attr("opacity", (d) => {
+        if (d.status === "promotion" || d.status === "seed") return 1;
+        return d.radius > 10 ? 1 : 0;
+      })
       .attr("class", "label-text")
       .attr("pointer-events", "none");
 

@@ -122,7 +122,7 @@ export function getSnapshot(month: number): SkillSnapshot {
 }
 
 export function getNodeRadius(proficiency: number, promotionRequired?: boolean): number {
-  if (proficiency === 0) return promotionRequired ? 9 : 7;
+  if (proficiency === 0) return promotionRequired ? 16 : 13;
   // proficiency 1-10 maps to radius 8-22
   return 8 + (proficiency / 10) * 14;
 }
