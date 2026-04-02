@@ -6,6 +6,8 @@ import MyVitals from "@/components/vitals/MyVitals";
 import MySkills from "@/components/skills/MySkills";
 import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
+import PeerFeedback from "@/components/peer/PeerFeedback";
+import ProgramOverview from "@/components/hr/ProgramOverview";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
