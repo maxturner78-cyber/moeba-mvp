@@ -56,6 +56,8 @@ const Index: React.FC = () => {
       return <MyTeam onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }
     if (activeNav === "assess-team") return <AssessTeam />;
+    if (activeNav === "my-coach") return <MyCoach />;
+    if (activeNav === "team-brief") return <TeamBrief />;
     return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
   };
 
