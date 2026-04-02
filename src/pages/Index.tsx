@@ -22,6 +22,8 @@ const navTitles: Record<string, string> = {
   "weekly-checkin": "Weekly Check-In",
   "my-team": "My Team",
   "assess-team": "Assess Team",
+  "my-coach": "My Coach",
+  "team-brief": "Team Brief",
 };
 
 const Index: React.FC = () => {
