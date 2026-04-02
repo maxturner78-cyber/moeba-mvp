@@ -60,7 +60,10 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
       className="shrink-0 flex flex-col"
       style={{
         width: 220,
-        background: "#111111",
+        background: "rgba(255,255,255,0.72)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderRight: "1px solid rgba(0,0,0,0.06)",
         minHeight: "100%",
         paddingTop: 16,
       }}
@@ -72,7 +75,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
           fontWeight: 500,
           textTransform: "uppercase",
           letterSpacing: "0.08em",
-          color: "rgba(255,255,255,0.25)",
+          color: "rgba(0,0,0,0.3)",
           marginTop: 8,
           marginBottom: 8,
           paddingLeft: 14,
@@ -92,9 +95,9 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
               style={{
                 padding: "9px 14px",
                 fontSize: 14,
-                fontWeight: 400,
-                color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.5)",
-                background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
+                fontWeight: isActive ? 500 : 400,
+                color: isActive ? "#0F0F0F" : "rgba(0,0,0,0.45)",
+                background: isActive ? "rgba(0,0,0,0.05)" : "transparent",
                 borderRadius: 8,
                 border: "none",
                 cursor: "pointer",
@@ -105,13 +108,13 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.color = "rgba(255,255,255,0.8)";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                  e.currentTarget.style.color = "rgba(0,0,0,0.7)";
+                  e.currentTarget.style.background = "rgba(0,0,0,0.03)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                  e.currentTarget.style.color = "rgba(0,0,0,0.45)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
