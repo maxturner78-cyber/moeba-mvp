@@ -103,7 +103,7 @@ const MyVitals: React.FC = () => {
       </div>
 
       {/* TWO COLUMN LAYOUT */}
-      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24 }}>
         {/* LEFT: Development Bar Stack */}
         <div>
           <DevelopmentBarStack />
