@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Copy, TrendingUp } from "lucide-react";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, Line, ComposedChart,
