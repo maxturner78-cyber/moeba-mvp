@@ -107,8 +107,7 @@ const MyVitals: React.FC = () => {
       <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24, marginBottom: 32 }}>
         {/* LEFT: Development Radar + Dimension Tiles */}
         <div>
-          <DevelopmentRadar />
-          <DimensionTiles />
+          <DevelopmentBarStack />
         </div>
 
         {/* RIGHT: Focus Areas + Peer Strengths */}
