@@ -73,7 +73,7 @@ const DevelopmentBarStack: React.FC = () => {
               key={dim.name}
               style={{
                 display: "grid",
-                gridTemplateColumns: "160px 1fr 48px 28px 48px",
+                gridTemplateColumns: "160px 1fr 48px",
                 alignItems: "center",
                 gap: 12,
                 padding: "10px 0",
