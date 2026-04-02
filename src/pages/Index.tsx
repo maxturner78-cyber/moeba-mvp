@@ -3,6 +3,7 @@ import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
 import MyVitals from "@/components/vitals/MyVitals";
+import MySkills from "@/components/skills/MySkills";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
@@ -28,6 +29,7 @@ const navTitles: Record<string, string> = {
 
 const renderPage = (activeNav: string) => {
   if (activeNav === "my-vitals") return <MyVitals />;
+  if (activeNav === "my-skills") return <MySkills />;
   return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
 };
 
