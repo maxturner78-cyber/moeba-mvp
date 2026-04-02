@@ -176,7 +176,7 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
       .attr("font-weight", (d) => (d.status === "promotion" ? 600 : 400))
       .attr("font-family", "Inter, sans-serif")
       .attr("fill", (d) => {
-        if (d.status === "promotion") return "#B45309";
+        if (d.status === "promotion") return "#6B7280";
         if (d.status === "seed") return "#6B7280";
         return d.radius > 14 ? "#374151" : "#6B7280";
       })

@@ -1,52 +1,57 @@
 import React from "react";
 
+const MONO = "'SF Mono', 'Fira Code', 'Cascadia Code', monospace";
+const GREEN = "#4ade80";
+const RED = "#f87171";
+const AMBER = "#fbbf24";
+
 const signalCards = [
   {
     label: "PERCEPTION GAP",
     value: "2.0 pts",
-    valueColor: "#EF4444",
+    valueColor: RED,
     detail: "↑ widening · 3 weeks",
     mini: [
-      { label: "you", value: "5.5", color: "#EF4444", pct: 55 },
-      { label: "mgr", value: "7.5", color: "#22C55E", pct: 75 },
+      { label: "you", value: "5.5", color: RED, pct: 55 },
+      { label: "mgr", value: "7.5", color: GREEN, pct: 75 },
     ],
   },
   {
     label: "CONFIDENCE TRAJECTORY",
     value: "5.5 / 10",
-    valueColor: "#F59E0B",
+    valueColor: AMBER,
     detail: "↓ -1.2 vs last month",
   },
   {
     label: "CURIOSITY",
     value: "4.8 / 10",
-    valueColor: "#F59E0B",
+    valueColor: AMBER,
     detail: "↓ questions declining",
   },
   {
     label: "MANAGER RELATIONSHIP",
     value: "7.1 / 10",
-    valueColor: "#22C55E",
+    valueColor: GREEN,
     detail: "↑ improving · 4 weeks",
   },
   {
     label: "INITIATIVE",
     value: "5.3 / 10",
-    valueColor: "#F59E0B",
+    valueColor: AMBER,
     detail: "↓ below cohort avg",
   },
   {
     label: "RESILIENCE",
     value: "6.8 / 10",
-    valueColor: "#22C55E",
+    valueColor: GREEN,
     detail: "→ recovery: 6 days",
   },
 ];
 
 const focusAreas = [
-  { name: "Curiosity & Learning", color: "#F59E0B" },
-  { name: "Self-Awareness", color: "#F59E0B" },
-  { name: "Initiative & Voice", color: "#F59E0B" },
+  { name: "Curiosity & Learning", color: AMBER },
+  { name: "Self-Awareness", color: AMBER },
+  { name: "Initiative & Voice", color: AMBER },
 ];
 
 const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -79,6 +84,10 @@ const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </button>
 );
 
+const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
+  <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 14, color }}>{children}</span>
+);
+
 const MyCoach: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
@@ -105,7 +114,7 @@ const MyCoach: React.FC = () => {
             <div style={{ fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF", marginBottom: 4 }}>
               {s.label}
             </div>
-            <div className="font-mono-data" style={{ fontSize: 22, fontWeight: 700, color: s.valueColor }}>
+            <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: s.valueColor }}>
               {s.value}
             </div>
             <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>
@@ -119,7 +128,7 @@ const MyCoach: React.FC = () => {
                     <div style={{ width: 100, height: 4, background: "#E8E8E8", borderRadius: 2, position: "relative" }}>
                       <div style={{ width: `${m.pct}%`, height: 4, background: m.color, borderRadius: 2 }} />
                     </div>
-                    <span className="font-mono-data" style={{ fontSize: 11, color: m.color }}>{m.value}</span>
+                    <span style={{ fontFamily: MONO, fontSize: 11, color: m.color }}>{m.value}</span>
                   </div>
                 ))}
               </div>
@@ -160,20 +169,20 @@ const MyCoach: React.FC = () => {
           {/* Message 1 */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#22C55E" }}>GRADSENSE AGENT</span>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
               <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:42 · mon w14</span>
             </div>
             <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
               <p style={{ marginBottom: 16 }}>Good morning Sarah. I've been watching your signals overnight.</p>
               <p style={{ marginBottom: 16 }}>One thing needs your attention today.</p>
               <p style={{ marginBottom: 16 }}>
-                Your manager rated you <span className="font-mono-data" style={{ fontWeight: 600 }}>7.5/10</span> last week. You rated yourself <span className="font-mono-data" style={{ fontWeight: 600 }}>5.5/10</span>. That's a <span className="font-mono-data" style={{ fontWeight: 600 }}>2.0</span> point gap — and it's been widening for three consecutive weeks. You think you're struggling. The data says you're not.
+                Your manager rated you <Mono>7.5/10</Mono> last week. You rated yourself <Mono>5.5/10</Mono>. That's a <Mono color={RED}>2.0</Mono> point gap — and it's been widening for three consecutive weeks. You think you're struggling. The data says you're not.
               </p>
               <p style={{ marginBottom: 16 }}>
-                This gap is invisible to both of you until someone names it. The research says 85% of people who leave have exactly this pattern in their last 90 days.
+                This gap is invisible to both of you until someone names it. The research says <Mono>85%</Mono> of people who leave have exactly this pattern in their last 90 days.
               </p>
-              <p style={{ fontWeight: 600, color: "#22C55E" }}>
+              <p style={{ fontWeight: 600, color: GREEN }}>
                 You're not at risk because of performance. You're at risk because of perception.
               </p>
             </div>
@@ -187,13 +196,13 @@ const MyCoach: React.FC = () => {
           {/* Message 2 */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#22C55E" }}>GRADSENSE AGENT</span>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
               <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:43 · mon w14</span>
             </div>
             <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
               <p style={{ marginBottom: 16 }}>
-                Also — <span style={{ fontWeight: 600 }}>9 days without a proactive update to your manager</span>. In hybrid, silence reads as disengagement even when you're working hard. Your visibility score dropped from <span className="font-mono-data" style={{ fontWeight: 600 }}>5.8 → 3.2</span> this month.
+                Also — <span style={{ fontWeight: 600 }}>9 days without a proactive update to your manager</span>. In hybrid, silence reads as disengagement even when you're working hard. Your visibility score dropped from <Mono>5.8 → 3.2</Mono> this month.
               </p>
               <p>
                 One Friday update fixes this. I've drafted one based on your week 13 check-in and the Meridian project milestone. Want me to show it?
@@ -230,7 +239,7 @@ const MyCoach: React.FC = () => {
                 width: 32,
                 height: 32,
                 borderRadius: "50%",
-                background: "#22C55E",
+                background: GREEN,
                 border: "none",
                 display: "flex",
                 alignItems: "center",

@@ -112,7 +112,7 @@ const MySkills: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
-            <span style={{ fontSize: 11, color: "#B45309", fontWeight: 600 }}>Required for promotion</span>
+            <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
           </div>
           <div className="flex items-center gap-2">
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
