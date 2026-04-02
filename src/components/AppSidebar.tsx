@@ -88,7 +88,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
             <button
               key={item.id}
               onClick={() => onNavChange(item.id)}
-              className="flex items-center text-left transition-colors"
+              className="flex items-center text-left"
               style={{
                 padding: "9px 14px",
                 fontSize: 14,
