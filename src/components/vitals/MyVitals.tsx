@@ -71,7 +71,7 @@ const MyVitals: React.FC = () => {
           padding: 24,
           paddingLeft: 28,
           position: "relative",
-          marginBottom: 32,
+          marginBottom: 0,
         }}
       >
         <div
