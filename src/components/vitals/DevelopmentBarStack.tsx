@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 type Trend = "up" | "down" | "stable";
 
