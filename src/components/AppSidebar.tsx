@@ -4,15 +4,8 @@ import {
   Activity,
   Sparkles,
   ClipboardCheck,
-  Shield,
   Users,
   ClipboardList,
-  FileText,
-  MessageCircle,
-  LayoutGrid,
-  Grid3X3,
-  UserCog,
-  Download,
 } from "lucide-react";
 import type { ViewTab } from "./TopBar";
 
@@ -20,7 +13,6 @@ interface NavItem {
   id: string;
   label: string;
   icon: LucideIcon;
-  section?: string;
 }
 
 const navConfig: Record<ViewTab, NavItem[]> = {
@@ -28,21 +20,10 @@ const navConfig: Record<ViewTab, NavItem[]> = {
     { id: "my-vitals", label: "My Vitals", icon: Activity },
     { id: "my-skills", label: "My Skills", icon: Sparkles },
     { id: "weekly-checkin", label: "Weekly Check-In", icon: ClipboardCheck },
-    { id: "need-support", label: "Need Support?", icon: Shield },
   ],
   manager: [
     { id: "my-team", label: "My Team", icon: Users },
     { id: "assess-team", label: "Assess Team", icon: ClipboardList },
-    { id: "checkin-briefs", label: "Check-In Briefs", icon: FileText },
-  ],
-  peer: [
-    { id: "peer-feedback", label: "Peer Feedback", icon: MessageCircle },
-  ],
-  hr: [
-    { id: "program-overview", label: "Program Overview", icon: LayoutGrid },
-    { id: "cohort-map", label: "Cohort Map", icon: Grid3X3 },
-    { id: "manager-effectiveness", label: "Manager Effectiveness", icon: UserCog },
-    { id: "reports", label: "Reports", icon: Download },
   ],
 };
 
@@ -68,7 +49,6 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
         paddingTop: 16,
       }}
     >
-      {/* Section label */}
       <div
         style={{
           fontSize: 10,
@@ -81,7 +61,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
           paddingLeft: 14,
         }}
       >
-        {activeTab === "graduate" ? "INSIGHTS" : activeTab === "manager" ? "TEAM" : activeTab === "peer" ? "FEEDBACK" : "ADMIN"}
+        {activeTab === "graduate" ? "INSIGHTS" : "TEAM"}
       </div>
 
       <nav className="flex flex-col gap-1 px-2">

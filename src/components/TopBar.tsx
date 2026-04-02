@@ -7,11 +7,16 @@ interface TopBarProps {
   onTabChange: (tab: ViewTab) => void;
 }
 
+export type ViewTab = "graduate" | "manager";
+
+interface TopBarProps {
+  activeTab: ViewTab;
+  onTabChange: (tab: ViewTab) => void;
+}
+
 const tabs: { id: ViewTab; label: string }[] = [
   { id: "graduate", label: "Graduate" },
   { id: "manager", label: "Manager" },
-  { id: "peer", label: "Peer" },
-  { id: "hr", label: "HR Admin" },
 ];
 
 const TopBar: React.FC<TopBarProps> = ({ activeTab, onTabChange }) => {

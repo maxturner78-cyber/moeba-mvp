@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -6,31 +6,20 @@ import MyVitals from "@/components/vitals/MyVitals";
 import MySkills from "@/components/skills/MySkills";
 import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
-import PeerFeedback from "@/components/peer/PeerFeedback";
-import ProgramOverview from "@/components/hr/ProgramOverview";
 import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import AssessTeam from "@/components/manager/AssessTeam";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
   manager: "my-team",
-  peer: "peer-feedback",
-  hr: "program-overview",
 };
 
 const navTitles: Record<string, string> = {
   "my-vitals": "My Vitals",
   "my-skills": "My Skills",
   "weekly-checkin": "Weekly Check-In",
-  "need-support": "Need Support?",
   "my-team": "My Team",
   "assess-team": "Assess Team",
-  "checkin-briefs": "Check-In Briefs",
-  "peer-feedback": "Peer Feedback",
-  "program-overview": "Program Overview",
-  "cohort-map": "Cohort Map",
-  "manager-effectiveness": "Manager Effectiveness",
-  "reports": "Reports",
 };
 
 const Index: React.FC = () => {
@@ -63,8 +52,6 @@ const Index: React.FC = () => {
       return <MyTeam onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }
     if (activeNav === "assess-team") return <AssessTeam />;
-    if (activeNav === "peer-feedback") return <PeerFeedback />;
-    if (activeNav === "program-overview") return <ProgramOverview />;
     return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
   };
 
