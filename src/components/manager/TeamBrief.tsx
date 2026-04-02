@@ -1,12 +1,17 @@
 import React from "react";
 
+const MONO = "'SF Mono', 'Fira Code', 'Cascadia Code', monospace";
+const GREEN = "#4ade80";
+const RED = "#f87171";
+const AMBER = "#fbbf24";
+
 const graduates = [
-  { name: "Sarah Chen", role: "Associate · Wk 14", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "gap: 2.0", metricColor: "#EF4444", urgent: true },
-  { name: "Alex Rodriguez", role: "Associate · Wk 8", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "↓ 2q/wk", metricColor: "#EF4444", urgent: true },
-  { name: "Priya Sharma", role: "Associate · Wk 22", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "conf dip", metricColor: "#F59E0B", urgent: false },
-  { name: "Tyler Morrison", role: "Associate · Wk 18", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "load: 8.8", metricColor: "#F59E0B", urgent: false },
-  { name: "Marcus Johnson", role: "Associate · Wk 26", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "8.2 tri", metricColor: "#22C55E", urgent: false },
-  { name: "Emma Thompson", role: "Associate · Wk 28", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "7.8 conf", metricColor: "#22C55E", urgent: false },
+  { name: "Sarah Chen", role: "Associate · Wk 14", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "gap: 2.0", metricColor: RED, urgent: true },
+  { name: "Alex Rodriguez", role: "Associate · Wk 8", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "↓ 2q/wk", metricColor: RED, urgent: true },
+  { name: "Priya Sharma", role: "Associate · Wk 22", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "conf dip", metricColor: AMBER, urgent: false },
+  { name: "Tyler Morrison", role: "Associate · Wk 18", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "load: 8.8", metricColor: AMBER, urgent: false },
+  { name: "Marcus Johnson", role: "Associate · Wk 26", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "8.2 tri", metricColor: GREEN, urgent: false },
+  { name: "Emma Thompson", role: "Associate · Wk 28", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "7.8 conf", metricColor: GREEN, urgent: false },
 ];
 
 const teamStats = [
@@ -46,6 +51,10 @@ const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </button>
 );
 
+const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
+  <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 14, color }}>{children}</span>
+);
+
 const TeamBrief: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
@@ -80,7 +89,7 @@ const TeamBrief: React.FC = () => {
               <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: g.badgeBg, color: g.badgeColor }}>
                 {g.badge}
               </span>
-              <span className="font-mono-data" style={{ fontSize: 11, color: g.metricColor }}>{g.metric}</span>
+              <span style={{ fontFamily: MONO, fontSize: 11, color: g.metricColor }}>{g.metric}</span>
             </div>
           </div>
         ))}
@@ -92,7 +101,7 @@ const TeamBrief: React.FC = () => {
           {teamStats.map((s) => (
             <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span style={{ fontSize: 11, color: "#9CA3AF" }}>{s.label}</span>
-              <span className="font-mono-data" style={{ fontSize: 13, color: "#0F0F0F" }}>{s.value}</span>
+              <span style={{ fontFamily: MONO, fontSize: 13, color: "#0F0F0F" }}>{s.value}</span>
             </div>
           ))}
         </div>
@@ -116,19 +125,19 @@ const TeamBrief: React.FC = () => {
           {/* Message 1 */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#22C55E" }}>GRADSENSE AGENT</span>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
               <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:15 · mon w14</span>
             </div>
             <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
               <p style={{ marginBottom: 16 }}>Morning. Two people need your attention today, not this week.</p>
               <p style={{ marginBottom: 16 }}>
-                <span style={{ fontWeight: 700 }}>Sarah Chen</span> — her perception gap hit <span className="font-mono-data" style={{ fontWeight: 600 }}>2.0</span> points this week. She rates herself <span className="font-mono-data" style={{ fontWeight: 600 }}>5.5</span>. You rated her <span className="font-mono-data" style={{ fontWeight: 600 }}>7.5</span> last Tuesday. She thinks she's failing. You think she's fine. Neither of you knows the other's number. This gap has widened three consecutive weeks. At <span className="font-mono-data" style={{ fontWeight: 600 }}>2.5</span> points it becomes very hard to close without a formal conversation.
+                <span style={{ fontWeight: 700 }}>Sarah Chen</span> — her perception gap hit <Mono color={RED}>2.0</Mono> points this week. She rates herself <Mono>5.5</Mono>. You rated her <Mono>7.5</Mono> last Tuesday. She thinks she's failing. You think she's fine. Neither of you knows the other's number. This gap has widened three consecutive weeks. At <Mono>2.5</Mono> points it becomes very hard to close without a formal conversation.
               </p>
               <p style={{ marginBottom: 16 }}>
-                <span style={{ fontWeight: 700 }}>Alex Rodriguez</span> — question frequency dropped from <span className="font-mono-data" style={{ fontWeight: 600 }}>6/week</span> in week 5 to <span className="font-mono-data" style={{ fontWeight: 600 }}>2/week</span> this week. Across three consecutive weeks. That's the MIT Sloan disengagement signal. He's not struggling with the work. He's withdrawing from it.
+                <span style={{ fontWeight: 700 }}>Alex Rodriguez</span> — question frequency dropped from <Mono>6/week</Mono> in week 5 to <Mono color={RED}>2/week</Mono> this week. Across three consecutive weeks. That's the MIT Sloan disengagement signal. He's not struggling with the work. He's withdrawing from it.
               </p>
-              <p style={{ fontWeight: 600, color: "#22C55E" }}>
+              <p style={{ fontWeight: 600, color: GREEN }}>
                 Both of these are 15-minute conversations. Both have scripts ready.
               </p>
             </div>
@@ -149,18 +158,18 @@ const TeamBrief: React.FC = () => {
           {/* Message 3 */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#22C55E" }}>GRADSENSE AGENT</span>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
               <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:16 · mon w14</span>
             </div>
             <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
               <p style={{ marginBottom: 16 }}>The goal: let Sarah tell you how she's doing before you tell her how you see her. If you lead with your rating, she'll nod and internalise nothing. <span style={{ fontWeight: 600 }}>Ask first.</span></p>
               <p style={{ marginBottom: 16 }}>Open with: <em>"I wanted to check in on how you're finding things. How would you rate your own performance this week — honestly?"</em></p>
               <p style={{ marginBottom: 16 }}>Listen. She'll likely say 5 or 6. Don't correct immediately.</p>
-              <p style={{ marginBottom: 16 }}>Then: <em>"That's interesting. From my side, I'd put you at <span className="font-mono-data" style={{ fontWeight: 600 }}>7.5</span>. Here's specifically why —"</em> and reference the Meridian deliverable and the client feedback from Thursday.</p>
+              <p style={{ marginBottom: 16 }}>Then: <em>"That's interesting. From my side, I'd put you at <Mono>7.5</Mono>. Here's specifically why —"</em> and reference the Meridian deliverable and the client feedback from Thursday.</p>
               <p style={{ marginBottom: 16 }}>The goal isn't to convince her she's wrong. It's to show her what you see that she doesn't. <span style={{ fontWeight: 600 }}>Name the gap. Make it visible.</span> That's the first step to closing it.</p>
               <p style={{ marginBottom: 16 }}>Ask before you leave: <em>"What's one thing you're unsure about right now that you haven't asked anyone about?"</em></p>
-              <p>This should take <span className="font-mono-data" style={{ fontWeight: 600 }}>12-15</span> minutes. Follow up next week — if the gap narrows by even <span className="font-mono-data" style={{ fontWeight: 600 }}>0.5</span> points, the intervention is working.</p>
+              <p>This should take <Mono>12-15</Mono> minutes. Follow up next week — if the gap narrows by even <Mono>0.5</Mono> points, the intervention is working.</p>
             </div>
           </div>
         </div>
@@ -189,7 +198,7 @@ const TeamBrief: React.FC = () => {
                 width: 32,
                 height: 32,
                 borderRadius: "50%",
-                background: "#22C55E",
+                background: GREEN,
                 border: "none",
                 display: "flex",
                 alignItems: "center",
