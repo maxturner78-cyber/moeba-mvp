@@ -1,12 +1,5 @@
 import React from "react";
 
-export type ViewTab = "graduate" | "manager" | "peer" | "hr";
-
-interface TopBarProps {
-  activeTab: ViewTab;
-  onTabChange: (tab: ViewTab) => void;
-}
-
 export type ViewTab = "graduate" | "manager";
 
 interface TopBarProps {
