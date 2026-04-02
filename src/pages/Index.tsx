@@ -8,6 +8,8 @@ import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import AssessTeam from "@/components/manager/AssessTeam";
+import MyCoach from "@/components/graduate/MyCoach";
+import TeamBrief from "@/components/manager/TeamBrief";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
