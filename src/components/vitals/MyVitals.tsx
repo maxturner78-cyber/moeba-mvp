@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle, Sparkles } from "lucide-react";
-import DevelopmentRadar from "@/components/vitals/DevelopmentRadar";
-import DimensionTiles from "@/components/vitals/DimensionTiles";
+import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
 import ProgressTimeline from "@/components/vitals/ProgressTimeline";
 
 const MyVitals: React.FC = () => {
