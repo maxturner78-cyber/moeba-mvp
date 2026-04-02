@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle } from "lucide-react";
 import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
-import ProgressTimeline from "@/components/vitals/ProgressTimeline";
 
 const MyVitals: React.FC = () => {
   return (
@@ -72,7 +71,7 @@ const MyVitals: React.FC = () => {
           padding: 24,
           paddingLeft: 28,
           position: "relative",
-          marginBottom: 32,
+          marginBottom: 0,
         }}
       >
         <div
@@ -104,7 +103,7 @@ const MyVitals: React.FC = () => {
       </div>
 
       {/* TWO COLUMN LAYOUT */}
-      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24 }}>
         {/* LEFT: Development Bar Stack */}
         <div>
           <DevelopmentBarStack />
@@ -192,9 +191,6 @@ const MyVitals: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* SECTION 6: Progress Timeline */}
-      <ProgressTimeline />
     </div>
   );
 };
