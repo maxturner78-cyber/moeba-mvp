@@ -161,3 +161,14 @@
 .gs-btn-primary:hover {
   background: #16A34A !important;
 }
+
+/* ── Dimension row hover ── */
+.dimension-row-hover {
+  transition: background 100ms ease;
+}
+.dimension-row-hover:hover {
+  background: #FAFAFA !important;
+}
+.dimension-row-hover:hover span:first-child {
+  font-weight: 600;
+}
