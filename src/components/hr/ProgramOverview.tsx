@@ -61,7 +61,7 @@ const ProgramOverview: React.FC = () => {
       <p style={{ fontSize: 13, color: "#9CA3AF", marginBottom: 24 }}>Q1 2026 · Graduate Cohort</p>
 
       {/* Top Metrics */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+      <div className="gs-stagger" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
         {metrics.map((m) => (
           <div key={m.label} style={{
             background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
