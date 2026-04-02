@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Copy, TrendingUp } from "lucide-react";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, Line, ComposedChart,
@@ -46,27 +46,143 @@ const DarkTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-/* ── Perception Bar Group ── */
-const BarGroup: React.FC<{ dim: string; self: number; manager: number; peer: number | null }> = ({ dim, self, manager, peer }) => {
-  const maxW = 100; // percentage scale out of 10
-  const bars = [
-    { label: "Self", value: self, color: "#6366F1" },
-    { label: "Manager", value: manager, color: "#F59E0B" },
-    ...(peer !== null ? [{ label: "Peer", value: peer, color: "#22C55E" }] : []),
-  ];
+/* ── Perception Gap Summary Card ── */
+const topGaps = [
+  { dim: "Self-Awareness", self: 5.2, others: 7.8, gap: 2.6 },
+  { dim: "Confidence", self: 5.5, others: 7.5, gap: 2.0 },
+  { dim: "Curiosity", self: 4.8, others: 5.8, gap: 1.0 },
+];
+
+const getGapColor = (gap: number) => {
+  if (gap > 2.5) return "#EF4444";
+  if (gap >= 1.5) return "#F59E0B";
+  return "#22C55E";
+};
+
+const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay: number; animated: boolean }> = ({ self, others, gap, delay, animated }) => {
+  const color = getGapColor(gap);
+  const selfPos = (self / 10) * 100;
+  const othersPos = (others / 10) * 100;
+  const left = Math.min(selfPos, othersPos);
+  const width = Math.abs(othersPos - selfPos);
+  const centerPos = 50;
+
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 11, color: "#6B7280", marginBottom: 4 }}>{dim}</div>
-      {bars.map((b) => (
-        <div key={b.label} className="flex items-center gap-2" style={{ marginBottom: 3 }}>
-          <div style={{ width: "100%", height: 8, background: "#F3F4F6", borderRadius: 4, position: "relative" }}>
-            <div style={{ width: `${(b.value / 10) * maxW}%`, height: 8, background: b.color, borderRadius: 4 }} />
+    <div style={{ position: "relative", height: 20, width: "100%" }}>
+      {/* Track */}
+      <div style={{ position: "absolute", top: 9, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
+      {/* Connecting line */}
+      <div style={{
+        position: "absolute", top: 9, height: 2, background: color, borderRadius: 1,
+        left: animated ? `${left}%` : `${centerPos}%`,
+        width: animated ? `${width}%` : "0%",
+        transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
+      }} />
+      {/* Self dot */}
+      <div style={{
+        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        background: "#6366F1", boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
+        left: animated ? `calc(${selfPos}% - 5px)` : `calc(${centerPos}% - 5px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`,
+      }} />
+      <span className="font-mono-data" style={{
+        position: "absolute", top: 17, fontSize: 10, color: "#6366F1",
+        left: animated ? `calc(${selfPos}% - 8px)` : `calc(${centerPos}% - 8px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`,
+      }}>{self}</span>
+      {/* Others dot */}
+      <div style={{
+        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        background: "#22C55E", boxShadow: "0 1px 3px rgba(34,197,94,0.3)",
+        left: animated ? `calc(${othersPos}% - 5px)` : `calc(${centerPos}% - 5px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`,
+      }} />
+      <span className="font-mono-data" style={{
+        position: "absolute", top: 17, fontSize: 10, color: "#22C55E",
+        left: animated ? `calc(${othersPos}% - 8px)` : `calc(${centerPos}% - 8px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`,
+      }}>{others}</span>
+    </div>
+  );
+};
+
+const PerceptionGapCard: React.FC = () => {
+  const [animated, setAnimated] = React.useState(false);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    const start = performance.now();
+    const target = 2.3;
+    const duration = 600;
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(parseFloat((target * eased).toFixed(1)));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    requestAnimationFrame(() => setAnimated(true));
+  }, []);
+
+  return (
+    <div style={{
+      background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+    }}>
+      {/* Section 1: Headline */}
+      <div className="flex items-baseline gap-3" style={{ marginBottom: 4 }}>
+        <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 700, color: "#EF4444" }}>
+          {count.toFixed(1)}
+        </span>
+        <span style={{ fontSize: 14, color: "#9CA3AF" }}>avg perception gap</span>
+      </div>
+      <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, marginBottom: 8 }}>
+        Sarah consistently rates herself lower than her manager and peers rate her
+      </p>
+      <div className="flex items-center gap-1.5" style={{ marginBottom: 0 }}>
+        <TrendingUp size={14} color="#EF4444" strokeWidth={2} />
+        <span style={{ fontSize: 12, fontWeight: 500, color: "#EF4444" }}>Widening over 4 weeks</span>
+      </div>
+
+      <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
+
+      {/* Section 2: Top 3 Gaps */}
+      <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
+        BIGGEST GAPS
+      </div>
+      <div className="flex flex-col" style={{ gap: 8, marginBottom: 12 }}>
+        {topGaps.map((g, i) => (
+          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "130px 1fr 56px", alignItems: "center", height: 28 }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
+            <DivergenceDot self={g.self} others={g.others} gap={g.gap} delay={i * 80} animated={animated} />
+            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(g.gap), textAlign: "right" }}>
+              {g.gap.toFixed(1)} pts
+            </span>
           </div>
-          <span className="font-mono-data" style={{ fontSize: 11, fontWeight: 500, color: "#374151", width: 24, textAlign: "right", flexShrink: 0 }}>
-            {b.value.toFixed(1)}
-          </span>
+        ))}
+      </div>
+      <button
+        style={{ fontSize: 12, fontWeight: 500, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", padding: 0, transition: "color 100ms" }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#374151"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "#9CA3AF"; }}
+      >
+        View all 9 dimensions →
+      </button>
+
+      <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
+
+      {/* Section 3: Legend */}
+      <div className="flex items-center" style={{ gap: 16 }}>
+        <div className="flex items-center" style={{ gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366F1" }} />
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
         </div>
-      ))}
+        <div className="flex items-center" style={{ gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager & peer avg</span>
+        </div>
+      </div>
     </div>
   );
 };
@@ -212,34 +328,8 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       {/* Three columns */}
       <div style={{ display: "grid", gridTemplateColumns: "35% 35% 30%", gap: 20, marginBottom: 24 }}>
         {/* Col 1: Perception Gap */}
-        <div style={{
-          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-        }}>
-          <h3 className="font-heading" style={{ fontSize: 17, fontWeight: 600, color: "#0F0F0F", marginBottom: 4 }}>
-            Perception Gap Analysis
-          </h3>
-          <div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
-            {[
-              { color: "#6366F1", label: "Self" },
-              { color: "#F59E0B", label: "Manager" },
-              { color: "#22C55E", label: "Peer" },
-            ].map((l) => (
-              <div key={l.label} className="flex items-center gap-1.5">
-                <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
-                <span style={{ fontSize: 11, color: "#9CA3AF" }}>{l.label}</span>
-              </div>
-            ))}
-          </div>
-          {perceptionData.map((d) => (
-            <BarGroup key={d.dim} dim={d.dim} self={d.self} manager={d.manager} peer={d.peer} />
-          ))}
-          <div style={{ background: "#FEF2F2", borderRadius: 8, padding: 12, marginTop: 8 }}>
-            <p style={{ fontSize: 12, color: "#DC2626", lineHeight: 1.5 }}>
-              <span className="font-mono-data" style={{ fontWeight: 600 }}>Average perception gap: 2.3 points</span>
-              {" "}— Sarah consistently rates herself lower than her manager and peers rate her
-            </p>
-          </div>
+        <div>
+          <PerceptionGapCard />
         </div>
 
         {/* Col 2: Trend Charts */}
