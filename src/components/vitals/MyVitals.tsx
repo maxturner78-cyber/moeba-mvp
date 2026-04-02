@@ -191,9 +191,6 @@ const MyVitals: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* SECTION 6: Progress Timeline */}
-      <ProgressTimeline />
     </div>
   );
 };
