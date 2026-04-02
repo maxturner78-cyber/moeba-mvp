@@ -6,6 +6,8 @@ import {
   ClipboardCheck,
   Users,
   ClipboardList,
+  MessageSquare,
+  Zap,
 } from "lucide-react";
 import type { ViewTab } from "./TopBar";
 
@@ -20,10 +22,12 @@ const navConfig: Record<ViewTab, NavItem[]> = {
     { id: "my-vitals", label: "My Vitals", icon: Activity },
     { id: "my-skills", label: "My Skills", icon: Sparkles },
     { id: "weekly-checkin", label: "Weekly Check-In", icon: ClipboardCheck },
+    { id: "my-coach", label: "My Coach", icon: MessageSquare },
   ],
   manager: [
     { id: "my-team", label: "My Team", icon: Users },
     { id: "assess-team", label: "Assess Team", icon: ClipboardList },
+    { id: "team-brief", label: "Team Brief", icon: Zap },
   ],
 };
 

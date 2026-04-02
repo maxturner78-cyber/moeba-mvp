@@ -8,6 +8,8 @@ import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import AssessTeam from "@/components/manager/AssessTeam";
+import MyCoach from "@/components/graduate/MyCoach";
+import TeamBrief from "@/components/manager/TeamBrief";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
@@ -20,6 +22,8 @@ const navTitles: Record<string, string> = {
   "weekly-checkin": "Weekly Check-In",
   "my-team": "My Team",
   "assess-team": "Assess Team",
+  "my-coach": "My Coach",
+  "team-brief": "Team Brief",
 };
 
 const Index: React.FC = () => {
@@ -52,6 +56,8 @@ const Index: React.FC = () => {
       return <MyTeam onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }
     if (activeNav === "assess-team") return <AssessTeam />;
+    if (activeNav === "my-coach") return <MyCoach />;
+    if (activeNav === "team-brief") return <TeamBrief />;
     return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
   };
 
