@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle } from "lucide-react";
 import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
-import ProgressTimeline from "@/components/vitals/ProgressTimeline";
 
 const MyVitals: React.FC = () => {
   return (
