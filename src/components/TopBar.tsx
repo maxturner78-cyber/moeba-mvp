@@ -1,6 +1,6 @@
 import React from "react";
 
-export type ViewTab = "graduate" | "manager" | "peer" | "hr";
+export type ViewTab = "graduate" | "manager";
 
 interface TopBarProps {
   activeTab: ViewTab;
@@ -10,8 +10,6 @@ interface TopBarProps {
 const tabs: { id: ViewTab; label: string }[] = [
   { id: "graduate", label: "Graduate" },
   { id: "manager", label: "Manager" },
-  { id: "peer", label: "Peer" },
-  { id: "hr", label: "HR Admin" },
 ];
 
 const TopBar: React.FC<TopBarProps> = ({ activeTab, onTabChange }) => {
