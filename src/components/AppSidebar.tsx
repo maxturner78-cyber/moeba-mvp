@@ -18,7 +18,7 @@ import type { ViewTab } from "./TopBar";
 interface NavItem {
   id: string;
   label: string;
-  icon: React.FC<{ size?: number; strokeWidth?: number }>;
+  icon: React.ComponentType<{ size?: number | string; strokeWidth?: number }>;
   section?: string;
 }
 
