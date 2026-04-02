@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
+import MyVitals from "@/components/vitals/MyVitals";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
@@ -23,6 +24,11 @@ const navTitles: Record<string, string> = {
   "cohort-map": "Cohort Map",
   "manager-effectiveness": "Manager Effectiveness",
   "reports": "Reports",
+};
+
+const renderPage = (activeNav: string) => {
+  if (activeNav === "my-vitals") return <MyVitals />;
+  return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
 };
 
 const Index: React.FC = () => {
@@ -48,7 +54,7 @@ const Index: React.FC = () => {
           style={{ padding: 32, background: "#FAFAFA" }}
         >
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            <PagePlaceholder title={navTitles[activeNav] || "Page"} />
+            {renderPage(activeNav)}
           </div>
         </main>
       </div>
