@@ -89,7 +89,7 @@ const MyTeam: React.FC<MyTeamProps> = ({ onSelectGraduate }) => {
       </div>
 
       {/* Top Metrics */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+      <div className="gs-stagger" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Graduates", value: counts.total, color: "#0F0F0F" },
           { label: "Accelerating", value: counts.accelerating, color: "#22C55E", trend: "↑ consistent", trendColor: "#22C55E" },

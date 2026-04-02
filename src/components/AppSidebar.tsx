@@ -88,7 +88,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
             <button
               key={item.id}
               onClick={() => onNavChange(item.id)}
-              className="flex items-center text-left transition-colors"
+              className="flex items-center text-left"
               style={{
                 padding: "9px 14px",
                 fontSize: 14,
@@ -101,6 +101,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
                 borderLeft: isActive ? "2px solid #22C55E" : "2px solid transparent",
                 gap: 10,
                 width: "100%",
+                transition: "color 120ms ease, background 120ms ease",
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {

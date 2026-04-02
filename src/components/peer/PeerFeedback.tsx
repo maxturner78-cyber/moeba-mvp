@@ -9,24 +9,16 @@ const RatingSlider: React.FC<{ label: string; value: number; onChange: (v: numbe
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 10 }}>{label}</div>
       <div className="flex items-center gap-3">
-        <div style={{ flex: 1, position: "relative" }}>
+        <div style={{ flex: 1 }}>
           <input
-            type="range"
-            min={1}
-            max={10}
-            value={value}
+            type="range" min={1} max={10} value={value}
             onChange={(e) => onChange(Number(e.target.value))}
-            style={{ width: "100%", cursor: "pointer" }}
-            className="peer-slider"
+            className="gs-slider"
+            style={{
+              width: "100%",
+              background: `linear-gradient(to right, #22C55E 0%, #22C55E ${pct}%, #E8E8E8 ${pct}%, #E8E8E8 100%)`,
+            }}
           />
-          <style>{`
-            .peer-slider { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; outline: none;
-              background: linear-gradient(to right, #22C55E 0%, #22C55E ${pct}%, #E8E8E8 ${pct}%, #E8E8E8 100%); }
-            .peer-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-              background: #22C55E; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.15); border: 2px solid #fff; }
-            .peer-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%;
-              background: #22C55E; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.15); border: 2px solid #fff; }
-          `}</style>
         </div>
         <span className="font-mono-data" style={{ fontSize: 16, fontWeight: 600, color: "#0F0F0F", width: 28, textAlign: "right" }}>
           {value}

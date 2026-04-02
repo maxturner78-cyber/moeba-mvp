@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -8,6 +8,8 @@ import MyTeam from "@/components/manager/MyTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import PeerFeedback from "@/components/peer/PeerFeedback";
 import ProgramOverview from "@/components/hr/ProgramOverview";
+import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
+import AssessTeam from "@/components/manager/AssessTeam";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-vitals",
@@ -35,27 +37,32 @@ const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
   const [activeNav, setActiveNav] = useState<string>("my-vitals");
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
+  const [pageKey, setPageKey] = useState(0);
 
   const handleTabChange = useCallback((tab: ViewTab) => {
     setActiveTab(tab);
     setActiveNav(defaultNav[tab]);
     setSelectedGraduateId(null);
+    setPageKey((k) => k + 1);
   }, []);
 
   const handleNavChange = useCallback((id: string) => {
     setActiveNav(id);
     setSelectedGraduateId(null);
+    setPageKey((k) => k + 1);
   }, []);
 
   const renderPage = () => {
     if (activeNav === "my-vitals") return <MyVitals />;
     if (activeNav === "my-skills") return <MySkills />;
+    if (activeNav === "weekly-checkin") return <WeeklyCheckIn />;
     if (activeNav === "my-team") {
       if (selectedGraduateId) {
-        return <GraduateProfile onBack={() => setSelectedGraduateId(null)} />;
+        return <GraduateProfile onBack={() => { setSelectedGraduateId(null); setPageKey((k) => k + 1); }} />;
       }
-      return <MyTeam onSelectGraduate={(id) => setSelectedGraduateId(id)} />;
+      return <MyTeam onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }
+    if (activeNav === "assess-team") return <AssessTeam />;
     if (activeNav === "peer-feedback") return <PeerFeedback />;
     if (activeNav === "program-overview") return <ProgramOverview />;
     return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
@@ -74,7 +81,7 @@ const Index: React.FC = () => {
           className="flex-1 overflow-y-auto"
           style={{ padding: 32, background: "#FAFAFA" }}
         >
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div key={pageKey} className="gs-page-enter" style={{ maxWidth: 1200, margin: "0 auto" }}>
             {renderPage()}
           </div>
         </main>
