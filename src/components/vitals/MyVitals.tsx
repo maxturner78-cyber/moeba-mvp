@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, Sparkles } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
 import ProgressTimeline from "@/components/vitals/ProgressTimeline";
 
@@ -105,117 +105,90 @@ const MyVitals: React.FC = () => {
 
       {/* TWO COLUMN LAYOUT */}
       <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24, marginBottom: 32 }}>
-        {/* LEFT: Development Radar + Dimension Tiles */}
+        {/* LEFT: Development Bar Stack */}
         <div>
           <DevelopmentBarStack />
         </div>
 
-        {/* RIGHT: Focus Areas + Peer Strengths */}
-        <div className="flex flex-col" style={{ gap: 24 }}>
-          {/* Focus Areas */}
-          <div>
-            <h3
-              className="font-heading"
-              style={{ fontSize: 17, fontWeight: 600, color: "#0F0F0F", marginBottom: 16 }}
-            >
-              Focus Areas
-            </h3>
-
-            <div className="flex flex-col" style={{ gap: 12 }}>
-              {/* Card 1 */}
-              <div
-                style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E8E8E8",
-                  borderRadius: 10,
-                  padding: 20,
-                  paddingLeft: 24,
-                  position: "relative",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 12,
-                    bottom: 12,
-                    width: 3,
-                    background: "#F59E0B",
-                    borderRadius: 2,
-                  }}
-                />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  CURIOSITY & LEARNING
-                </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  Your question frequency dropped from 5/week to 2. Try this: before each team meeting, write down one question you'd like to ask. Even "How did you approach that?" counts.
-                </p>
-              </div>
-
-              {/* Card 2 */}
-              <div
-                style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E8E8E8",
-                  borderRadius: 10,
-                  padding: 20,
-                  paddingLeft: 24,
-                  position: "relative",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 12,
-                    bottom: 12,
-                    width: 3,
-                    background: "#F59E0B",
-                    borderRadius: 2,
-                  }}
-                />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  SELF-AWARENESS ALIGNMENT
-                </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  There's a growing gap between how you rate yourself and how others rate you — and they're rating you higher. You may be underestimating your impact. Pay attention to positive feedback this week.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Peer Strengths */}
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8E8E8",
-              borderRadius: 10,
-              padding: 20,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-            }}
+        {/* RIGHT: Focus Areas */}
+        <div>
+          <h3
+            className="font-heading"
+            style={{ fontSize: 17, fontWeight: 600, color: "#0F0F0F", marginBottom: 16 }}
           >
-            <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-              <Sparkles size={16} color="#22C55E" strokeWidth={1.5} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#0F0F0F" }}>
-                What your peers see in you
-              </span>
+            Focus Areas
+          </h3>
+
+          <div className="flex flex-col" style={{ gap: 12 }}>
+            {/* Card 1 */}
+            <div
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E8E8E8",
+                borderRadius: 10,
+                padding: 20,
+                paddingLeft: 24,
+                position: "relative",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 12,
+                  bottom: 12,
+                  width: 3,
+                  background: "#F59E0B",
+                  borderRadius: 2,
+                }}
+              />
+              <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                CURIOSITY & LEARNING
+              </div>
+              <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
+                <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
+              </div>
+              <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                Your question frequency dropped from 5/week to 2. Try this: before each team meeting, write down one question you'd like to ask. Even "How did you approach that?" counts.
+              </p>
             </div>
-            <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.7, fontStyle: "italic" }}>
-              "Your colleagues highlight your ability to explain complex ideas clearly and your reliability on team deliverables. One peer noted you're the first person they go to when they need help understanding a brief."
-            </p>
-            <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 12 }}>
-              Updated monthly · Anonymous peer feedback
-            </p>
+
+            {/* Card 2 */}
+            <div
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E8E8E8",
+                borderRadius: 10,
+                padding: 20,
+                paddingLeft: 24,
+                position: "relative",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 12,
+                  bottom: 12,
+                  width: 3,
+                  background: "#F59E0B",
+                  borderRadius: 2,
+                }}
+              />
+              <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                SELF-AWARENESS ALIGNMENT
+              </div>
+              <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
+                <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
+              </div>
+              <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                There's a growing gap between how you rate yourself and how your manager rates you — and they're rating you higher. You may be underestimating your impact. Pay attention to positive feedback this week.
+              </p>
+            </div>
           </div>
         </div>
       </div>
