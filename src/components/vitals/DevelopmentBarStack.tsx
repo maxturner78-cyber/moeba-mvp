@@ -59,7 +59,7 @@ const DevelopmentBarStack: React.FC = () => {
         Development Profile
       </h3>
       <p style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 20 }}>
-        Blended from your self-assessment, manager observations, and peer feedback
+        Blended from your self-assessment and manager observations
       </p>
 
       <div>
