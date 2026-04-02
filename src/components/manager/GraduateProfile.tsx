@@ -328,34 +328,8 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       {/* Three columns */}
       <div style={{ display: "grid", gridTemplateColumns: "35% 35% 30%", gap: 20, marginBottom: 24 }}>
         {/* Col 1: Perception Gap */}
-        <div style={{
-          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-        }}>
-          <h3 className="font-heading" style={{ fontSize: 17, fontWeight: 600, color: "#0F0F0F", marginBottom: 4 }}>
-            Perception Gap Analysis
-          </h3>
-          <div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
-            {[
-              { color: "#6366F1", label: "Self" },
-              { color: "#F59E0B", label: "Manager" },
-              { color: "#22C55E", label: "Peer" },
-            ].map((l) => (
-              <div key={l.label} className="flex items-center gap-1.5">
-                <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
-                <span style={{ fontSize: 11, color: "#9CA3AF" }}>{l.label}</span>
-              </div>
-            ))}
-          </div>
-          {perceptionData.map((d) => (
-            <BarGroup key={d.dim} dim={d.dim} self={d.self} manager={d.manager} peer={d.peer} />
-          ))}
-          <div style={{ background: "#FEF2F2", borderRadius: 8, padding: 12, marginTop: 8 }}>
-            <p style={{ fontSize: 12, color: "#DC2626", lineHeight: 1.5 }}>
-              <span className="font-mono-data" style={{ fontWeight: 600 }}>Average perception gap: 2.3 points</span>
-              {" "}— Sarah consistently rates herself lower than her manager and peers rate her
-            </p>
-          </div>
+        <div>
+          <PerceptionGapCard />
         </div>
 
         {/* Col 2: Trend Charts */}
