@@ -3,23 +3,6 @@ import React from "react";
 const MONO = "'SF Mono', 'Fira Code', 'Cascadia Code', monospace";
 const GREEN = "#4ade80";
 const RED = "#f87171";
-const AMBER = "#fbbf24";
-
-const graduates = [
-  { name: "Sarah Chen", role: "Associate · Wk 14", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "gap: 2.0", metricColor: RED, urgent: true },
-  { name: "Alex Rodriguez", role: "Associate · Wk 8", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "↓ 2q/wk", metricColor: RED, urgent: true },
-  { name: "Priya Sharma", role: "Associate · Wk 22", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "conf dip", metricColor: AMBER, urgent: false },
-  { name: "Tyler Morrison", role: "Associate · Wk 18", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "load: 8.8", metricColor: AMBER, urgent: false },
-  { name: "Marcus Johnson", role: "Associate · Wk 26", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "8.2 tri", metricColor: GREEN, urgent: false },
-  { name: "Emma Thompson", role: "Associate · Wk 28", badge: "thriving", badgeBg: "#F0FDF4", badgeColor: "#15803D", metric: "7.8 conf", metricColor: GREEN, urgent: false },
-];
-
-const teamStats = [
-  { label: "avg growth index", value: "5.9" },
-  { label: "avg perception gap", value: "1.8" },
-  { label: "check-in rate", value: "83%" },
-  { label: "avg q/week", value: "4.1" },
-];
 
 const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <button
@@ -58,7 +41,6 @@ const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ childre
 const TeamBrief: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
-      {/* Main Panel */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", position: "relative" }}>
         <div style={{ padding: "0 32px", flex: 1, overflowY: "auto", paddingBottom: 80 }}>
           {/* Header bar */}

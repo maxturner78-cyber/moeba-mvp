@@ -3,56 +3,6 @@ import React from "react";
 const MONO = "'SF Mono', 'Fira Code', 'Cascadia Code', monospace";
 const GREEN = "#4ade80";
 const RED = "#f87171";
-const AMBER = "#fbbf24";
-
-const signalCards = [
-  {
-    label: "PERCEPTION GAP",
-    value: "2.0 pts",
-    valueColor: RED,
-    detail: "↑ widening · 3 weeks",
-    mini: [
-      { label: "you", value: "5.5", color: RED, pct: 55 },
-      { label: "mgr", value: "7.5", color: GREEN, pct: 75 },
-    ],
-  },
-  {
-    label: "CONFIDENCE TRAJECTORY",
-    value: "5.5 / 10",
-    valueColor: AMBER,
-    detail: "↓ -1.2 vs last month",
-  },
-  {
-    label: "CURIOSITY",
-    value: "4.8 / 10",
-    valueColor: AMBER,
-    detail: "↓ questions declining",
-  },
-  {
-    label: "MANAGER RELATIONSHIP",
-    value: "7.1 / 10",
-    valueColor: GREEN,
-    detail: "↑ improving · 4 weeks",
-  },
-  {
-    label: "INITIATIVE",
-    value: "5.3 / 10",
-    valueColor: AMBER,
-    detail: "↓ below cohort avg",
-  },
-  {
-    label: "RESILIENCE",
-    value: "6.8 / 10",
-    valueColor: GREEN,
-    detail: "→ recovery: 6 days",
-  },
-];
-
-const focusAreas = [
-  { name: "Curiosity & Learning", color: AMBER },
-  { name: "Self-Awareness", color: AMBER },
-  { name: "Initiative & Voice", color: AMBER },
-];
 
 const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <button
@@ -91,7 +41,6 @@ const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ childre
 const MyCoach: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
-      {/* Main Panel */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", position: "relative" }}>
         <div style={{ padding: "0 32px", flex: 1, overflowY: "auto", paddingBottom: 80 }}>
           {/* Header bar */}
