@@ -91,67 +91,7 @@ const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ childre
 const MyCoach: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
-      {/* Left Panel */}
-      <div
-        style={{
-          width: 280,
-          flexShrink: 0,
-          background: "#F5F5F4",
-          borderRight: "1px solid #E8E8E8",
-          padding: 20,
-          overflowY: "auto",
-        }}
-      >
-        <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF" }}>
-          LIVE SIGNALS
-        </div>
-        <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2, marginBottom: 16 }}>
-          w14 · updated today
-        </div>
-
-        {signalCards.map((s, i) => (
-          <div key={i} style={{ borderBottom: "1px solid #E8E8E8", padding: "14px 0" }}>
-            <div style={{ fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF", marginBottom: 4 }}>
-              {s.label}
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: s.valueColor }}>
-              {s.value}
-            </div>
-            <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>
-              {s.detail}
-            </div>
-            {s.mini && (
-              <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
-                {s.mini.map((m) => (
-                  <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 10, color: "#9CA3AF", width: 24, textAlign: "right" }}>{m.label}</span>
-                    <div style={{ width: 100, height: 4, background: "#E8E8E8", borderRadius: 2, position: "relative" }}>
-                      <div style={{ width: `${m.pct}%`, height: 4, background: m.color, borderRadius: 2 }} />
-                    </div>
-                    <span style={{ fontFamily: MONO, fontSize: 11, color: m.color }}>{m.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-
-        <div style={{ borderTop: "1px solid #E8E8E8", marginTop: 16, paddingTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
-            DEVELOPMENT PILLARS
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {focusAreas.map((a) => (
-              <div key={a.name} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#374151" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: a.color, flexShrink: 0 }} />
-                {a.name}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right Panel */}
+      {/* Main Panel */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", position: "relative" }}>
         <div style={{ padding: "0 32px", flex: 1, overflowY: "auto", paddingBottom: 80 }}>
           {/* Header bar */}

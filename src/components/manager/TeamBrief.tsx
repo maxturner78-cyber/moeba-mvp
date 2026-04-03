@@ -58,56 +58,7 @@ const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ childre
 const TeamBrief: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
-      {/* Left Panel */}
-      <div
-        style={{
-          width: 280,
-          flexShrink: 0,
-          background: "#F5F5F4",
-          borderRight: "1px solid #E8E8E8",
-          padding: 20,
-          overflowY: "auto",
-        }}
-      >
-        <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 16 }}>
-          TEAM SIGNAL FEED
-        </div>
-
-        {graduates.map((g, i) => (
-          <div
-            key={i}
-            style={{
-              borderBottom: "1px solid #E8E8E8",
-              padding: "14px 0",
-              borderLeft: g.urgent ? "3px solid rgba(239,68,68,0.3)" : "3px solid transparent",
-              paddingLeft: g.urgent ? 10 : 0,
-            }}
-          >
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#0F0F0F", marginBottom: 2 }}>{g.name}</div>
-            <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 6 }}>{g.role}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: g.badgeBg, color: g.badgeColor }}>
-                {g.badge}
-              </span>
-              <span style={{ fontFamily: MONO, fontSize: 11, color: g.metricColor }}>{g.metric}</span>
-            </div>
-          </div>
-        ))}
-
-        <div style={{ borderTop: "1px solid #E8E8E8", marginTop: 16, paddingTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
-            TEAM HEALTH W14
-          </div>
-          {teamStats.map((s) => (
-            <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: "#9CA3AF" }}>{s.label}</span>
-              <span style={{ fontFamily: MONO, fontSize: 13, color: "#0F0F0F" }}>{s.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Right Panel */}
+      {/* Main Panel */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", position: "relative" }}>
         <div style={{ padding: "0 32px", flex: 1, overflowY: "auto", paddingBottom: 80 }}>
           {/* Header bar */}
