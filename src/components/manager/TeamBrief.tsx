@@ -5,7 +5,6 @@ const GREEN = "#4ade80";
 const RED = "#f87171";
 const AMBER = "#fbbf24";
 
-const graduates = [
   { name: "Sarah Chen", role: "Associate · Wk 14", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "gap: 2.0", metricColor: RED, urgent: true },
   { name: "Alex Rodriguez", role: "Associate · Wk 8", badge: "urgent", badgeBg: "#FEF2F2", badgeColor: "#DC2626", metric: "↓ 2q/wk", metricColor: RED, urgent: true },
   { name: "Priya Sharma", role: "Associate · Wk 22", badge: "watch", badgeBg: "#FFFBEB", badgeColor: "#D97706", metric: "conf dip", metricColor: AMBER, urgent: false },

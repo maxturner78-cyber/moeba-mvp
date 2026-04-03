@@ -5,7 +5,6 @@ const GREEN = "#4ade80";
 const RED = "#f87171";
 const AMBER = "#fbbf24";
 
-const signalCards = [
   {
     label: "PERCEPTION GAP",
     value: "2.0 pts",
