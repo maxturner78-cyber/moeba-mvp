@@ -3,32 +3,19 @@ import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
 import MyVitals from "@/components/vitals/MyVitals";
-import MySkills from "@/components/skills/MySkills";
-import MyTeam from "@/components/manager/MyTeam";
-import GraduateProfile from "@/components/manager/GraduateProfile";
 import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
-import AssessTeam from "@/components/manager/AssessTeam";
-import MyCoach from "@/components/graduate/MyCoach";
 import TeamBrief from "@/components/manager/TeamBrief";
+import AssessTeam from "@/components/manager/AssessTeam";
+import GraduateProfile from "@/components/manager/GraduateProfile";
 
 const defaultNav: Record<ViewTab, string> = {
-  graduate: "my-vitals",
-  manager: "my-team",
-};
-
-const navTitles: Record<string, string> = {
-  "my-vitals": "My Vitals",
-  "my-skills": "My Skills",
-  "weekly-checkin": "Weekly Check-In",
-  "my-team": "My Team",
-  "assess-team": "Assess Team",
-  "my-coach": "My Coach",
-  "team-brief": "Team Brief",
+  graduate: "my-development",
+  manager: "team-brief",
 };
 
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
-  const [activeNav, setActiveNav] = useState<string>("my-vitals");
+  const [activeNav, setActiveNav] = useState<string>("my-development");
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
   const [pageKey, setPageKey] = useState(0);
 
@@ -46,19 +33,16 @@ const Index: React.FC = () => {
   }, []);
 
   const renderPage = () => {
-    if (activeNav === "my-vitals") return <MyVitals />;
-    if (activeNav === "my-skills") return <MySkills />;
+    if (activeNav === "my-development") return <MyVitals />;
     if (activeNav === "weekly-checkin") return <WeeklyCheckIn />;
-    if (activeNav === "my-team") {
+    if (activeNav === "team-brief") {
       if (selectedGraduateId) {
         return <GraduateProfile onBack={() => { setSelectedGraduateId(null); setPageKey((k) => k + 1); }} />;
       }
-      return <MyTeam onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
+      return <TeamBrief />;
     }
     if (activeNav === "assess-team") return <AssessTeam />;
-    if (activeNav === "my-coach") return <MyCoach />;
-    if (activeNav === "team-brief") return <TeamBrief />;
-    return <PagePlaceholder title={navTitles[activeNav] || "Page"} />;
+    return <PagePlaceholder title="Page" />;
   };
 
   return (
