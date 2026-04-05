@@ -54,9 +54,9 @@ const DevelopmentBarStack: React.FC = () => {
     >
       <h3
         className="font-heading"
-        style={{ fontSize: 17, fontWeight: 600, color: "#0F0F0F", marginBottom: 4 }}
+        style={{ fontSize: 17, fontWeight: 500, color: "#0F0F0F", marginBottom: 4 }}
       >
-        Development Profile
+        Your development profile
       </h3>
       <p style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 20 }}>
         Blended from your self-assessment and manager observations
