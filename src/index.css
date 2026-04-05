@@ -154,12 +154,15 @@
   box-shadow: 0 0 0 3px #DCFCE7;
 }
 
-/* ── Button hover ── */
+/* ── Button hover + press ── */
 .gs-btn-primary {
-  transition: background 120ms ease;
+  transition: background 120ms ease, transform 80ms ease;
 }
 .gs-btn-primary:hover {
   background: #16A34A !important;
+}
+.gs-btn-primary:active {
+  transform: scale(0.98);
 }
 
 /* ── Dimension row hover ── */
