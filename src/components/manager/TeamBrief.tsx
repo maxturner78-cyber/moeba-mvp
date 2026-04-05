@@ -1,153 +1,173 @@
 import React from "react";
+import { ChevronRight } from "lucide-react";
+import { teamGraduates, statusColors } from "@/data/teamData";
+import StatusBadge from "@/components/StatusBadge";
 
-const MONO = "'SF Mono', 'Fira Code', 'Cascadia Code', monospace";
-const GREEN = "#4ade80";
-const RED = "#f87171";
+interface TeamBriefProps {
+  onSelectGraduate: (id: string) => void;
+}
 
-const ActionBtn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <button
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 4,
-      padding: "8px 16px",
-      background: "#F0FDF4",
-      border: "1px solid #DCFCE7",
-      borderRadius: 100,
-      color: "#15803D",
-      fontFamily: '"Inter", sans-serif',
-      fontSize: 13,
-      fontWeight: 500,
-      cursor: "pointer",
-      transition: "all 150ms ease",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = "#DCFCE7";
-      e.currentTarget.style.borderColor = "#22C55E";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = "#F0FDF4";
-      e.currentTarget.style.borderColor = "#DCFCE7";
-    }}
-  >
-    {children}
-  </button>
-);
-
-const Mono: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
-  <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 14, color }}>{children}</span>
-);
-
-const TeamBrief: React.FC = () => {
+const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
   return (
-    <div style={{ display: "flex", height: "100%", margin: "-32px", minHeight: "calc(100vh - 48px)" }}>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", position: "relative" }}>
-        <div style={{ padding: "0 32px", flex: 1, overflowY: "auto", paddingBottom: 80 }}>
-          {/* Header bar */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #E8E8E8", marginBottom: 24 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="live-dot" />
-              <span style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F" }}>gradsense — manager agent</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 12, color: "#9CA3AF" }}>j.park@swangroup.com.au · 6 reports</span>
-              <span style={{ background: "#FEF2F2", color: "#DC2626", fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 100 }}>2 urgent</span>
-            </div>
-          </div>
+    <div>
+      {/* SECTION 1: Team Summary */}
+      <div
+        style={{
+          background: "#F0FDF4",
+          border: "1px solid #DCFCE7",
+          borderRadius: 10,
+          padding: "24px 28px",
+          position: "relative",
+          marginBottom: 32,
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: 0, top: 12, bottom: 12,
+            width: 3, background: "#22C55E", borderRadius: 2,
+          }}
+        />
 
-          {/* Message 1 */}
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
-              <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:15 · mon w14</span>
-            </div>
-            <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 16 }}>Morning. Two people need your attention today, not this week.</p>
-              <p style={{ marginBottom: 16 }}>
-                <span style={{ fontWeight: 700 }}>Sarah Chen</span> — her perception gap hit <Mono color={RED}>2.0</Mono> points this week. She rates herself <Mono>5.5</Mono>. You rated her <Mono>7.5</Mono> last Tuesday. She thinks she's failing. You think she's fine. Neither of you knows the other's number. This gap has widened three consecutive weeks. At <Mono>2.5</Mono> points it becomes very hard to close without a formal conversation.
-              </p>
-              <p style={{ marginBottom: 16 }}>
-                <span style={{ fontWeight: 700 }}>Alex Rodriguez</span> — question frequency dropped from <Mono>6/week</Mono> in week 5 to <Mono color={RED}>2/week</Mono> this week. Across three consecutive weeks. That's the MIT Sloan disengagement signal. He's not struggling with the work. He's withdrawing from it.
-              </p>
-              <p style={{ fontWeight: 600, color: GREEN }}>
-                Both of these are 15-minute conversations. Both have scripts ready.
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
-              <ActionBtn>script: sarah →</ActionBtn>
-              <ActionBtn>script: alex →</ActionBtn>
-              <ActionBtn>full team →</ActionBtn>
-            </div>
-          </div>
-
-          {/* User Message */}
-          <div style={{ marginBottom: 32, display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ maxWidth: "70%", background: "#F0FDF4", borderRadius: "10px 10px 2px 10px", padding: "12px 16px", fontSize: 14, color: "#0F0F0F" }}>
-              give me the script for sarah
-            </div>
-          </div>
-
-          {/* Message 3 */}
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: GREEN }}>GRADSENSE AGENT</span>
-              <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: 8 }}>07:16 · mon w14</span>
-            </div>
-            <div style={{ fontSize: 15, color: "#0F0F0F", lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 16 }}>The goal: let Sarah tell you how she's doing before you tell her how you see her. If you lead with your rating, she'll nod and internalise nothing. <span style={{ fontWeight: 600 }}>Ask first.</span></p>
-              <p style={{ marginBottom: 16 }}>Open with: <em>"I wanted to check in on how you're finding things. How would you rate your own performance this week — honestly?"</em></p>
-              <p style={{ marginBottom: 16 }}>Listen. She'll likely say 5 or 6. Don't correct immediately.</p>
-              <p style={{ marginBottom: 16 }}>Then: <em>"That's interesting. From my side, I'd put you at <Mono>7.5</Mono>. Here's specifically why —"</em> and reference the Meridian deliverable and the client feedback from Thursday.</p>
-              <p style={{ marginBottom: 16 }}>The goal isn't to convince her she's wrong. It's to show her what you see that she doesn't. <span style={{ fontWeight: 600 }}>Name the gap. Make it visible.</span> That's the first step to closing it.</p>
-              <p style={{ marginBottom: 16 }}>Ask before you leave: <em>"What's one thing you're unsure about right now that you haven't asked anyone about?"</em></p>
-              <p>This should take <Mono>12-15</Mono> minutes. Follow up next week — if the gap narrows by even <Mono>0.5</Mono> points, the intervention is working.</p>
-            </div>
-          </div>
+        {/* Header */}
+        <div className="flex items-center gap-2" style={{ marginBottom: 4 }}>
+          <div
+            className="pulse-dot"
+            style={{
+              width: 8, height: 8, borderRadius: "50%", background: "#22C55E",
+              animation: "pulse-scale 2s ease-in-out infinite",
+            }}
+          />
+          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#15803D" }}>
+            Team Brief
+          </span>
+        </div>
+        <div style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 16 }}>
+          Monday w14 · 2 items need attention
         </div>
 
-        {/* Chat input */}
-        <div style={{ position: "sticky", bottom: 0, padding: "16px 32px", background: "linear-gradient(transparent, #FFFFFF 20%)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <input
-              type="text"
-              placeholder="Ask about any team member or situation..."
-              style={{
-                flex: 1,
-                padding: "14px 16px",
-                border: "1px solid #E8E8E8",
-                borderRadius: 10,
-                background: "#F9FAFB",
-                fontSize: 14,
-                color: "#0F0F0F",
-                outline: "none",
-                fontFamily: '"Inter", sans-serif',
-              }}
-              readOnly
-            />
+        {/* Body */}
+        <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7 }}>
+          <p style={{ marginBottom: 12 }}>Two people need your attention this week.</p>
+          <p style={{ marginBottom: 12 }}>
+            <span style={{ fontWeight: 500 }}>Sarah Chen</span> — her perception gap hit{" "}
+            <span className="font-mono-data" style={{ fontWeight: 500 }}>3.0</span> points. She rated herself 5, you rated her 8. This gap has been widening for 3 consecutive weeks. A calibration conversation is recommended — her check-in brief has a conversation guide ready.
+          </p>
+          <p style={{ marginBottom: 12 }}>
+            <span style={{ fontWeight: 500 }}>Emily Zhang</span> — workload perception spiked to{" "}
+            <span className="font-mono-data" style={{ fontWeight: 500 }}>9/10</span> and her manager support score dropped from 7 to 4. She may feel unsupported during the current busy period.
+          </p>
+          <p>The other 4 graduates are stable. Assessment forms are pre-populated and ready.</p>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2" style={{ marginTop: 20 }}>
+          {[
+            { label: "Open Sarah's brief →", id: "g1" },
+            { label: "Open Emily's brief →", id: "g6" },
+          ].map((btn) => (
             <button
+              key={btn.id}
+              onClick={() => onSelectGraduate(btn.id)}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: GREEN,
+                padding: "8px 18px",
+                background: "#22C55E",
+                color: "#FFFFFF",
+                fontSize: 13,
+                fontWeight: 600,
                 border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                borderRadius: 100,
                 cursor: "pointer",
-                flexShrink: 0,
+                transition: "background 150ms ease",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="19" x2="12" y2="5" />
-                <polyline points="5 12 12 5 19 12" />
-              </svg>
+              {btn.label}
             </button>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* SECTION 2: Graduate List */}
+      <div
+        style={{
+          background: "#fff",
+          border: "1px solid #E8E8E8",
+          borderRadius: 10,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          overflow: "hidden",
+          marginBottom: 20,
+        }}
+      >
+        {teamGraduates.map((g, i) => {
+          const sc = statusColors[g.status];
+          return (
+            <div
+              key={g.id}
+              onClick={() => onSelectGraduate(g.id)}
+              className="flex items-center transition-colors"
+              style={{
+                padding: "16px 20px",
+                borderBottom: i < teamGraduates.length - 1 ? "1px solid #F3F4F6" : "none",
+                cursor: "pointer",
+                gap: 16,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#FAFAFA"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              {/* Avatar */}
+              <div
+                className="flex items-center justify-center shrink-0"
+                style={{
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: sc.bg, color: sc.text,
+                  fontSize: 12, fontWeight: 600,
+                }}
+              >
+                {g.initials}
+              </div>
+
+              {/* Name + role */}
+              <div style={{ width: 200, flexShrink: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>{g.name}</div>
+                <div style={{ fontSize: 12, color: "#9CA3AF" }}>{g.role} · W{g.week}</div>
+              </div>
+
+              {/* Status badge */}
+              <div style={{ width: 130, flexShrink: 0 }}>
+                <StatusBadge status={g.status} />
+              </div>
+
+              {/* Signal */}
+              <div
+                style={{
+                  flex: 1, fontSize: 13, color: "#374151",
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}
+              >
+                {g.signal}
+              </div>
+
+              {/* Chevron */}
+              <ChevronRight size={16} color="#D1D5DB" style={{ flexShrink: 0 }} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Time saved callout */}
+      <p style={{ fontSize: 12, color: "#9CA3AF", textAlign: "center" }}>
+        Time saved this quarter: ~10 hours of review preparation auto-generated from continuous data
+      </p>
+
+      {/* Pulse animation keyframes */}
+      <style>{`
+        @keyframes pulse-scale {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.3); opacity: 0.7; }
+        }
+      `}</style>
     </div>
   );
 };

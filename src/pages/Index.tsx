@@ -39,7 +39,7 @@ const Index: React.FC = () => {
       if (selectedGraduateId) {
         return <GraduateProfile onBack={() => { setSelectedGraduateId(null); setPageKey((k) => k + 1); }} />;
       }
-      return <TeamBrief />;
+      return <TeamBrief onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }
     if (activeNav === "assess-team") return <AssessTeam />;
     return <PagePlaceholder title="Page" />;

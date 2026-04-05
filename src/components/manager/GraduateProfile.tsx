@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, TrendingUp } from "lucide-react";
+import { ArrowLeft, Copy, TrendingUp, CheckCircle } from "lucide-react";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, Line, ComposedChart,
@@ -34,7 +34,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-/* ── Perception Gap Summary Card (manager-only data) ── */
+/* ── Perception Gap Card ── */
 const topGaps = [
   { dim: "Self-Awareness", self: 5.2, others: 8.0, gap: 2.8 },
   { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
@@ -53,37 +53,37 @@ const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay
   const othersPos = (others / 10) * 100;
   const left = Math.min(selfPos, othersPos);
   const width = Math.abs(othersPos - selfPos);
-  const centerPos = 50;
+  const center = 50;
 
   return (
     <div style={{ position: "relative", height: 20, width: "100%" }}>
       <div style={{ position: "absolute", top: 9, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
       <div style={{
         position: "absolute", top: 9, height: 2, background: color, borderRadius: 1,
-        left: animated ? `${left}%` : `${centerPos}%`,
+        left: animated ? `${left}%` : `${center}%`,
         width: animated ? `${width}%` : "0%",
         transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
       }} />
       <div style={{
         position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
         background: "#6366F1", boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
-        left: animated ? `calc(${selfPos}% - 5px)` : `calc(${centerPos}% - 5px)`,
+        left: animated ? `calc(${selfPos}% - 5px)` : `calc(${center}% - 5px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }} />
       <span className="font-mono-data" style={{
         position: "absolute", top: 17, fontSize: 10, color: "#6366F1",
-        left: animated ? `calc(${selfPos}% - 8px)` : `calc(${centerPos}% - 8px)`,
+        left: animated ? `calc(${selfPos}% - 8px)` : `calc(${center}% - 8px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }}>{self}</span>
       <div style={{
         position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
         background: "#22C55E", boxShadow: "0 1px 3px rgba(34,197,94,0.3)",
-        left: animated ? `calc(${othersPos}% - 5px)` : `calc(${centerPos}% - 5px)`,
+        left: animated ? `calc(${othersPos}% - 5px)` : `calc(${center}% - 5px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }} />
       <span className="font-mono-data" style={{
         position: "absolute", top: 17, fontSize: 10, color: "#22C55E",
-        left: animated ? `calc(${othersPos}% - 8px)` : `calc(${centerPos}% - 8px)`,
+        left: animated ? `calc(${othersPos}% - 8px)` : `calc(${center}% - 8px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }}>{others}</span>
     </div>
@@ -115,23 +115,23 @@ const PerceptionGapCard: React.FC = () => {
       boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
     }}>
       <div className="flex items-baseline gap-3" style={{ marginBottom: 4 }}>
-        <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 700, color: "#EF4444" }}>
+        <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 500, color: "#DC2626" }}>
           {count.toFixed(1)}
         </span>
         <span style={{ fontSize: 14, color: "#9CA3AF" }}>avg perception gap</span>
       </div>
       <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, marginBottom: 8 }}>
-        Sarah consistently rates herself lower than her manager rates her
+        Sarah consistently rates herself lower than you rate her
       </p>
       <div className="flex items-center gap-1.5">
-        <TrendingUp size={14} color="#EF4444" strokeWidth={2} />
-        <span style={{ fontSize: 12, fontWeight: 500, color: "#EF4444" }}>Widening over 4 weeks</span>
+        <TrendingUp size={14} color="#DC2626" strokeWidth={2} />
+        <span style={{ fontSize: 12, fontWeight: 500, color: "#DC2626" }}>Widening over 4 weeks</span>
       </div>
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
       <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
-        BIGGEST GAPS
+        Biggest Gaps
       </div>
       <div className="flex flex-col" style={{ gap: 8, marginBottom: 12 }}>
         {topGaps.map((g, i) => (
@@ -144,13 +144,6 @@ const PerceptionGapCard: React.FC = () => {
           </div>
         ))}
       </div>
-      <button
-        style={{ fontSize: 12, fontWeight: 500, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", padding: 0, transition: "color 100ms" }}
-        onMouseEnter={(e) => { e.currentTarget.style.color = "#374151"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.color = "#9CA3AF"; }}
-      >
-        View all 9 dimensions →
-      </button>
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
@@ -168,7 +161,7 @@ const PerceptionGapCard: React.FC = () => {
   );
 };
 
-/* ── Trend tabs ── */
+/* ── Trend Chart ── */
 type TrendTab = "performance" | "confidence" | "questions" | "workload";
 
 const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
@@ -210,8 +203,8 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
           <Area type="monotone" dataKey="manager" stroke="transparent" fill="url(#gapFill)" />
           <Line type="monotone" dataKey="self" stroke="#6366F1" strokeWidth={2} dot={false}
             activeDot={{ r: 3, fill: "#fff", stroke: "#6366F1", strokeWidth: 2 }} />
-          <Line type="monotone" dataKey="manager" stroke="#F59E0B" strokeWidth={2} dot={false}
-            activeDot={{ r: 3, fill: "#fff", stroke: "#F59E0B", strokeWidth: 2 }} />
+          <Line type="monotone" dataKey="manager" stroke="#22C55E" strokeWidth={2} dot={false}
+            activeDot={{ r: 3, fill: "#fff", stroke: "#22C55E", strokeWidth: 2 }} />
         </ComposedChart>
       </ResponsiveContainer>
     );
@@ -274,13 +267,13 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
         onMouseEnter={(e) => { e.currentTarget.style.color = "#374151"; }}
         onMouseLeave={(e) => { e.currentTarget.style.color = "#9CA3AF"; }}
       >
-        <ArrowLeft size={14} /> My Team
+        <ArrowLeft size={14} /> Team Brief
       </button>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <div className="flex items-center gap-3" style={{ marginBottom: 4 }}>
-          <h1 className="font-heading" style={{ fontSize: 26, fontWeight: 700, color: "#0F0F0F", letterSpacing: "-0.02em" }}>
+          <h1 className="font-heading" style={{ fontSize: 22, fontWeight: 500, color: "#0F0F0F", letterSpacing: "-0.02em" }}>
             Sarah Chen
           </h1>
           <StatusBadge status="attention" />
@@ -289,9 +282,9 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       </div>
 
       {/* Two columns: 55% / 45% */}
-      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 20 }}>
         {/* Left Column */}
-        <div className="flex flex-col" style={{ gap: 24 }}>
+        <div className="flex flex-col" style={{ gap: 20 }}>
           <PerceptionGapCard />
 
           {/* Trend Charts */}
@@ -326,43 +319,68 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
                   <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div style={{ width: 10, height: 2, background: "#F59E0B", borderRadius: 1 }} />
+                  <div style={{ width: 10, height: 2, background: "#22C55E", borderRadius: 1 }} />
                   <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
                 </div>
               </div>
             )}
           </div>
+
+          {/* Intervention History */}
+          <div style={{
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
+              Intervention History
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 13, color: "#374151" }}>Mar 15 — Calibration conversation</span>
+              </div>
+              <span
+                className="inline-flex items-center gap-1"
+                style={{
+                  background: "#F0FDF4", color: "#15803D", borderRadius: 100,
+                  padding: "4px 10px", fontSize: 12, fontWeight: 500,
+                }}
+              >
+                <CheckCircle size={12} /> Confidence +1.5 pts
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col" style={{ gap: 24 }}>
-          {/* Check-In Brief */}
+        <div className="flex flex-col" style={{ gap: 20 }}>
+          {/* Check-In Brief — sticky */}
           <div
             style={{
+              position: "sticky", top: 100,
               background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20, paddingLeft: 24,
               boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
               borderLeft: "3px solid #22C55E",
             }}
           >
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#0F0F0F", marginBottom: 2 }}>
-              Check-In Brief — Week 12
+            <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 2 }}>
+              Check-in brief — week 12
             </div>
             <div style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 16 }}>
               Prepared for your 1-on-1 with Sarah
             </div>
 
             <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              WHAT CHANGED
+              What Changed
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px 0" }}>
               {[
-                "Confidence dropped from 7 → 5 (second consecutive decline)",
-                "Questions dropped from 4 → 1 (lowest in 8 weeks)",
-                "You rated her 8/10, she rated herself 5/10 — 3-point gap",
+                <>Confidence dropped <span className="font-mono-data" style={{ fontWeight: 500 }}>7</span> → <span className="font-mono-data" style={{ fontWeight: 500 }}>5</span> (second consecutive decline)</>,
+                <>Questions dropped <span className="font-mono-data" style={{ fontWeight: 500 }}>4</span> → <span className="font-mono-data" style={{ fontWeight: 500 }}>1</span> (lowest in 8 weeks)</>,
+                <>You rated her <span className="font-mono-data" style={{ fontWeight: 500 }}>8</span>, she rated herself <span className="font-mono-data" style={{ fontWeight: 500 }}>5</span> — 3-point gap</>,
               ].map((t, i) => (
                 <li key={i} className="flex items-start gap-2" style={{ fontSize: 13, color: "#374151", marginBottom: 6 }}>
                   <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#D1D5DB", marginTop: 7, flexShrink: 0 }} />
-                  {t}
+                  <span>{t}</span>
                 </li>
               ))}
             </ul>
@@ -370,28 +388,28 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
             <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
 
             <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              WHAT THIS SUGGESTS
+              What This Suggests
             </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.65, marginBottom: 16 }}>
-              Sarah may be experiencing imposter syndrome. She's performing well by your assessment, but doesn't see it. Declining confidence + reduced questions = someone withdrawing because they believe they're failing.
+            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
+              Sarah may be experiencing imposter syndrome. She's performing well by your assessment but doesn't see it. Declining confidence + reduced questions = someone withdrawing because they believe they're failing.
             </p>
 
             <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
 
             <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              WHAT TO SAY
+              What To Say
             </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.65, marginBottom: 16 }}>
-              Open with specific recognition — reference the client deliverable you rated 8/10. Then ask how she thinks it went. If she rates herself lower, name the gap gently: "That's interesting — from my side, I thought it was excellent. Here's why..."
+            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
+              Open with specific recognition — reference the client deliverable you rated 8/10. Then ask how she thinks it went. Listen for the gap. If she rates herself lower, name it gently: "That's interesting — from my side, I thought it was excellent."
             </p>
 
             <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
 
             <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              ONE QUESTION TO ASK
+              One Question To Ask
             </div>
-            <div style={{ background: "#F0FDF4", borderRadius: 6, padding: 12, marginBottom: 16 }}>
-              <p style={{ fontSize: 14, color: "#15803D", fontWeight: 500, margin: 0 }}>
+            <div style={{ background: "#F0FDF4", borderRadius: 8, padding: 12, marginBottom: 16 }}>
+              <p style={{ fontSize: 14, fontWeight: 500, color: "#166534", margin: 0 }}>
                 "What's one thing you're unsure about right now that you haven't asked anyone about yet?"
               </p>
             </div>
@@ -410,20 +428,20 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Development Focus Areas with Manager Actions */}
+          {/* Focus Areas with Manager Actions */}
           <div>
             <h3 className="font-heading" style={{ fontSize: 15, fontWeight: 600, color: "#0F0F0F", marginBottom: 12 }}>
               Development Focus Areas
             </h3>
             <div className="flex flex-col" style={{ gap: 12 }}>
-              {/* Card 1: Curiosity */}
+              {/* Curiosity */}
               <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20, paddingLeft: 24,
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
                 position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
               }}>
                 <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
                 <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  CURIOSITY & LEARNING
+                  Curiosity & Learning
                 </div>
                 <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
                   <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
@@ -432,22 +450,22 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
                 <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
                   Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
                 </p>
-                <div style={{ background: "#FFFBEB", borderRadius: 6, padding: 10 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#D97706" }}>How you can help: </span>
-                  <span style={{ fontSize: 12, color: "#92400E", lineHeight: 1.5 }}>
-                    Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
-                  </span>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
                 </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
+                </p>
               </div>
 
-              {/* Card 2: Self-Awareness */}
+              {/* Self-Awareness */}
               <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20, paddingLeft: 24,
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
                 position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
               }}>
                 <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
                 <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  SELF-AWARENESS ALIGNMENT
+                  Self-Awareness Alignment
                 </div>
                 <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
                   <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
@@ -456,12 +474,12 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
                 <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
                   There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
                 </p>
-                <div style={{ background: "#FFFBEB", borderRadius: 6, padding: 10 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#D97706" }}>How you can help: </span>
-                  <span style={{ fontSize: 12, color: "#92400E", lineHeight: 1.5 }}>
-                    When giving positive feedback this week, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured that client memo was excellent — particularly the risk section") does.
-                  </span>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
                 </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
+                </p>
               </div>
             </div>
           </div>
