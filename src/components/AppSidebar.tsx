@@ -2,12 +2,10 @@ import React from "react";
 import { LucideIcon } from "lucide-react";
 import {
   Activity,
-  Sparkles,
   ClipboardCheck,
-  Users,
-  ClipboardList,
-  MessageSquare,
   Zap,
+  ClipboardList,
+  Users,
 } from "lucide-react";
 import type { ViewTab } from "./TopBar";
 
@@ -19,15 +17,12 @@ interface NavItem {
 
 const navConfig: Record<ViewTab, NavItem[]> = {
   graduate: [
-    { id: "my-vitals", label: "My Vitals", icon: Activity },
-    { id: "my-skills", label: "My Skills", icon: Sparkles },
-    { id: "weekly-checkin", label: "Weekly Check-In", icon: ClipboardCheck },
-    { id: "my-coach", label: "My Coach", icon: MessageSquare },
+    { id: "my-development", label: "My Development", icon: Activity },
+    { id: "weekly-checkin", label: "Check-In", icon: ClipboardCheck },
   ],
   manager: [
-    { id: "my-team", label: "My Team", icon: Users },
-    { id: "assess-team", label: "Assess Team", icon: ClipboardList },
     { id: "team-brief", label: "Team Brief", icon: Zap },
+    { id: "assess-team", label: "Assess Team", icon: ClipboardList },
   ],
 };
 
