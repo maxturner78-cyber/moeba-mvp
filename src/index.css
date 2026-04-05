@@ -94,13 +94,13 @@
   animation: gs-fade-in 300ms ease-out both;
 }
 .gs-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.gs-stagger > *:nth-child(2) { animation-delay: 40ms; }
-.gs-stagger > *:nth-child(3) { animation-delay: 80ms; }
-.gs-stagger > *:nth-child(4) { animation-delay: 120ms; }
-.gs-stagger > *:nth-child(5) { animation-delay: 160ms; }
-.gs-stagger > *:nth-child(6) { animation-delay: 200ms; }
-.gs-stagger > *:nth-child(7) { animation-delay: 240ms; }
-.gs-stagger > *:nth-child(8) { animation-delay: 280ms; }
+.gs-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.gs-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.gs-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.gs-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.gs-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.gs-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.gs-stagger > *:nth-child(8) { animation-delay: 350ms; }
 
 /* Page transition wrapper */
 .gs-page-enter {
@@ -154,12 +154,15 @@
   box-shadow: 0 0 0 3px #DCFCE7;
 }
 
-/* ── Button hover ── */
+/* ── Button hover + press ── */
 .gs-btn-primary {
-  transition: background 120ms ease;
+  transition: background 120ms ease, transform 80ms ease;
 }
 .gs-btn-primary:hover {
   background: #16A34A !important;
+}
+.gs-btn-primary:active {
+  transform: scale(0.98);
 }
 
 /* ── Dimension row hover ── */

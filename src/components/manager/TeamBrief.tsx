@@ -51,11 +51,11 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           <p style={{ marginBottom: 12 }}>Two people need your attention this week.</p>
           <p style={{ marginBottom: 12 }}>
             <span style={{ fontWeight: 500 }}>Sarah Chen</span> — her perception gap hit{" "}
-            <span className="font-mono-data" style={{ fontWeight: 500 }}>3.0</span> points. She rated herself 5, you rated her 8. This gap has been widening for 3 consecutive weeks. A calibration conversation is recommended — her check-in brief has a conversation guide ready.
+            <span className="font-mono-data" style={{ fontWeight: 500 }}>3.0</span> points. She rated herself 5, you rated her 8 on the Meridian audit workpapers. This gap has been widening for 3 consecutive weeks. A calibration conversation is recommended — her check-in brief has a conversation guide ready.
           </p>
           <p style={{ marginBottom: 12 }}>
             <span style={{ fontWeight: 500 }}>Emily Zhang</span> — workload perception spiked to{" "}
-            <span className="font-mono-data" style={{ fontWeight: 500 }}>9/10</span> and her manager support score dropped from 7 to 4. She may feel unsupported during the current busy period.
+            <span className="font-mono-data" style={{ fontWeight: 500 }}>9/10</span> and her manager support score dropped from 7 to 4. She may feel unsupported during the current client deliverable cycle.
           </p>
           <p>The other 4 graduates are stable. Assessment forms are pre-populated and ready.</p>
         </div>

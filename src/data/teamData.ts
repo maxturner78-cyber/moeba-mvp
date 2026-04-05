@@ -15,32 +15,32 @@ export interface TeamGraduate {
 export const teamGraduates: TeamGraduate[] = [
   {
     id: "g1", name: "Sarah Chen", initials: "SC", role: "Graduate Associate", week: 12,
-    status: "attention", signal: "Self-assessment diverged from manager by 3 points this week",
+    status: "attention", signal: "Perception gap 3.0 pts — calibration recommended",
     confidenceTrend: [8, 8, 7, 5, 6, 7, 7, 6, 5, 5, 5, 5], perceptionGap: 3.0,
   },
   {
     id: "g6", name: "Emily Zhang", initials: "EZ", role: "Graduate Associate", week: 13,
-    status: "attention", signal: "Workload spiked to 9/10. Manager support score dropped sharply",
+    status: "attention", signal: "Workload 9/10, manager support dropping",
     confidenceTrend: [7, 7, 6, 6, 5, 5, 5, 5, 4, 4, 5, 5], perceptionGap: 2.5,
   },
   {
     id: "g4", name: "Tyler Morrison", initials: "TM", role: "Graduate Consultant", week: 14,
-    status: "stalling", signal: "Initiative declining for 3 weeks. Peer connection below average",
+    status: "stalling", signal: "Initiative declining 3 weeks, peer connection low",
     confidenceTrend: [7, 7, 7, 6, 6, 6, 6, 6, 6, 5, 5, 5], perceptionGap: 1.5,
   },
   {
     id: "g3", name: "Priya Patel", initials: "PP", role: "Graduate Analyst", week: 10,
-    status: "steady", signal: "Stable across all dimensions. No concerns flagged",
+    status: "steady", signal: "Stable across all dimensions",
     confidenceTrend: [6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7], perceptionGap: 0.8,
   },
   {
     id: "g2", name: "Marcus Johnson", initials: "MJ", role: "Senior Associate", week: 16,
-    status: "accelerating", signal: "Strong alignment. Confidence trending up 4 consecutive weeks",
+    status: "accelerating", signal: "Strong alignment, confidence up 4 weeks",
     confidenceTrend: [6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9], perceptionGap: 0.3,
   },
   {
     id: "g5", name: "James Park", initials: "JP", role: "Graduate Analyst", week: 11,
-    status: "accelerating", signal: "Peer scores above average. Self-awareness improving consistently",
+    status: "accelerating", signal: "Peer scores above average, self-awareness improving",
     confidenceTrend: [5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8], perceptionGap: 0.5,
   },
 ];
