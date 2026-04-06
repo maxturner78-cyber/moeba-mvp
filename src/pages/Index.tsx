@@ -3,6 +3,7 @@ import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
 import MyVitals from "@/components/vitals/MyVitals";
+import MySkills from "@/components/skills/MySkills";
 import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
@@ -34,6 +35,7 @@ const Index: React.FC = () => {
 
   const renderPage = () => {
     if (activeNav === "my-development") return <MyVitals />;
+    if (activeNav === "my-skills") return <MySkills />;
     if (activeNav === "weekly-checkin") return <WeeklyCheckIn />;
     if (activeNav === "team-brief") {
       if (selectedGraduateId) {
