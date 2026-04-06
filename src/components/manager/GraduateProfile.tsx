@@ -290,9 +290,35 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
           <StatusBadge status="attention" />
         </div>
         <p style={{ fontSize: 13, color: "#9CA3AF" }}>Graduate Associate · Week 12 · Manager: David Liu</p>
+
+        {/* View Tabs */}
+        <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
+          {([
+            { id: "overview" as ProfileView, label: "Overview" },
+            { id: "skills" as ProfileView, label: "Skills Constellation", icon: <Sparkles size={13} style={{ marginRight: 5 }} /> },
+          ]).map((t) => {
+            const active = profileView === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setProfileView(t.id)}
+                className="flex items-center"
+                style={{
+                  padding: "8px 16px", fontSize: 13, fontWeight: active ? 600 : 400,
+                  color: active ? "#22C55E" : "#9CA3AF", background: "none", border: "none",
+                  borderBottom: active ? "2px solid #22C55E" : "2px solid transparent",
+                  cursor: "pointer", marginBottom: -1, transition: "color 100ms ease",
+                }}
+              >
+                {t.icon}{t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Two columns: 55% / 45% */}
+      {profileView === "overview" ? (
+      /* Two columns: 55% / 45% */
       <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 20 }}>
         {/* Left Column */}
         <div className="flex flex-col" style={{ gap: 20 }}>
