@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles } from "lucide-react";
+import SkillsGraph from "@/components/skills/SkillsGraph";
+import { getSnapshot } from "@/data/skillsData";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, Line, ComposedChart,
@@ -247,8 +249,17 @@ interface Props {
   onBack: () => void;
 }
 
+type ProfileView = "overview" | "skills";
+
 const GraduateProfile: React.FC<Props> = ({ onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
+  const [profileView, setProfileView] = useState<ProfileView>("overview");
+
+  const snapshot = getSnapshot(3);
+  const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
+  const developing = snapshot.nodes.filter((n) => n.proficiency > 0 && n.proficiency <= 6).length;
+  const notStarted = snapshot.nodes.filter((n) => n.proficiency === 0 && !n.promotionRequired).length;
+  const promoRequired = snapshot.nodes.filter((n) => n.promotionRequired).length;
 
   const trendTabs: { id: TrendTab; label: string }[] = [
     { id: "performance", label: "Performance" },
@@ -279,9 +290,35 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
           <StatusBadge status="attention" />
         </div>
         <p style={{ fontSize: 13, color: "#9CA3AF" }}>Graduate Associate · Week 12 · Manager: David Liu</p>
+
+        {/* View Tabs */}
+        <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
+          {([
+            { id: "overview" as ProfileView, label: "Overview" },
+            { id: "skills" as ProfileView, label: "Skills Constellation", icon: <Sparkles size={13} style={{ marginRight: 5 }} /> },
+          ]).map((t) => {
+            const active = profileView === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setProfileView(t.id)}
+                className="flex items-center"
+                style={{
+                  padding: "8px 16px", fontSize: 13, fontWeight: active ? 600 : 400,
+                  color: active ? "#22C55E" : "#9CA3AF", background: "none", border: "none",
+                  borderBottom: active ? "2px solid #22C55E" : "2px solid transparent",
+                  cursor: "pointer", marginBottom: -1, transition: "color 100ms ease",
+                }}
+              >
+                {t.icon}{t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Two columns: 55% / 45% */}
+      {profileView === "overview" ? (
+      /* Two columns: 55% / 45% */
       <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 20 }}>
         {/* Left Column */}
         <div className="flex flex-col" style={{ gap: 20 }}>
@@ -485,6 +522,70 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
       </div>
+      ) : (
+      /* Skills Constellation View */
+      <div className="flex flex-col" style={{ gap: 20 }}>
+        <div style={{
+          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          position: "relative", overflow: "hidden", height: 520,
+        }}>
+          <SkillsGraph month={3} />
+
+          {/* Legend */}
+          <div style={{
+            position: "absolute", bottom: 16, right: 16,
+            background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+            border: "1px solid #E8E8E8", borderRadius: 10, padding: "14px 18px",
+            display: "flex", flexDirection: "column", gap: 7, zIndex: 10,
+          }}>
+            <div className="flex items-center gap-2">
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
+              <span style={{ fontSize: 11, color: "#6B7280" }}>Developed skill</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", opacity: 0.5 }} />
+              <span style={{ fontSize: 11, color: "#6B7280" }}>Developing</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
+              <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
+              <span style={{ fontSize: 11, color: "#6B7280" }}>Not yet started</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary stats */}
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: "#0F0F0F" }}>{snapshot.nodes.length}</span>
+          <span style={{ fontSize: 13, color: "#9CA3AF" }}>skills tracked</span>
+          <span style={{ color: "#E8E8E8", margin: "0 6px" }}>·</span>
+          <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: "#22C55E" }}>{developed}</span>
+          <span style={{ fontSize: 13, color: "#9CA3AF" }}>developed</span>
+          <span style={{ color: "#E8E8E8", margin: "0 6px" }}>·</span>
+          <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: "#22C55E" }}>{developing}</span>
+          <span style={{ fontSize: 13, color: "#9CA3AF" }}>developing</span>
+          <span style={{ color: "#E8E8E8", margin: "0 6px" }}>·</span>
+          <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: "#9CA3AF" }}>{notStarted}</span>
+          <span style={{ fontSize: 13, color: "#9CA3AF" }}>not started</span>
+          <span style={{ color: "#E8E8E8", margin: "0 6px" }}>·</span>
+          <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: "#F59E0B" }}>{promoRequired}</span>
+          <span style={{ fontSize: 13, color: "#9CA3AF" }}>required for promotion</span>
+        </div>
+
+        {/* Manager context note */}
+        <div style={{
+          background: "#F0FDF4", borderRadius: 8, padding: 14,
+        }}>
+          <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
+            <span style={{ fontWeight: 500 }}>Manager insight:</span> Sarah has <span className="font-mono-data" style={{ fontWeight: 600 }}>{promoRequired}</span> skills flagged as required for promotion that haven't been started yet. Consider discussing a learning plan for <em>Stakeholder Management</em> and <em>Client Relationship Building</em> in your next 1-on-1.
+          </p>
+        </div>
+      </div>
+      )}
     </div>
   );
 };
