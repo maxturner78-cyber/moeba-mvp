@@ -5,7 +5,7 @@ import {
   ClipboardCheck,
   Zap,
   ClipboardList,
-  Users,
+  Sparkles,
 } from "lucide-react";
 import type { ViewTab } from "./TopBar";
 
@@ -18,6 +18,7 @@ interface NavItem {
 const navConfig: Record<ViewTab, NavItem[]> = {
   graduate: [
     { id: "my-development", label: "My Development", icon: Activity },
+    { id: "my-skills", label: "Skills Constellation", icon: Sparkles },
     { id: "weekly-checkin", label: "Check-In", icon: ClipboardCheck },
   ],
   manager: [
