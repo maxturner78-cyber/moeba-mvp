@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles } from "lucide-react";
+import SkillsGraph from "@/components/skills/SkillsGraph";
+import { getSnapshot } from "@/data/skillsData";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, Line, ComposedChart,
@@ -247,8 +249,17 @@ interface Props {
   onBack: () => void;
 }
 
+type ProfileView = "overview" | "skills";
+
 const GraduateProfile: React.FC<Props> = ({ onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
+  const [profileView, setProfileView] = useState<ProfileView>("overview");
+
+  const snapshot = getSnapshot(3);
+  const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
+  const developing = snapshot.nodes.filter((n) => n.proficiency > 0 && n.proficiency <= 6).length;
+  const notStarted = snapshot.nodes.filter((n) => n.proficiency === 0 && !n.promotionRequired).length;
+  const promoRequired = snapshot.nodes.filter((n) => n.promotionRequired).length;
 
   const trendTabs: { id: TrendTab; label: string }[] = [
     { id: "performance", label: "Performance" },
