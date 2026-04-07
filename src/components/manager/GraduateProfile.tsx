@@ -88,7 +88,7 @@ const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay
 
 /* ── Behavioural Perception Gap Data ── */
 const allBehaviouralGaps = [
-  { dim: "Self-Awareness", self: 5.2, others: 8.0, gap: 2.8 },
+  { dim: "Ownership & Follow-Through", self: 5.2, others: 8.0, gap: 2.8 },
   { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
   { dim: "Curiosity", self: 4.8, others: 5.5, gap: 0.7 },
   { dim: "Manager Relationship", self: 7.1, others: 7.5, gap: 0.4 },
@@ -511,7 +511,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           Recommended Action
         </div>
         <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Self-Awareness</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Both suggest Sarah doesn't recognise her own progress. In your next 1-on-1, walk through a recent piece of her work and have her assess it before you share your rating — this builds calibration through evidence rather than reassurance.
+          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Both suggest Sarah doesn't recognise her own progress. In your next 1-on-1, walk through a recent piece of her work and have her assess it before you share your rating — this builds calibration through evidence rather than reassurance.
         </p>
       </div>
     </div>
@@ -774,7 +774,7 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
               }}>
                 <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
                 <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  Self-Awareness Alignment
+                  Ownership & Follow-Through
                 </div>
                 <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
                   <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>

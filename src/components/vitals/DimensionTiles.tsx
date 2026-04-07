@@ -11,7 +11,7 @@ interface DimensionTile {
 }
 
 const tiles: DimensionTile[] = [
-  { name: "Self-Awareness", score: 5.2, trend: "down", sparkline: [6.0, 5.8, 5.5, 5.2] },
+  { name: "Ownership & Follow-Through", score: 5.2, trend: "down", sparkline: [6.0, 5.8, 5.5, 5.2] },
   { name: "Confidence", score: 5.5, trend: "down", sparkline: [7.0, 6.5, 6.0, 5.5] },
   { name: "Curiosity", score: 4.8, trend: "down", sparkline: [5.5, 5.2, 5.0, 4.8] },
   { name: "Manager Rel.", score: 7.1, trend: "up", sparkline: [6.5, 6.7, 6.9, 7.1] },

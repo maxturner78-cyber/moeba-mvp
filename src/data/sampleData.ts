@@ -1,7 +1,7 @@
 export type Status = "accelerating" | "steady" | "stalling" | "attention";
 
 export interface Dimensions {
-  selfAwareness: number;
+  ownershipFollowThrough: number;
   confidence: number;
   curiosity: number;
   managerRelationship: number;
@@ -64,7 +64,7 @@ export const graduates: Graduate[] = [
     managerId: "m1",
     managerName: "David Liu",
     status: "attention",
-    dimensions: { selfAwareness: 5.2, confidence: 5.5, curiosity: 4.8, managerRelationship: 7.1, teamConnection: 7.4, feedbackApplication: 8.1, workloadMgmt: 6.0, initiative: 5.3, resilience: 6.8 },
+    dimensions: { ownershipFollowThrough: 5.2, confidence: 5.5, curiosity: 4.8, managerRelationship: 7.1, teamConnection: 7.4, feedbackApplication: 8.1, workloadMgmt: 6.0, initiative: 5.3, resilience: 6.8 },
     selfCheckin: {
       confidence: [8,8,7,5,6,7,7,6,5,5,5,5],
       workload: [6,6,7,7,7,7,6,7,9,7,7,6],
@@ -94,7 +94,7 @@ export const graduates: Graduate[] = [
     managerId: "m2",
     managerName: "Rebecca Torres",
     status: "accelerating",
-    dimensions: { selfAwareness: 8.0, confidence: 8.2, curiosity: 7.5, managerRelationship: 8.4, teamConnection: 8.1, feedbackApplication: 7.8, workloadMgmt: 7.6, initiative: 8.0, resilience: 7.9 },
+    dimensions: { ownershipFollowThrough: 8.0, confidence: 8.2, curiosity: 7.5, managerRelationship: 8.4, teamConnection: 8.1, feedbackApplication: 7.8, workloadMgmt: 7.6, initiative: 8.0, resilience: 7.9 },
   },
   {
     id: "g3",
@@ -104,7 +104,7 @@ export const graduates: Graduate[] = [
     managerId: "m2",
     managerName: "Rebecca Torres",
     status: "steady",
-    dimensions: { selfAwareness: 6.5, confidence: 6.8, curiosity: 6.2, managerRelationship: 6.9, teamConnection: 6.5, feedbackApplication: 7.0, workloadMgmt: 6.8, initiative: 6.4, resilience: 6.6 },
+    dimensions: { ownershipFollowThrough: 6.5, confidence: 6.8, curiosity: 6.2, managerRelationship: 6.9, teamConnection: 6.5, feedbackApplication: 7.0, workloadMgmt: 6.8, initiative: 6.4, resilience: 6.6 },
   },
   {
     id: "g4",
@@ -114,7 +114,7 @@ export const graduates: Graduate[] = [
     managerId: "m1",
     managerName: "David Liu",
     status: "stalling",
-    dimensions: { selfAwareness: 6.0, confidence: 6.1, curiosity: 5.5, managerRelationship: 5.8, teamConnection: 5.5, feedbackApplication: 6.5, workloadMgmt: 6.2, initiative: 4.8, resilience: 5.9 },
+    dimensions: { ownershipFollowThrough: 6.0, confidence: 6.1, curiosity: 5.5, managerRelationship: 5.8, teamConnection: 5.5, feedbackApplication: 6.5, workloadMgmt: 6.2, initiative: 4.8, resilience: 5.9 },
   },
   {
     id: "g5",
@@ -124,7 +124,7 @@ export const graduates: Graduate[] = [
     managerId: "m2",
     managerName: "Rebecca Torres",
     status: "accelerating",
-    dimensions: { selfAwareness: 7.5, confidence: 7.2, curiosity: 7.8, managerRelationship: 7.6, teamConnection: 7.9, feedbackApplication: 7.4, workloadMgmt: 7.0, initiative: 7.3, resilience: 7.1 },
+    dimensions: { ownershipFollowThrough: 7.5, confidence: 7.2, curiosity: 7.8, managerRelationship: 7.6, teamConnection: 7.9, feedbackApplication: 7.4, workloadMgmt: 7.0, initiative: 7.3, resilience: 7.1 },
   },
   {
     id: "g6",
@@ -134,7 +134,7 @@ export const graduates: Graduate[] = [
     managerId: "m1",
     managerName: "David Liu",
     status: "attention",
-    dimensions: { selfAwareness: 5.8, confidence: 5.5, curiosity: 6.0, managerRelationship: 4.8, teamConnection: 6.2, feedbackApplication: 6.8, workloadMgmt: 4.2, initiative: 5.5, resilience: 5.0 },
+    dimensions: { ownershipFollowThrough: 5.8, confidence: 5.5, curiosity: 6.0, managerRelationship: 4.8, teamConnection: 6.2, feedbackApplication: 6.8, workloadMgmt: 4.2, initiative: 5.5, resilience: 5.0 },
   },
 ];
 

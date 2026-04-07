@@ -155,7 +155,7 @@ const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
               }}
             />
             <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#B45309", marginBottom: 8 }}>
-              Self-Awareness Alignment
+              Ownership & Follow-Through
             </div>
             <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
               <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>

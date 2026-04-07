@@ -8,7 +8,7 @@ import {
 } from "recharts";
 
 const currentData = [
-  { dimension: "Self-Awareness", value: 5.2, prev: 6.0 },
+  { dimension: "Ownership & Follow-Through", value: 5.2, prev: 6.0 },
   { dimension: "Confidence", value: 5.5, prev: 7.0 },
   { dimension: "Curiosity", value: 4.8, prev: 5.5 },
   { dimension: "Manager Rel.", value: 7.1, prev: 6.5 },

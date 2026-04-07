@@ -17,7 +17,7 @@ const dimensions: DimensionRow[] = [
   { name: "Workload Management", score: 6.0, trend: "stable", sparkline: [6.5, 6.2, 6.5, 6.0, 6.0, 6.2, 5.8, 6.0] },
   { name: "Confidence Stability", score: 5.5, trend: "down", sparkline: [7.8, 7.5, 7.0, 6.5, 6.0, 5.8, 5.5, 5.5] },
   { name: "Initiative & Voice", score: 5.3, trend: "down", sparkline: [6.5, 6.2, 6.0, 5.8, 5.8, 5.5, 5.5, 5.3] },
-  { name: "Self-Awareness", score: 5.2, trend: "down", sparkline: [6.8, 6.5, 6.2, 6.0, 5.8, 5.5, 5.3, 5.2] },
+  { name: "Ownership & Follow-Through", score: 5.2, trend: "down", sparkline: [6.8, 6.5, 6.2, 6.0, 5.8, 5.5, 5.3, 5.2] },
   { name: "Curiosity & Learning", score: 4.8, trend: "down", sparkline: [6.0, 5.8, 5.5, 5.5, 5.2, 5.0, 5.0, 4.8] },
 ];
 
