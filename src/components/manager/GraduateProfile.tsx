@@ -593,84 +593,136 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       </div>
 
       {profileView === "overview" ? (
-      /* Grid layout with explicit rows for horizontal alignment */
-      <div className="flex flex-col" style={{ gap: 20 }}>
-        {/* Row 1: Trend Charts full width */}
-        <div style={{
-          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-        }}>
-          <div className="flex items-center gap-0" style={{ marginBottom: 16, borderBottom: "1px solid #F3F4F6" }}>
-            {trendTabs.map((t) => {
-              const active = trendTab === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setTrendTab(t.id)}
-                  style={{
-                    padding: "8px 14px", fontSize: 13, fontWeight: active ? 600 : 400,
-                    color: active ? "#22C55E" : "#9CA3AF", background: "none", border: "none",
-                    borderBottom: active ? "2px solid #22C55E" : "2px solid transparent",
-                    cursor: "pointer", marginBottom: -1,
-                  }}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-          <TrendChart tab={trendTab} />
-          {trendTab === "performance" && (
-            <div className="flex items-center gap-4 justify-center" style={{ marginTop: 8 }}>
-              <div className="flex items-center gap-1.5">
-                <div style={{ width: 10, height: 2, background: "#6366F1", borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
+      /* Two columns: 55% / 45% */
+      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 20 }}>
+        {/* Left Column */}
+        <div className="flex flex-col" style={{ gap: 20 }}>
+          {/* Trend Charts */}
+          <div style={{
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          }}>
+            <div className="flex items-center gap-0" style={{ marginBottom: 16, borderBottom: "1px solid #F3F4F6" }}>
+              {trendTabs.map((t) => {
+                const active = trendTab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTrendTab(t.id)}
+                    style={{
+                      padding: "8px 14px", fontSize: 13, fontWeight: active ? 600 : 400,
+                      color: active ? "#22C55E" : "#9CA3AF", background: "none", border: "none",
+                      borderBottom: active ? "2px solid #22C55E" : "2px solid transparent",
+                      cursor: "pointer", marginBottom: -1,
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+            <TrendChart tab={trendTab} />
+            {trendTab === "performance" && (
+              <div className="flex items-center gap-4 justify-center" style={{ marginTop: 8 }}>
+                <div className="flex items-center gap-1.5">
+                  <div style={{ width: 10, height: 2, background: "#6366F1", borderRadius: 1 }} />
+                  <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div style={{ width: 10, height: 2, background: "#22C55E", borderRadius: 1 }} />
+                  <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <div style={{ width: 10, height: 2, background: "#22C55E", borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
+            )}
+          </div>
+
+          {/* Development Focus Areas */}
+          <div>
+            <h3 className="font-heading" style={{ fontSize: 15, fontWeight: 600, color: "#0F0F0F", marginBottom: 12 }}>
+              Development Focus Areas
+            </h3>
+            <div className="flex flex-col" style={{ gap: 12 }}>
+              <div style={{
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
+                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}>
+                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                  Curiosity & Learning
+                </div>
+                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
+                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
+                  Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
+                </p>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
+                </p>
+              </div>
+
+              <div style={{
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
+                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}>
+                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                  Ownership & Follow-Through
+                </div>
+                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
+                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
+                  There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
+                </p>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
+                </p>
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Intervention History */}
+          <div style={{
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
+              Intervention History
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 13, color: "#374151" }}>Mar 15 — Calibration conversation</span>
+              </div>
+              <span
+                className="inline-flex items-center gap-1"
+                style={{
+                  background: "#F0FDF4", color: "#15803D", borderRadius: 100,
+                  padding: "4px 10px", fontSize: 12, fontWeight: 500,
+                }}
+              >
+                <CheckCircle size={12} /> Confidence +1.5 pts
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Development Focus Areas heading */}
-        <h3 className="font-heading" style={{ fontSize: 15, fontWeight: 600, color: "#0F0F0F", marginBottom: -8 }}>
-          Development Focus Areas
-        </h3>
-
-        {/* Row 2: Focus Area 1 (left) + Check-In Brief (right) — aligned */}
-        <div style={{ display: "grid", gridTemplateColumns: "55% 1fr", gap: 20, alignItems: "stretch" }}>
-          <div style={{
-            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-            position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-            display: "flex", flexDirection: "column",
-          }}>
-            <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-              Curiosity & Learning
-            </div>
-            <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-              <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
-              <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-              Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
-            </p>
-            <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-              How You Can Help
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, flex: 1 }}>
-              Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
-            </p>
-          </div>
-
+        {/* Right Column */}
+        <div className="flex flex-col" style={{ gap: 20 }}>
           {/* Check-In Brief */}
           <div
             style={{
               background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20, paddingLeft: 24,
               boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-              borderLeft: "3px solid #22C55E", display: "flex", flexDirection: "column",
+              borderLeft: "3px solid #22C55E",
             }}
           >
             <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 2 }}>
@@ -725,7 +777,7 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
               </p>
             </div>
 
-            <div className="flex items-center justify-between" style={{ marginTop: "auto" }}>
+            <div className="flex items-center justify-between">
               <span style={{ fontSize: 11, color: "#9CA3AF" }}>Estimated conversation: ~10 min</span>
               <button
                 className="flex items-center gap-1"
@@ -737,32 +789,6 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
                 <Copy size={12} /> Copy Brief
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Row 3: Focus Area 2 (left) + Performance Review (right) — aligned */}
-        <div style={{ display: "grid", gridTemplateColumns: "55% 1fr", gap: 20, alignItems: "start" }}>
-          <div style={{
-            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-            position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-          }}>
-            <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-              Ownership & Follow-Through
-            </div>
-            <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-              <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
-              <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-              There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
-            </p>
-            <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-              How You Can Help
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-              When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
-            </p>
           </div>
 
           {/* Generate Performance Review */}
@@ -816,32 +842,6 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
             <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 10 }}>
               Coming soon — this feature is currently in development
             </p>
-          </div>
-        </div>
-
-        {/* Row 4: Intervention History full width left column */}
-        <div style={{ maxWidth: "55%" }}>
-          <div style={{
-            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-          }}>
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
-              Intervention History
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span style={{ fontSize: 13, color: "#374151" }}>Mar 15 — Calibration conversation</span>
-              </div>
-              <span
-                className="inline-flex items-center gap-1"
-                style={{
-                  background: "#F0FDF4", color: "#15803D", borderRadius: 100,
-                  padding: "4px 10px", fontSize: 12, fontWeight: 500,
-                }}
-              >
-                <CheckCircle size={12} /> Confidence +1.5 pts
-              </span>
-            </div>
           </div>
         </div>
       </div>
