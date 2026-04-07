@@ -40,7 +40,7 @@ export const teamGraduates: TeamGraduate[] = [
   },
   {
     id: "g5", name: "James Park", initials: "JP", role: "Graduate Analyst", week: 11,
-    status: "accelerating", signal: "Peer scores above average, self-awareness improving",
+    status: "accelerating", signal: "Peer scores above average, ownership & follow-through improving",
     confidenceTrend: [5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8], perceptionGap: 0.5,
   },
 ];
