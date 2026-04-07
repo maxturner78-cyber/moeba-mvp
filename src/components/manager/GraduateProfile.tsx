@@ -393,7 +393,7 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
           {/* Check-In Brief — sticky */}
           <div
             style={{
-              position: "sticky", top: 100,
+              position: "sticky", top: 32, zIndex: 10,
               background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20, paddingLeft: 24,
               boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
               borderLeft: "3px solid #22C55E",
