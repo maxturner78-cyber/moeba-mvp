@@ -389,7 +389,7 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col" style={{ gap: 20 }}>
+        <div style={{ position: "relative" }}>
           {/* Check-In Brief — sticky */}
           <div
             style={{
