@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import SkillsGraph from "@/components/skills/SkillsGraph";
 import { getSnapshot } from "@/data/skillsData";
 import {
@@ -36,13 +36,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-/* ── Perception Gap Card ── */
-const topGaps = [
-  { dim: "Self-Awareness", self: 5.2, others: 8.0, gap: 2.8 },
-  { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
-  { dim: "Curiosity", self: 4.8, others: 5.5, gap: 0.7 },
-];
-
+/* ── Perception Gap Shared ── */
 const getGapColor = (gap: number) => {
   if (gap > 2.5) return "#EF4444";
   if (gap >= 1.5) return "#F59E0B";
@@ -92,13 +86,58 @@ const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay
   );
 };
 
-const PerceptionGapCard: React.FC = () => {
+/* ── Behavioural Perception Gap Data ── */
+const allBehaviouralGaps = [
+  { dim: "Self-Awareness", self: 5.2, others: 8.0, gap: 2.8 },
+  { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
+  { dim: "Curiosity", self: 4.8, others: 5.5, gap: 0.7 },
+  { dim: "Manager Relationship", self: 7.1, others: 7.5, gap: 0.4 },
+  { dim: "Team Connection", self: 7.4, others: 7.8, gap: 0.4 },
+  { dim: "Feedback Application", self: 8.1, others: 8.0, gap: -0.1 },
+  { dim: "Workload Management", self: 6.0, others: 6.8, gap: 0.8 },
+  { dim: "Initiative", self: 5.3, others: 6.5, gap: 1.2 },
+  { dim: "Resilience", self: 6.8, others: 7.2, gap: 0.4 },
+];
+
+/* ── Skills Perception Gap Data ── */
+const allSkillsGaps = [
+  { dim: "Financial Statement Review", self: 5.0, others: 7.5, gap: 2.5 },
+  { dim: "Audit Planning", self: 4.5, others: 6.0, gap: 1.5 },
+  { dim: "Tax Compliance Basics", self: 3.2, others: 5.0, gap: 1.8 },
+  { dim: "Documentation Standards", self: 7.0, others: 6.5, gap: -0.5 },
+  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, others: 8.0, gap: 0.5 },
+  { dim: "Client Communication", self: 3.0, others: 5.5, gap: 2.5 },
+  { dim: "Risk Assessment", self: 3.5, others: 4.8, gap: 1.3 },
+  { dim: "AML/CTF Procedures", self: 5.0, others: 5.5, gap: 0.5 },
+  { dim: "Ethics & Prof. Standards", self: 6.5, others: 7.0, gap: 0.5 },
+  { dim: "Tax Return Preparation", self: 2.8, others: 4.2, gap: 1.4 },
+  { dim: "Journal Entries & Depreciation", self: 4.0, others: 5.5, gap: 1.5 },
+  { dim: "Presentation Skills", self: 4.0, others: 5.0, gap: 1.0 },
+];
+
+/* ── Perception Gap Section Component ── */
+interface GapSectionProps {
+  title: string;
+  subtitle: string;
+  gaps: typeof allBehaviouralGaps;
+  defaultCount: number;
+  avgGap: number;
+  avgColor: string;
+  trend: string;
+  trendColor: string;
+  insight: string;
+}
+
+const GapSection: React.FC<GapSectionProps> = ({
+  title, subtitle, gaps, defaultCount, avgGap, avgColor, trend, trendColor, insight,
+}) => {
+  const [expanded, setExpanded] = useState(false);
   const [animated, setAnimated] = React.useState(false);
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
     const start = performance.now();
-    const target = 2.3;
+    const target = avgGap;
     const duration = 600;
     const tick = () => {
       const elapsed = performance.now() - start;
@@ -109,43 +148,69 @@ const PerceptionGapCard: React.FC = () => {
     };
     requestAnimationFrame(tick);
     requestAnimationFrame(() => setAnimated(true));
-  }, []);
+  }, [avgGap]);
+
+  const sorted = [...gaps].sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
+  const visible = expanded ? sorted : sorted.slice(0, defaultCount);
+  const remaining = sorted.length - defaultCount;
 
   return (
     <div style={{
       background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
       boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
     }}>
+      <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 4 }}>
+        {title}
+      </div>
+      <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 16 }}>{subtitle}</div>
+
       <div className="flex items-baseline gap-3" style={{ marginBottom: 4 }}>
-        <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 500, color: "#DC2626" }}>
+        <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 500, color: avgColor }}>
           {count.toFixed(1)}
         </span>
         <span style={{ fontSize: 14, color: "#9CA3AF" }}>avg perception gap</span>
       </div>
       <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, marginBottom: 8 }}>
-        Sarah consistently rates herself lower than you rate her
+        {insight}
       </p>
       <div className="flex items-center gap-1.5">
-        <TrendingUp size={14} color="#DC2626" strokeWidth={2} />
-        <span style={{ fontSize: 12, fontWeight: 500, color: "#DC2626" }}>Widening over 4 weeks</span>
+        <TrendingUp size={14} color={trendColor} strokeWidth={2} />
+        <span style={{ fontSize: 12, fontWeight: 500, color: trendColor }}>{trend}</span>
       </div>
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
       <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
-        Biggest Gaps
+        {expanded ? "All Gaps" : "Biggest Gaps"}
       </div>
       <div className="flex flex-col" style={{ gap: 8, marginBottom: 12 }}>
-        {topGaps.map((g, i) => (
-          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "130px 1fr 56px", alignItems: "center", height: 28 }}>
+        {visible.map((g, i) => (
+          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 28 }}>
             <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot self={g.self} others={g.others} gap={g.gap} delay={i * 80} animated={animated} />
-            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(g.gap), textAlign: "right" }}>
-              {g.gap.toFixed(1)} pts
+            <DivergenceDot self={g.self} others={g.others} gap={Math.abs(g.gap)} delay={i * 60} animated={animated} />
+            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.gap)), textAlign: "right" }}>
+              {Math.abs(g.gap).toFixed(1)} pts
             </span>
           </div>
         ))}
       </div>
+
+      {remaining > 0 && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1"
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: 12, fontWeight: 500, color: "#22C55E", padding: 0,
+          }}
+        >
+          {expanded ? (
+            <><ChevronUp size={14} /> Show top {defaultCount}</>
+          ) : (
+            <><ChevronDown size={14} /> See all {gaps.length} {title.toLowerCase().includes("skill") ? "skills" : "behaviours"}</>
+          )}
+        </button>
+      )}
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
@@ -376,12 +441,89 @@ const CompetencyChecklist: React.FC = () => {
   );
 };
 
+/* ── Perception Gap Analysis View ── */
+const PerceptionGapAnalysis: React.FC = () => {
+  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allBehaviouralGaps.length;
+  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allSkillsGaps.length;
+
+  return (
+    <div className="flex flex-col" style={{ gap: 24 }}>
+      {/* Summary */}
+      <div style={{
+        background: "#F0FDF4", borderRadius: 8, padding: 14,
+      }}>
+        <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
+          <span style={{ fontWeight: 500 }}>Perception gap analysis</span> compares Sarah's self-assessment against your observations — across both behavioural indicators and role-specific skills. Large gaps suggest she may need recalibration or targeted feedback.
+        </p>
+      </div>
+
+      {/* Combined avg */}
+      <div className="flex items-center gap-6" style={{ marginBottom: -8 }}>
+        <div className="flex items-center gap-2">
+          <div style={{ width: 3, height: 20, background: "#6366F1", borderRadius: 2 }} />
+          <div>
+            <div style={{ fontSize: 11, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>Behavioural avg gap</div>
+            <span className="font-mono-data" style={{ fontSize: 18, fontWeight: 600, color: getGapColor(behaviouralAvg) }}>{behaviouralAvg.toFixed(1)}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div style={{ width: 3, height: 20, background: "#8B5CF6", borderRadius: 2 }} />
+          <div>
+            <div style={{ fontSize: 11, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>Skills avg gap</div>
+            <span className="font-mono-data" style={{ fontSize: 18, fontWeight: 600, color: getGapColor(skillsAvg) }}>{skillsAvg.toFixed(1)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Two-column layout */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <GapSection
+          title="Behavioural Indicators"
+          subtitle="9 dimensions from weekly check-ins"
+          gaps={allBehaviouralGaps}
+          defaultCount={3}
+          avgGap={behaviouralAvg}
+          avgColor={getGapColor(behaviouralAvg)}
+          trend="Widening over 4 weeks"
+          trendColor="#DC2626"
+          insight="Sarah consistently rates herself lower than you rate her across behavioural indicators"
+        />
+        <GapSection
+          title="Role-Specific Skills"
+          subtitle="SWN competency framework skills"
+          gaps={allSkillsGaps}
+          defaultCount={3}
+          avgGap={skillsAvg}
+          avgColor={getGapColor(skillsAvg)}
+          trend="Steady over 3 weeks"
+          trendColor="#F59E0B"
+          insight="Sarah underestimates her technical progress — particularly in financial statement review and client communication"
+        />
+      </div>
+
+      {/* Actionable insight */}
+      <div style={{
+        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
+        borderLeft: "3px solid #22C55E",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 8 }}>
+          Recommended Action
+        </div>
+        <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
+          The largest gaps are in <span style={{ fontWeight: 500 }}>Self-Awareness</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Both suggest Sarah doesn't recognise her own progress. In your next 1-on-1, walk through a recent piece of her work and have her assess it before you share your rating — this builds calibration through evidence rather than reassurance.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 /* ── Main Component ── */
 interface Props {
   onBack: () => void;
 }
 
-type ProfileView = "overview" | "skills";
+type ProfileView = "overview" | "skills" | "perception-gap";
 
 const GraduateProfile: React.FC<Props> = ({ onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
@@ -427,6 +569,7 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
         <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
           {([
             { id: "overview" as ProfileView, label: "Overview" },
+            { id: "perception-gap" as ProfileView, label: "Perception Gap Analysis", icon: <BarChart3 size={13} style={{ marginRight: 5 }} /> },
             { id: "skills" as ProfileView, label: "Skills Constellation", icon: <Sparkles size={13} style={{ marginRight: 5 }} /> },
           ]).map((t) => {
             const active = profileView === t.id;
@@ -454,8 +597,6 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 20 }}>
         {/* Left Column */}
         <div className="flex flex-col" style={{ gap: 20 }}>
-          <PerceptionGapCard />
-
           {/* Trend Charts */}
           <div style={{
             background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24,
@@ -653,6 +794,8 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
       </div>
+      ) : profileView === "perception-gap" ? (
+      <PerceptionGapAnalysis />
       ) : (
       /* Skills Constellation View */
       <div className="flex flex-col" style={{ gap: 20 }}>
