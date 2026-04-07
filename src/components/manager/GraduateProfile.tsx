@@ -524,37 +524,43 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       ) : (
       /* Skills Constellation View */
       <div className="flex flex-col" style={{ gap: 20 }}>
-        <div style={{
-          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-          position: "relative", overflow: "hidden", height: 520,
-        }}>
-          <SkillsGraph month={3} />
-
-          {/* Legend */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20 }}>
+          {/* Graph */}
           <div style={{
-            position: "absolute", bottom: 16, right: 16,
-            background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
-            border: "1px solid #E8E8E8", borderRadius: 10, padding: "14px 18px",
-            display: "flex", flexDirection: "column", gap: 7, zIndex: 10,
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+            position: "relative", overflow: "hidden", height: 520,
           }}>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Developed skill</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", opacity: 0.5 }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Developing</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Not yet started</span>
+            <SkillsGraph month={3} />
+
+            {/* Legend */}
+            <div style={{
+              position: "absolute", bottom: 16, left: 16,
+              background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+              border: "1px solid #E8E8E8", borderRadius: 10, padding: "14px 18px",
+              display: "flex", flexDirection: "column", gap: 7, zIndex: 10,
+            }}>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Developed skill</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", opacity: 0.5 }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Developing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Not yet started</span>
+              </div>
             </div>
           </div>
+
+          {/* Competency Framework Checklist */}
+          <CompetencyChecklist />
         </div>
 
         {/* Summary stats */}
