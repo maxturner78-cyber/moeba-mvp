@@ -190,13 +190,8 @@ const WeeklyInsightCard: React.FC<{
     {/* Check-in CTA or form or done state */}
     {checkInState === "prompt" && (
       <div className="flex items-center justify-between">
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 2 }}>
-            Ready for this week's check-in?
-          </div>
-          <p style={{ fontSize: 12, color: "#6B7280" }}>
-            ~90 seconds. Your responses generate next week's insight.
-          </p>
+        <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>
+          Ready for this week's check-in?
         </div>
         <button
           onClick={onStartCheckIn}
