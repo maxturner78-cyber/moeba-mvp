@@ -186,10 +186,6 @@ const DevelopmentBarStack: React.FC = () => {
                 {trendLabel}
               </span>
 
-              {/* Mini sparkline */}
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <MiniSparkline data={dim.sparkline} color={trendColor} />
-              </div>
             </div>
           );
         })}
