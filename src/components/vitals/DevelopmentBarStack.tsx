@@ -6,20 +6,19 @@ interface DimensionRow {
   name: string;
   score: number;
   trend: Trend;
-  benchmark: number;
   sparkline: number[];
 }
 
 const dimensions: DimensionRow[] = [
-  { name: "Feedback Application", score: 8.1, trend: "up", benchmark: 7.2, sparkline: [7.0, 7.5, 7.8, 7.5, 8.0, 7.8, 8.0, 8.1] },
-  { name: "Team Connection", score: 7.4, trend: "up", benchmark: 6.8, sparkline: [6.2, 6.5, 6.8, 7.0, 7.0, 7.2, 7.3, 7.4] },
-  { name: "Manager Relationship", score: 7.1, trend: "up", benchmark: 6.9, sparkline: [6.0, 6.2, 6.5, 6.8, 6.8, 7.0, 7.0, 7.1] },
-  { name: "Resilience", score: 6.8, trend: "stable", benchmark: 6.5, sparkline: [6.5, 6.8, 6.5, 6.2, 6.5, 6.8, 6.8, 6.8] },
-  { name: "Workload Management", score: 6.0, trend: "stable", benchmark: 6.3, sparkline: [6.5, 6.2, 6.5, 6.0, 6.0, 6.2, 5.8, 6.0] },
-  { name: "Confidence Stability", score: 5.5, trend: "down", benchmark: 6.8, sparkline: [7.8, 7.5, 7.0, 6.5, 6.0, 5.8, 5.5, 5.5] },
-  { name: "Initiative & Voice", score: 5.3, trend: "down", benchmark: 6.4, sparkline: [6.5, 6.2, 6.0, 5.8, 5.8, 5.5, 5.5, 5.3] },
-  { name: "Self-Awareness", score: 5.2, trend: "down", benchmark: 6.5, sparkline: [6.8, 6.5, 6.2, 6.0, 5.8, 5.5, 5.3, 5.2] },
-  { name: "Curiosity & Learning", score: 4.8, trend: "down", benchmark: 6.2, sparkline: [6.0, 5.8, 5.5, 5.5, 5.2, 5.0, 5.0, 4.8] },
+  { name: "Feedback Application", score: 8.1, trend: "up", sparkline: [7.0, 7.5, 7.8, 7.5, 8.0, 7.8, 8.0, 8.1] },
+  { name: "Team Connection", score: 7.4, trend: "up", sparkline: [6.2, 6.5, 6.8, 7.0, 7.0, 7.2, 7.3, 7.4] },
+  { name: "Manager Relationship", score: 7.1, trend: "up", sparkline: [6.0, 6.2, 6.5, 6.8, 6.8, 7.0, 7.0, 7.1] },
+  { name: "Resilience", score: 6.8, trend: "stable", sparkline: [6.5, 6.8, 6.5, 6.2, 6.5, 6.8, 6.8, 6.8] },
+  { name: "Workload Management", score: 6.0, trend: "stable", sparkline: [6.5, 6.2, 6.5, 6.0, 6.0, 6.2, 5.8, 6.0] },
+  { name: "Confidence Stability", score: 5.5, trend: "down", sparkline: [7.8, 7.5, 7.0, 6.5, 6.0, 5.8, 5.5, 5.5] },
+  { name: "Initiative & Voice", score: 5.3, trend: "down", sparkline: [6.5, 6.2, 6.0, 5.8, 5.8, 5.5, 5.5, 5.3] },
+  { name: "Self-Awareness", score: 5.2, trend: "down", sparkline: [6.8, 6.5, 6.2, 6.0, 5.8, 5.5, 5.3, 5.2] },
+  { name: "Curiosity & Learning", score: 4.8, trend: "down", sparkline: [6.0, 5.8, 5.5, 5.5, 5.2, 5.0, 5.0, 4.8] },
 ];
 
 const getScoreColor = (score: number) => {
@@ -28,19 +27,58 @@ const getScoreColor = (score: number) => {
   return "#EF4444";
 };
 
+const getTrendColor = (sparkline: number[]) => {
+  const first = sparkline[0];
+  const last = sparkline[sparkline.length - 1];
+  const diff = last - first;
+  if (diff > 0.3) return "#22C55E";
+  if (diff < -0.3) return "#EF4444";
+  return "#9CA3AF";
+};
+
+const getTrendLabel = (sparkline: number[]) => {
+  const first = sparkline[0];
+  const last = sparkline[sparkline.length - 1];
+  const diff = last - first;
+  const absDiff = Math.abs(diff).toFixed(1);
+  if (diff > 0.3) return `+${absDiff}`;
+  if (diff < -0.3) return `−${absDiff}`;
+  return "—";
+};
+
+const MiniSparkline: React.FC<{ data: number[]; color: string }> = ({ data, color }) => {
+  const width = 48;
+  const height = 16;
+  const min = Math.min(...data) - 0.5;
+  const max = Math.max(...data) + 0.5;
+  const range = max - min || 1;
+
+  const points = data.map((v, i) => ({
+    x: (i / (data.length - 1)) * width,
+    y: height - ((v - min) / range) * height,
+  }));
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
+
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: "block" }}>
+      <path d={linePath} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
+      <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={2} fill={color} />
+    </svg>
+  );
+};
 
 const DevelopmentBarStack: React.FC = () => {
   const [animated, setAnimated] = useState(false);
-  const [hoveredBenchmark, setHoveredBenchmark] = useState<number | null>(null);
 
   useEffect(() => {
     const t = requestAnimationFrame(() => setAnimated(true));
     return () => cancelAnimationFrame(t);
   }, []);
 
-  const above = dimensions.filter(d => d.score > d.benchmark).length;
-  const atAvg = dimensions.filter(d => Math.abs(d.score - d.benchmark) <= 0.3).length;
-  const below = dimensions.filter(d => d.score < d.benchmark - 0.3).length;
+  const improving = dimensions.filter(d => d.sparkline[d.sparkline.length - 1] - d.sparkline[0] > 0.3).length;
+  const steady = dimensions.filter(d => Math.abs(d.sparkline[d.sparkline.length - 1] - d.sparkline[0]) <= 0.3).length;
+  const declining = dimensions.filter(d => d.sparkline[d.sparkline.length - 1] - d.sparkline[0] < -0.3).length;
 
   return (
     <div
@@ -59,12 +97,14 @@ const DevelopmentBarStack: React.FC = () => {
         Your development profile
       </h3>
       <p style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 20 }}>
-        Blended from your self-assessment and manager observations
+        Blended from your self-assessment and manager observations · 12 weeks
       </p>
 
       <div>
         {dimensions.map((dim, i) => {
           const barColor = getScoreColor(dim.score);
+          const trendColor = getTrendColor(dim.sparkline);
+          const trendLabel = getTrendLabel(dim.sparkline);
           const isBottomGroup = i >= 6;
 
           return (
@@ -72,15 +112,13 @@ const DevelopmentBarStack: React.FC = () => {
               key={dim.name}
               style={{
                 display: "grid",
-                gridTemplateColumns: "160px 1fr 48px",
+                gridTemplateColumns: "150px 1fr 48px 32px 56px",
                 alignItems: "center",
-                gap: 12,
-                padding: "10px 0",
+                gap: 8,
+                padding: "10px 4px",
                 borderBottom: i < dimensions.length - 1 ? "1px solid #F5F5F5" : "none",
                 background: isBottomGroup ? "#FEFCE8" : "transparent",
                 borderRadius: isBottomGroup && i === 6 ? "4px 4px 0 0" : isBottomGroup && i === 8 ? "0 0 4px 4px" : undefined,
-                paddingLeft: 4,
-                paddingRight: 4,
                 transition: "background 100ms ease",
                 cursor: "default",
               }}
@@ -107,7 +145,7 @@ const DevelopmentBarStack: React.FC = () => {
                   height: 8,
                   background: "#F3F4F6",
                   borderRadius: 4,
-                  overflow: "visible",
+                  overflow: "hidden",
                 }}
               >
                 <div
@@ -120,41 +158,6 @@ const DevelopmentBarStack: React.FC = () => {
                     transitionDelay: `${i * 60}ms`,
                   }}
                 />
-                {/* Benchmark marker */}
-                <div
-                  style={{
-                    position: "absolute",
-                    left: `${(dim.benchmark / 10) * 100}%`,
-                    top: -4,
-                    width: 2,
-                    height: 16,
-                    background: "rgba(15,15,15,0.15)",
-                    borderRadius: 1,
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={() => setHoveredBenchmark(i)}
-                  onMouseLeave={() => setHoveredBenchmark(null)}
-                >
-                  {hoveredBenchmark === i && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 22,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        background: "#111111",
-                        borderRadius: 6,
-                        padding: "6px 10px",
-                        whiteSpace: "nowrap",
-                        fontSize: 11,
-                        color: "#FFFFFF",
-                        zIndex: 10,
-                      }}
-                    >
-                      Cohort average: {dim.benchmark}
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* Score */}
@@ -170,6 +173,23 @@ const DevelopmentBarStack: React.FC = () => {
                 {dim.score.toFixed(1)}
               </span>
 
+              {/* Trend change label */}
+              <span
+                className="font-mono-data"
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: trendColor,
+                  textAlign: "right",
+                }}
+              >
+                {trendLabel}
+              </span>
+
+              {/* Mini sparkline */}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <MiniSparkline data={dim.sparkline} color={trendColor} />
+              </div>
             </div>
           );
         })}
@@ -177,12 +197,12 @@ const DevelopmentBarStack: React.FC = () => {
 
       {/* Summary */}
       <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 16 }}>
-        <span className="font-mono-data" style={{ fontWeight: 600, color: "#22C55E" }}>{above}</span>
-        {" dimensions above cohort average · "}
-        <span className="font-mono-data" style={{ fontWeight: 600, color: "#9CA3AF" }}>{atAvg}</span>
-        {" at average · "}
-        <span className="font-mono-data" style={{ fontWeight: 600, color: "#F59E0B" }}>{below}</span>
-        {" below average"}
+        <span className="font-mono-data" style={{ fontWeight: 600, color: "#22C55E" }}>{improving}</span>
+        {" improving · "}
+        <span className="font-mono-data" style={{ fontWeight: 600, color: "#9CA3AF" }}>{steady}</span>
+        {" steady · "}
+        <span className="font-mono-data" style={{ fontWeight: 600, color: "#EF4444" }}>{declining}</span>
+        {" declining"}
       </p>
     </div>
   );
