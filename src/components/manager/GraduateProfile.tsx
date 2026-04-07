@@ -244,6 +244,138 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   );
 };
 
+/* ── Competency Framework Checklist ── */
+interface CompetencyItem {
+  label: string;
+  status: "met" | "developing" | "not-started";
+}
+interface CompetencyCategory {
+  title: string;
+  items: CompetencyItem[];
+}
+
+const frameworkData: CompetencyCategory[] = [
+  {
+    title: "Technical Knowledge",
+    items: [
+      { label: "Business & investment structures (individuals, companies, trusts)", status: "developing" },
+      { label: "Assessable income, deductions & tax offsets", status: "developing" },
+      { label: "Basic GST concepts & BAS preparation", status: "not-started" },
+      { label: "Depreciation rules (Div 40, Div 43)", status: "not-started" },
+      { label: "Basic CGT & main residence exemption", status: "not-started" },
+      { label: "Superannuation basics (SG, concessional/non-concessional)", status: "met" },
+      { label: "Company & trust losses (conceptual)", status: "not-started" },
+      { label: "Basic Division 7A loans", status: "not-started" },
+      { label: "Deceased estate administration", status: "not-started" },
+      { label: "PAYG withholding & instalment frameworks", status: "developing" },
+    ],
+  },
+  {
+    title: "Technical Skills",
+    items: [
+      { label: "Prepare financial statements (individuals, basic companies & trusts)", status: "developing" },
+      { label: "Extract & code data from Xero, MYOB, QuickBooks", status: "met" },
+      { label: "Year-end journal entries & depreciation schedules", status: "developing" },
+      { label: "Income tax returns (individuals, sole traders, basic trusts)", status: "developing" },
+      { label: "Prepare & lodge BAS/IAS; apply PAYG variation", status: "not-started" },
+      { label: "PAYG payment summaries & Single Touch Payroll", status: "not-started" },
+      { label: "Liaise with ATO on routine matters", status: "not-started" },
+      { label: "Create job budgets & draft invoices", status: "met" },
+      { label: "Proficient in MS Office, XPM, Active Workpapers, FYI Docs", status: "developing" },
+      { label: "Complete Xero certification within 6 months", status: "met" },
+    ],
+  },
+  {
+    title: "Behavioural Competencies",
+    items: [
+      { label: "Takes ownership & seeks clarification proactively", status: "developing" },
+      { label: "Actively seeks feedback; demonstrates improvement over review cycles", status: "developing" },
+      { label: "Maintains attention to detail; self-checks before submission", status: "met" },
+    ],
+  },
+];
+
+const statusIcon = (s: CompetencyItem["status"]) => {
+  if (s === "met") return (
+    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#22C55E", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    </div>
+  );
+  if (s === "developing") return (
+    <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #F59E0B", background: "#FEF3C7", flexShrink: 0 }} />
+  );
+  return (
+    <div style={{ width: 16, height: 16, borderRadius: "50%", border: "1.5px dashed #D1D5DB", background: "#F9FAFB", flexShrink: 0 }} />
+  );
+};
+
+const CompetencyChecklist: React.FC = () => {
+  const allItems = frameworkData.flatMap((c) => c.items);
+  const met = allItems.filter((i) => i.status === "met").length;
+  const total = allItems.length;
+
+  return (
+    <div style={{
+      background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+      padding: "20px 18px", height: 520, overflowY: "auto",
+    }}>
+      <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 4 }}>
+        Competency Framework
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F", marginBottom: 4 }}>
+        Graduate Associate → Associate
+      </div>
+      <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+        <div style={{ flex: 1, height: 4, background: "#F3F4F6", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ width: `${(met / total) * 100}%`, height: "100%", background: "#22C55E", borderRadius: 2, transition: "width 600ms ease" }} />
+        </div>
+        <span className="font-mono-data" style={{ fontSize: 12, fontWeight: 500, color: "#6B7280" }}>
+          {met}/{total}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-3" style={{ marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid #F3F4F6" }}>
+        <div className="flex items-center gap-1.5">
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
+          <span style={{ fontSize: 10, color: "#6B7280" }}>Met</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div style={{ width: 8, height: 8, borderRadius: "50%", border: "1.5px solid #F59E0B", background: "#FEF3C7" }} />
+          <span style={{ fontSize: 10, color: "#6B7280" }}>Developing</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div style={{ width: 8, height: 8, borderRadius: "50%", border: "1px dashed #D1D5DB", background: "#F9FAFB" }} />
+          <span style={{ fontSize: 10, color: "#6B7280" }}>Not started</span>
+        </div>
+      </div>
+
+      {frameworkData.map((cat) => (
+        <div key={cat.title} style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 8 }}>
+            {cat.title}
+          </div>
+          <div className="flex flex-col" style={{ gap: 6 }}>
+            {cat.items.map((item, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <div style={{ marginTop: 1 }}>{statusIcon(item.status)}</div>
+                <span style={{
+                  fontSize: 12, lineHeight: 1.4,
+                  color: item.status === "met" ? "#9CA3AF" : "#374151",
+                  textDecoration: item.status === "met" ? "line-through" : "none",
+                  textDecorationColor: "#D1D5DB",
+                }}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 /* ── Main Component ── */
 interface Props {
   onBack: () => void;
@@ -524,37 +656,43 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       ) : (
       /* Skills Constellation View */
       <div className="flex flex-col" style={{ gap: 20 }}>
-        <div style={{
-          background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-          position: "relative", overflow: "hidden", height: 520,
-        }}>
-          <SkillsGraph month={3} />
-
-          {/* Legend */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20 }}>
+          {/* Graph */}
           <div style={{
-            position: "absolute", bottom: 16, right: 16,
-            background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
-            border: "1px solid #E8E8E8", borderRadius: 10, padding: "14px 18px",
-            display: "flex", flexDirection: "column", gap: 7, zIndex: 10,
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+            position: "relative", overflow: "hidden", height: 520,
           }}>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Developed skill</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", opacity: 0.5 }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Developing</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
-              <span style={{ fontSize: 11, color: "#6B7280" }}>Not yet started</span>
+            <SkillsGraph month={3} />
+
+            {/* Legend */}
+            <div style={{
+              position: "absolute", bottom: 16, left: 16,
+              background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+              border: "1px solid #E8E8E8", borderRadius: 10, padding: "14px 18px",
+              display: "flex", flexDirection: "column", gap: 7, zIndex: 10,
+            }}>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Developed skill</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", opacity: 0.5 }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Developing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEF3C7", border: "2px dashed #F59E0B" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Required for promotion</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F3F4F6", border: "1.5px dashed #9CA3AF" }} />
+                <span style={{ fontSize: 11, color: "#6B7280" }}>Not yet started</span>
+              </div>
             </div>
           </div>
+
+          {/* Competency Framework Checklist */}
+          <CompetencyChecklist />
         </div>
 
         {/* Summary stats */}
