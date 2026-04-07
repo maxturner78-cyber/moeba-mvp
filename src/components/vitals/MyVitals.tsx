@@ -129,11 +129,39 @@ const CheckInForm: React.FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
   );
 };
 
-/* ─── Weekly Insight ─── */
-const WeeklyInsight: React.FC = () => (
-  <div>
-    <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
+/* ─── Weekly Insight Card (always visible, check-in CTA blended in) ─── */
+const WeeklyInsightCard: React.FC<{
+  checkInState: "prompt" | "form" | "done";
+  onStartCheckIn: () => void;
+  formVisible: boolean;
+  onSubmitCheckIn: () => void;
+}> = ({ checkInState, onStartCheckIn, formVisible, onSubmitCheckIn }) => (
+  <div
+    style={{
+      background: "#F0FDF4",
+      border: "1px solid #DCFCE7",
+      borderRadius: 10,
+      padding: "24px 28px",
+      position: "relative",
+      marginBottom: 40,
+    }}
+  >
+    <div
+      style={{
+        position: "absolute",
+        left: 0, top: 12, bottom: 12,
+        width: 3, background: "#22C55E", borderRadius: 2,
+      }}
+    />
+
+    {/* Header */}
+    <div className="flex items-center gap-2" style={{ marginBottom: 4 }}>
+      <div
+        style={{
+          width: 8, height: 8, borderRadius: "50%", background: "#22C55E",
+          animation: "pulse-scale 2s ease-in-out infinite",
+        }}
+      />
       <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#15803D" }}>
         Weekly Insight
       </span>
@@ -141,25 +169,99 @@ const WeeklyInsight: React.FC = () => (
         Week 12 · Generated today
       </span>
     </div>
-    <p style={{ fontSize: 15, color: "#374151", lineHeight: 1.7 }}>
-      Your confidence held steady at{" "}
-      <span className="font-mono-data" style={{ fontWeight: 600 }}>7</span> this week, and your manager rated your work quality at{" "}
-      <span className="font-mono-data" style={{ fontWeight: 600 }}>8</span> — that's strong alignment. One thing to watch: your question frequency dropped to{" "}
-      <span className="font-mono-data" style={{ fontWeight: 600 }}>2</span> this week, down from an average of{" "}
-      <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span>. In weeks where you ask more questions, your output tends to be rated higher. Is there something you're stuck on that you haven't raised yet?
-    </p>
-    <div className="flex items-center gap-1.5" style={{ marginTop: 16 }}>
-      <CheckCircle size={14} color="#22C55E" strokeWidth={2} />
-      <span style={{ fontSize: 12, color: "#9CA3AF" }}>Check-in submitted Mar 28</span>
+
+    {/* Insight body — always visible */}
+    <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7, marginTop: 14 }}>
+      <p style={{ marginBottom: 12 }}>
+        Your manager rated your work quality at{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>8</span> on the Meridian audit workpapers — but you rated yourself{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span>. That's a{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600, color: "#B45309" }}>3.0</span>-point perception gap, and it's been widening for{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>3</span> consecutive weeks. You're doing better than you think.
+      </p>
+      <p style={{ marginBottom: 12 }}>
+        Your question frequency dropped to{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>2</span> this week, down from an average of{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span>. In weeks where you ask more questions, your output tends to be rated higher. There's a direct correlation in your data.
+      </p>
+      <p>
+        Confidence held steady at{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>7</span> — that's good. But your workload score hit{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>8</span>, the highest in{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>6</span> weeks. If you're absorbing more without asking for help, that pattern tends to precede a dip. Flag it early.
+      </p>
     </div>
+
+    {/* Divider */}
+    <div style={{ borderTop: "1px solid #DCFCE7", margin: "20px 0 16px" }} />
+
+    {/* Check-in CTA or form or done state */}
+    {checkInState === "prompt" && (
+      <div className="flex items-center justify-between">
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 2 }}>
+            Ready for this week's check-in?
+          </div>
+          <p style={{ fontSize: 12, color: "#6B7280" }}>
+            ~90 seconds. Your responses generate next week's insight.
+          </p>
+        </div>
+        <button
+          onClick={onStartCheckIn}
+          className="flex items-center gap-1"
+          style={{
+            padding: "9px 22px",
+            background: "#22C55E",
+            color: "#FFFFFF",
+            fontSize: 14,
+            fontWeight: 600,
+            border: "none",
+            borderRadius: 100,
+            cursor: "pointer",
+            transition: "background 150ms ease",
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
+        >
+          Start Check-In <ChevronRight size={16} />
+        </button>
+      </div>
+    )}
+
+    {checkInState === "form" && (
+      <div
+        style={{
+          opacity: formVisible ? 1 : 0,
+          transform: formVisible ? "translateY(0)" : "translateY(8px)",
+          transition: "opacity 200ms ease, transform 200ms ease",
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 4 }}>
+          Weekly Check-In
+        </div>
+        <p style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>
+          Be honest — this builds your development profile.
+        </p>
+        <CheckInForm onSubmit={onSubmitCheckIn} />
+      </div>
+    )}
+
+    {checkInState === "done" && (
+      <div className="flex items-center gap-2 animate-fade-in">
+        <CheckCircle size={16} color="#22C55E" strokeWidth={2} />
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#15803D" }}>
+          Check-in submitted — your Week 13 insight will generate on Monday
+        </span>
+      </div>
+    )}
   </div>
 );
 
 /* ─── Main Page ─── */
 const MyVitals: React.FC = () => {
-  const [checkInState, setCheckInState] = useState<"prompt" | "form" | "insight">("prompt");
+  const [checkInState, setCheckInState] = useState<"prompt" | "form" | "done">("prompt");
   const [formVisible, setFormVisible] = useState(false);
-  const formRef = useRef<HTMLDivElement>(null);
 
   const handleStartCheckIn = () => {
     setCheckInState("form");
@@ -168,86 +270,18 @@ const MyVitals: React.FC = () => {
 
   const handleSubmit = () => {
     setFormVisible(false);
-    setTimeout(() => setCheckInState("insight"), 250);
+    setTimeout(() => setCheckInState("done"), 250);
   };
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
-      {/* SECTION 1: Check-In / Insight */}
-      <div
-        style={{
-          background: "#F0FDF4",
-          border: "1px solid #DCFCE7",
-          borderRadius: 10,
-          padding: "24px 28px",
-          paddingLeft: 28,
-          position: "relative",
-          marginBottom: 40,
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            left: 0, top: 12, bottom: 12,
-            width: 3, background: "#22C55E", borderRadius: 2,
-          }}
-        />
-
-        {checkInState === "prompt" && (
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 500, color: "#0F0F0F", marginBottom: 6 }}>
-              Ready for your weekly check-in?
-            </div>
-            <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 16 }}>
-              This takes about 90 seconds. Your responses generate this week's personalised insight.
-            </p>
-            <button
-              onClick={handleStartCheckIn}
-              className="flex items-center gap-1"
-              style={{
-                padding: "9px 22px",
-                background: "#22C55E",
-                color: "#FFFFFF",
-                fontSize: 14,
-                fontWeight: 600,
-                border: "none",
-                borderRadius: 100,
-                cursor: "pointer",
-                transition: "background 150ms ease",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
-            >
-              Start Check-In <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
-
-        {checkInState === "form" && (
-          <div
-            ref={formRef}
-            style={{
-              opacity: formVisible ? 1 : 0,
-              transform: formVisible ? "translateY(0)" : "translateY(8px)",
-              transition: "opacity 200ms ease, transform 200ms ease",
-            }}
-          >
-            <div style={{ fontSize: 16, fontWeight: 500, color: "#0F0F0F", marginBottom: 4 }}>
-              Weekly Check-In
-            </div>
-            <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 4 }}>
-              ~2 minutes. Be honest — this builds your development profile.
-            </p>
-            <CheckInForm onSubmit={handleSubmit} />
-          </div>
-        )}
-
-        {checkInState === "insight" && (
-          <div className="animate-fade-in">
-            <WeeklyInsight />
-          </div>
-        )}
-      </div>
+      {/* SECTION 1: Weekly Insight + Check-In */}
+      <WeeklyInsightCard
+        checkInState={checkInState}
+        onStartCheckIn={handleStartCheckIn}
+        formVisible={formVisible}
+        onSubmitCheckIn={handleSubmit}
+      />
 
       {/* SECTION 2: Development Profile */}
       <div style={{ marginBottom: 40 }}>
@@ -264,7 +298,6 @@ const MyVitals: React.FC = () => {
         </h3>
 
         <div className="flex flex-col" style={{ gap: 12 }}>
-          {/* Card 1 */}
           <div
             style={{
               background: "#FFFFFF",
@@ -293,7 +326,6 @@ const MyVitals: React.FC = () => {
             </p>
           </div>
 
-          {/* Card 2 */}
           <div
             style={{
               background: "#FFFFFF",
