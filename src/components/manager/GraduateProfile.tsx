@@ -636,6 +636,60 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
             )}
           </div>
 
+          {/* Development Focus Areas */}
+          <div>
+            <h3 className="font-heading" style={{ fontSize: 15, fontWeight: 600, color: "#0F0F0F", marginBottom: 12 }}>
+              Development Focus Areas
+            </h3>
+            <div className="flex flex-col" style={{ gap: 12 }}>
+              <div style={{
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
+                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}>
+                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                  Curiosity & Learning
+                </div>
+                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
+                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
+                  Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
+                </p>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
+                </p>
+              </div>
+
+              <div style={{
+                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
+                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              }}>
+                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
+                  Ownership & Follow-Through
+                </div>
+                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
+                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
+                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
+                  There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
+                </p>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
+                  How You Can Help
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+                  When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Intervention History */}
           <div style={{
             background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
@@ -737,60 +791,57 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Focus Areas with Manager Actions */}
-          <div>
-            <h3 className="font-heading" style={{ fontSize: 15, fontWeight: 600, color: "#0F0F0F", marginBottom: 12 }}>
-              Development Focus Areas
-            </h3>
-            <div className="flex flex-col" style={{ gap: 12 }}>
-              {/* Curiosity */}
+          {/* Generate Performance Review */}
+          <div style={{
+            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          }}>
+            <div className="flex items-center gap-3" style={{ marginBottom: 8 }}>
               <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+                width: 36, height: 36, borderRadius: 8, background: "#F0FDF4",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
-                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  Curiosity & Learning
-                </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-                  Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
-                </p>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-                  How You Can Help
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
-                </p>
+                <FileText size={18} color="#22C55E" />
               </div>
-
-              {/* Self-Awareness */}
-              <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-              }}>
-                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  Ownership & Follow-Through
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>
+                  Generate Performance Review Draft
                 </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
+                <div style={{ fontSize: 12, color: "#9CA3AF" }}>
+                  12 weeks of data → ready-to-edit review
                 </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-                  There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
-                </p>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-                  How You Can Help
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
-                </p>
               </div>
             </div>
+            <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.5, marginBottom: 16 }}>
+              Auto-populate a quarterly or annual performance review using Sarah's check-in data, perception gaps, and development trajectory. Edit before submitting — save hours of prep.
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                style={{
+                  padding: "9px 20px", background: "#22C55E", color: "#fff",
+                  fontSize: 13, fontWeight: 600, border: "none", borderRadius: 100,
+                  cursor: "pointer", transition: "background 150ms ease",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
+              >
+                Quarterly Review
+              </button>
+              <button
+                style={{
+                  padding: "9px 20px", background: "#fff", color: "#374151",
+                  fontSize: 13, fontWeight: 500, border: "1px solid #E8E8E8", borderRadius: 100,
+                  cursor: "pointer", transition: "all 150ms ease",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#22C55E"; e.currentTarget.style.color = "#22C55E"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E8E8E8"; e.currentTarget.style.color = "#374151"; }}
+              >
+                Annual Review
+              </button>
+            </div>
+            <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 10 }}>
+              Coming soon — this feature is currently in development
+            </p>
           </div>
         </div>
       </div>
