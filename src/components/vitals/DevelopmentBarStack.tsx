@@ -112,7 +112,7 @@ const DevelopmentBarStack: React.FC = () => {
               key={dim.name}
               style={{
                 display: "grid",
-                gridTemplateColumns: "150px 1fr 48px 32px 56px",
+                gridTemplateColumns: "150px 1fr 48px 36px",
                 alignItems: "center",
                 gap: 8,
                 padding: "10px 4px",
@@ -186,10 +186,6 @@ const DevelopmentBarStack: React.FC = () => {
                 {trendLabel}
               </span>
 
-              {/* Mini sparkline */}
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <MiniSparkline data={dim.sparkline} color={trendColor} />
-              </div>
             </div>
           );
         })}
