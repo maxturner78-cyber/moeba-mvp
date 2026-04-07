@@ -124,7 +124,7 @@ export const graduates: Graduate[] = [
     managerId: "m2",
     managerName: "Rebecca Torres",
     status: "accelerating",
-    dimensions: { selfAwareness: 7.5, confidence: 7.2, curiosity: 7.8, managerRelationship: 7.6, teamConnection: 7.9, feedbackApplication: 7.4, workloadMgmt: 7.0, initiative: 7.3, resilience: 7.1 },
+    dimensions: { ownershipFollowThrough: 7.5, confidence: 7.2, curiosity: 7.8, managerRelationship: 7.6, teamConnection: 7.9, feedbackApplication: 7.4, workloadMgmt: 7.0, initiative: 7.3, resilience: 7.1 },
   },
   {
     id: "g6",
@@ -134,7 +134,7 @@ export const graduates: Graduate[] = [
     managerId: "m1",
     managerName: "David Liu",
     status: "attention",
-    dimensions: { selfAwareness: 5.8, confidence: 5.5, curiosity: 6.0, managerRelationship: 4.8, teamConnection: 6.2, feedbackApplication: 6.8, workloadMgmt: 4.2, initiative: 5.5, resilience: 5.0 },
+    dimensions: { ownershipFollowThrough: 5.8, confidence: 5.5, curiosity: 6.0, managerRelationship: 4.8, teamConnection: 6.2, feedbackApplication: 6.8, workloadMgmt: 4.2, initiative: 5.5, resilience: 5.0 },
   },
 ];
 
