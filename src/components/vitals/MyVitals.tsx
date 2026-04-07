@@ -173,22 +173,14 @@ const WeeklyInsightCard: React.FC<{
     {/* Insight body — always visible */}
     <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7, marginTop: 14 }}>
       <p style={{ marginBottom: 12 }}>
-        Your manager rated your work quality at{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>8</span> on the Meridian audit workpapers — but you rated yourself{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span>. That's a{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600, color: "#B45309" }}>3.0</span>-point perception gap, and it's been widening for{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>3</span> consecutive weeks. You're doing better than you think.
+        Your work on the Meridian audit workpapers landed really well this week — the quality is clearly there, and it's being noticed. You might not feel it yet, but you're performing stronger than you give yourself credit for. Trust that a bit more.
       </p>
       <p style={{ marginBottom: 12 }}>
-        Your question frequency dropped to{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>2</span> this week, down from an average of{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span>. In weeks where you ask more questions, your output tends to be rated higher. There's a direct correlation in your data.
+        One thing to watch: you went quieter this week — fewer questions, less reaching out. Your best weeks tend to be the ones where you're actively pulling people in. Try picking one thing you're unsure about before your next team meeting and just asking. That habit compounds.
       </p>
       <p>
-        Confidence held steady at{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>7</span> — that's good. But your workload score hit{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>8</span>, the highest in{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>6</span> weeks. If you're absorbing more without asking for help, that pattern tends to precede a dip. Flag it early.
+        Your confidence is solid, which is great. But your workload is creeping up — it's the highest it's been in{" "}
+        <span className="font-mono-data" style={{ fontWeight: 600 }}>6</span> weeks. If things are piling up, flag it now rather than pushing through silently. Raising it early is a sign of good judgement, not weakness.
       </p>
     </div>
 
