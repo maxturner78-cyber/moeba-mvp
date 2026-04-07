@@ -34,7 +34,7 @@ const Index: React.FC = () => {
   }, []);
 
   const renderPage = () => {
-    if (activeNav === "my-development") return <MyVitals />;
+    if (activeNav === "my-development") return <MyVitals onStartCheckIn={() => handleNavChange("weekly-checkin")} />;
     if (activeNav === "my-skills") return <MySkills />;
     if (activeNav === "weekly-checkin") return <WeeklyCheckIn />;
     if (activeNav === "team-brief") {
