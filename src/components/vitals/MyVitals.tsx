@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { CheckCircle, ChevronRight } from "lucide-react";
+import React from "react";
+import { ChevronRight } from "lucide-react";
 import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
 
 /* ─── Check-In Form (inline) ─── */
