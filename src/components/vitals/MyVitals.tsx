@@ -258,6 +258,31 @@ const WeeklyInsightCard: React.FC<{
   </div>
 );
 
+/* ─── Main Page ─── */
+const MyVitals: React.FC = () => {
+  const [checkInState, setCheckInState] = useState<"prompt" | "form" | "done">("prompt");
+  const [formVisible, setFormVisible] = useState(false);
+
+  const handleStartCheckIn = () => {
+    setCheckInState("form");
+    setTimeout(() => setFormVisible(true), 30);
+  };
+
+  const handleSubmit = () => {
+    setFormVisible(false);
+    setTimeout(() => setCheckInState("done"), 250);
+  };
+
+  return (
+    <div style={{ maxWidth: 680, margin: "0 auto" }}>
+      {/* SECTION 1: Weekly Insight + Check-In */}
+      <WeeklyInsightCard
+        checkInState={checkInState}
+        onStartCheckIn={handleStartCheckIn}
+        formVisible={formVisible}
+        onSubmitCheckIn={handleSubmit}
+      />
+
       {/* SECTION 2: Development Profile */}
       <div style={{ marginBottom: 40 }}>
         <DevelopmentBarStack />
@@ -273,7 +298,6 @@ const WeeklyInsightCard: React.FC<{
         </h3>
 
         <div className="flex flex-col" style={{ gap: 12 }}>
-          {/* Card 1 */}
           <div
             style={{
               background: "#FFFFFF",
@@ -302,7 +326,6 @@ const WeeklyInsightCard: React.FC<{
             </p>
           </div>
 
-          {/* Card 2 */}
           <div
             style={{
               background: "#FFFFFF",
