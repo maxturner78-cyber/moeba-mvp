@@ -43,45 +43,68 @@ const getGapColor = (gap: number) => {
   return "#22C55E";
 };
 
-const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay: number; animated: boolean }> = ({ self, others, gap, delay, animated }) => {
-  const color = getGapColor(gap);
+const DivergenceDot: React.FC<{
+  self: number; manager: number; peer?: number; maxGap: number; delay: number; animated: boolean;
+}> = ({ self, manager, peer, maxGap, delay, animated }) => {
+  const color = getGapColor(maxGap);
   const selfPos = (self / 10) * 100;
-  const othersPos = (others / 10) * 100;
-  const left = Math.min(selfPos, othersPos);
-  const width = Math.abs(othersPos - selfPos);
+  const managerPos = (manager / 10) * 100;
+  const peerPos = peer != null ? (peer / 10) * 100 : null;
+  const allPositions = [selfPos, managerPos, ...(peerPos != null ? [peerPos] : [])];
+  const left = Math.min(...allPositions);
+  const right = Math.max(...allPositions);
+  const width = right - left;
   const center = 50;
 
   return (
-    <div style={{ position: "relative", height: 20, width: "100%" }}>
-      <div style={{ position: "absolute", top: 9, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
+    <div style={{ position: "relative", height: 24, width: "100%" }}>
+      <div style={{ position: "absolute", top: 11, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
       <div style={{
-        position: "absolute", top: 9, height: 2, background: color, borderRadius: 1,
+        position: "absolute", top: 10, height: 2, background: color, borderRadius: 1, opacity: 0.4,
         left: animated ? `${left}%` : `${center}%`,
         width: animated ? `${width}%` : "0%",
         transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
       }} />
+      {/* Self (indigo) */}
       <div style={{
-        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
         background: "#6366F1", boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
         left: animated ? `calc(${selfPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
+        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 3,
       }} />
       <span className="font-mono-data" style={{
-        position: "absolute", top: 17, fontSize: 10, color: "#6366F1",
-        left: animated ? `calc(${selfPos}% - 8px)` : `calc(${center}% - 8px)`,
+        position: "absolute", top: 18, fontSize: 9, color: "#6366F1",
+        left: animated ? `calc(${selfPos}% - 6px)` : `calc(${center}% - 6px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }}>{self}</span>
+      {/* Manager (green) */}
       <div style={{
-        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
         background: "#22C55E", boxShadow: "0 1px 3px rgba(34,197,94,0.3)",
-        left: animated ? `calc(${othersPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
+        left: animated ? `calc(${managerPos}% - 5px)` : `calc(${center}% - 5px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 2,
       }} />
       <span className="font-mono-data" style={{
-        position: "absolute", top: 17, fontSize: 10, color: "#22C55E",
-        left: animated ? `calc(${othersPos}% - 8px)` : `calc(${center}% - 8px)`,
+        position: "absolute", top: 18, fontSize: 9, color: "#22C55E",
+        left: animated ? `calc(${managerPos}% - 6px)` : `calc(${center}% - 6px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
-      }}>{others}</span>
+      }}>{manager}</span>
+      {/* Peer (amber) */}
+      {peerPos != null && peer != null && (
+        <>
+          <div style={{
+            position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
+            background: "#F59E0B", boxShadow: "0 1px 3px rgba(245,158,11,0.3)",
+            left: animated ? `calc(${peerPos}% - 5px)` : `calc(${center}% - 5px)`,
+            transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 1,
+          }} />
+          <span className="font-mono-data" style={{
+            position: "absolute", top: 18, fontSize: 9, color: "#F59E0B",
+            left: animated ? `calc(${peerPos}% - 6px)` : `calc(${center}% - 6px)`,
+            transition: `left 500ms ease-out ${delay + 800}ms`,
+          }}>{peer}</span>
+        </>
+      )}
     </div>
   );
 };
