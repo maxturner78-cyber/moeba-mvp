@@ -43,76 +43,99 @@ const getGapColor = (gap: number) => {
   return "#22C55E";
 };
 
-const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay: number; animated: boolean }> = ({ self, others, gap, delay, animated }) => {
-  const color = getGapColor(gap);
+const DivergenceDot: React.FC<{
+  self: number; manager: number; peer?: number; maxGap: number; delay: number; animated: boolean;
+}> = ({ self, manager, peer, maxGap, delay, animated }) => {
+  const color = getGapColor(maxGap);
   const selfPos = (self / 10) * 100;
-  const othersPos = (others / 10) * 100;
-  const left = Math.min(selfPos, othersPos);
-  const width = Math.abs(othersPos - selfPos);
+  const managerPos = (manager / 10) * 100;
+  const peerPos = peer != null ? (peer / 10) * 100 : null;
+  const allPositions = [selfPos, managerPos, ...(peerPos != null ? [peerPos] : [])];
+  const left = Math.min(...allPositions);
+  const right = Math.max(...allPositions);
+  const width = right - left;
   const center = 50;
 
   return (
-    <div style={{ position: "relative", height: 20, width: "100%" }}>
-      <div style={{ position: "absolute", top: 9, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
+    <div style={{ position: "relative", height: 24, width: "100%" }}>
+      <div style={{ position: "absolute", top: 11, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
       <div style={{
-        position: "absolute", top: 9, height: 2, background: color, borderRadius: 1,
+        position: "absolute", top: 10, height: 2, background: color, borderRadius: 1, opacity: 0.4,
         left: animated ? `${left}%` : `${center}%`,
         width: animated ? `${width}%` : "0%",
         transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
       }} />
+      {/* Self (indigo) */}
       <div style={{
-        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
         background: "#6366F1", boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
         left: animated ? `calc(${selfPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
+        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 3,
       }} />
       <span className="font-mono-data" style={{
-        position: "absolute", top: 17, fontSize: 10, color: "#6366F1",
-        left: animated ? `calc(${selfPos}% - 8px)` : `calc(${center}% - 8px)`,
+        position: "absolute", top: 18, fontSize: 9, color: "#6366F1",
+        left: animated ? `calc(${selfPos}% - 6px)` : `calc(${center}% - 6px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
       }}>{self}</span>
+      {/* Manager (green) */}
       <div style={{
-        position: "absolute", top: 5, width: 10, height: 10, borderRadius: "50%",
+        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
         background: "#22C55E", boxShadow: "0 1px 3px rgba(34,197,94,0.3)",
-        left: animated ? `calc(${othersPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
+        left: animated ? `calc(${managerPos}% - 5px)` : `calc(${center}% - 5px)`,
+        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 2,
       }} />
       <span className="font-mono-data" style={{
-        position: "absolute", top: 17, fontSize: 10, color: "#22C55E",
-        left: animated ? `calc(${othersPos}% - 8px)` : `calc(${center}% - 8px)`,
+        position: "absolute", top: 18, fontSize: 9, color: "#22C55E",
+        left: animated ? `calc(${managerPos}% - 6px)` : `calc(${center}% - 6px)`,
         transition: `left 500ms ease-out ${delay + 800}ms`,
-      }}>{others}</span>
+      }}>{manager}</span>
+      {/* Peer (amber) */}
+      {peerPos != null && peer != null && (
+        <>
+          <div style={{
+            position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
+            background: "#F59E0B", boxShadow: "0 1px 3px rgba(245,158,11,0.3)",
+            left: animated ? `calc(${peerPos}% - 5px)` : `calc(${center}% - 5px)`,
+            transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 1,
+          }} />
+          <span className="font-mono-data" style={{
+            position: "absolute", top: 18, fontSize: 9, color: "#F59E0B",
+            left: animated ? `calc(${peerPos}% - 6px)` : `calc(${center}% - 6px)`,
+            transition: `left 500ms ease-out ${delay + 800}ms`,
+          }}>{peer}</span>
+        </>
+      )}
     </div>
   );
 };
 
-/* ── Behavioural Perception Gap Data ── */
+/* ── Behavioural Perception Gap Data (with peer) ── */
 const allBehaviouralGaps = [
-  { dim: "Ownership & Follow-Through", self: 5.2, others: 8.0, gap: 2.8 },
-  { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
-  { dim: "Curiosity", self: 4.8, others: 5.5, gap: 0.7 },
-  { dim: "Manager Relationship", self: 7.1, others: 7.5, gap: 0.4 },
-  { dim: "Team Connection", self: 7.4, others: 7.8, gap: 0.4 },
-  { dim: "Feedback Application", self: 8.1, others: 8.0, gap: -0.1 },
-  { dim: "Workload Management", self: 6.0, others: 6.8, gap: 0.8 },
-  { dim: "Initiative", self: 5.3, others: 6.5, gap: 1.2 },
-  { dim: "Resilience", self: 6.8, others: 7.2, gap: 0.4 },
+  { dim: "Ownership & Follow-Through", self: 5.2, manager: 8.0, peer: 7.2 as number | undefined, maxGap: 2.8 },
+  { dim: "Confidence", self: 5.5, manager: 7.8, peer: 6.8 as number | undefined, maxGap: 2.3 },
+  { dim: "Curiosity", self: 4.8, manager: 5.5, peer: 5.8 as number | undefined, maxGap: 1.0 },
+  { dim: "Manager Relationship", self: 7.1, manager: 7.5, peer: undefined as number | undefined, maxGap: 0.4 },
+  { dim: "Team Connection", self: 7.4, manager: 7.8, peer: 8.1 as number | undefined, maxGap: 0.7 },
+  { dim: "Feedback Application", self: 8.1, manager: 8.0, peer: 7.5 as number | undefined, maxGap: 0.6 },
+  { dim: "Workload Management", self: 6.0, manager: 6.8, peer: 6.5 as number | undefined, maxGap: 0.8 },
+  { dim: "Initiative", self: 5.3, manager: 6.5, peer: 7.0 as number | undefined, maxGap: 1.7 },
+  { dim: "Resilience", self: 6.8, manager: 7.2, peer: 7.0 as number | undefined, maxGap: 0.4 },
 ];
 
-/* ── Skills Perception Gap Data ── */
+/* ── Skills Perception Gap Data (with peer) ── */
 const allSkillsGaps = [
-  { dim: "Financial Statement Review", self: 5.0, others: 7.5, gap: 2.5 },
-  { dim: "Audit Planning", self: 4.5, others: 6.0, gap: 1.5 },
-  { dim: "Tax Compliance Basics", self: 3.2, others: 5.0, gap: 1.8 },
-  { dim: "Documentation Standards", self: 7.0, others: 6.5, gap: -0.5 },
-  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, others: 8.0, gap: 0.5 },
-  { dim: "Client Communication", self: 3.0, others: 5.5, gap: 2.5 },
-  { dim: "Risk Assessment", self: 3.5, others: 4.8, gap: 1.3 },
-  { dim: "AML/CTF Procedures", self: 5.0, others: 5.5, gap: 0.5 },
-  { dim: "Ethics & Prof. Standards", self: 6.5, others: 7.0, gap: 0.5 },
-  { dim: "Tax Return Preparation", self: 2.8, others: 4.2, gap: 1.4 },
-  { dim: "Journal Entries & Depreciation", self: 4.0, others: 5.5, gap: 1.5 },
-  { dim: "Presentation Skills", self: 4.0, others: 5.0, gap: 1.0 },
+  { dim: "Financial Statement Review", self: 5.0, manager: 7.5, peer: 6.8 as number | undefined, maxGap: 2.5 },
+  { dim: "Audit Planning", self: 4.5, manager: 6.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
+  { dim: "Tax Compliance Basics", self: 3.2, manager: 5.0, peer: 4.8 as number | undefined, maxGap: 1.8 },
+  { dim: "Documentation Standards", self: 7.0, manager: 6.5, peer: 7.2 as number | undefined, maxGap: 0.7 },
+  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, manager: 8.0, peer: 7.8 as number | undefined, maxGap: 0.5 },
+  { dim: "Client Communication", self: 3.0, manager: 5.5, peer: 4.5 as number | undefined, maxGap: 2.5 },
+  { dim: "Risk Assessment", self: 3.5, manager: 4.8, peer: 4.2 as number | undefined, maxGap: 1.3 },
+  { dim: "AML/CTF Procedures", self: 5.0, manager: 5.5, peer: 5.2 as number | undefined, maxGap: 0.5 },
+  { dim: "Ethics & Prof. Standards", self: 6.5, manager: 7.0, peer: 6.8 as number | undefined, maxGap: 0.5 },
+  { dim: "Tax Return Preparation", self: 2.8, manager: 4.2, peer: 3.8 as number | undefined, maxGap: 1.4 },
+  { dim: "Journal Entries & Depreciation", self: 4.0, manager: 5.5, peer: 5.0 as number | undefined, maxGap: 1.5 },
+  { dim: "Presentation Skills", self: 4.0, manager: 5.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
 ];
 
 /* ── Perception Gap Section Component ── */
@@ -150,7 +173,7 @@ const GapSection: React.FC<GapSectionProps> = ({
     requestAnimationFrame(() => setAnimated(true));
   }, [avgGap]);
 
-  const sorted = [...gaps].sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
+  const sorted = [...gaps].sort((a, b) => Math.abs(b.maxGap) - Math.abs(a.maxGap));
   const visible = expanded ? sorted : sorted.slice(0, defaultCount);
   const remaining = sorted.length - defaultCount;
 
@@ -183,13 +206,13 @@ const GapSection: React.FC<GapSectionProps> = ({
       <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
         {expanded ? "All Gaps" : "Biggest Gaps"}
       </div>
-      <div className="flex flex-col" style={{ gap: 8, marginBottom: 12 }}>
+      <div className="flex flex-col" style={{ gap: 10, marginBottom: 12 }}>
         {visible.map((g, i) => (
-          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 28 }}>
+          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 32 }}>
             <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot self={g.self} others={g.others} gap={Math.abs(g.gap)} delay={i * 60} animated={animated} />
-            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.gap)), textAlign: "right" }}>
-              {Math.abs(g.gap).toFixed(1)} pts
+            <DivergenceDot self={g.self} manager={g.manager} peer={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
+            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.maxGap)), textAlign: "right" }}>
+              {Math.abs(g.maxGap).toFixed(1)} pts
             </span>
           </div>
         ))}
@@ -214,7 +237,7 @@ const GapSection: React.FC<GapSectionProps> = ({
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
-      <div className="flex items-center" style={{ gap: 16 }}>
+      <div className="flex items-center flex-wrap" style={{ gap: 16 }}>
         <div className="flex items-center" style={{ gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366F1" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
@@ -222,6 +245,10 @@ const GapSection: React.FC<GapSectionProps> = ({
         <div className="flex items-center" style={{ gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
+        </div>
+        <div className="flex items-center" style={{ gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer / Buddy rating</span>
         </div>
       </div>
     </div>
@@ -443,8 +470,8 @@ const CompetencyChecklist: React.FC = () => {
 
 /* ── Perception Gap Analysis View ── */
 const PerceptionGapAnalysis: React.FC = () => {
-  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allBehaviouralGaps.length;
-  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allSkillsGaps.length;
+  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allBehaviouralGaps.length;
+  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allSkillsGaps.length;
 
   return (
     <div className="flex flex-col" style={{ gap: 24 }}>
@@ -453,7 +480,7 @@ const PerceptionGapAnalysis: React.FC = () => {
         background: "#F0FDF4", borderRadius: 8, padding: 14,
       }}>
         <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-          <span style={{ fontWeight: 500 }}>Perception gap analysis</span> compares Sarah's self-assessment against your observations — across both behavioural indicators and role-specific skills. Large gaps suggest she may need recalibration or targeted feedback.
+          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer/buddy's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
         </p>
       </div>
 
@@ -486,7 +513,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           avgColor={getGapColor(behaviouralAvg)}
           trend="Widening over 4 weeks"
           trendColor="#DC2626"
-          insight="Sarah consistently rates herself lower than you rate her across behavioural indicators"
+          insight="Sarah consistently rates herself lower than both you and her peer across behavioural indicators — her buddy rates her closer to your assessment, confirming this isn't just your perspective"
         />
         <GapSection
           title="Role-Specific Skills"
@@ -497,7 +524,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           avgColor={getGapColor(skillsAvg)}
           trend="Steady over 3 weeks"
           trendColor="#F59E0B"
-          insight="Sarah underestimates her technical progress — particularly in financial statement review and client communication"
+          insight="All three perspectives agree Sarah underestimates her technical progress — peer ratings align closely with yours, particularly in financial statement review"
         />
       </div>
 
@@ -511,7 +538,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           Recommended Action
         </div>
         <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Both suggest Sarah doesn't recognise her own progress. In your next 1-on-1, walk through a recent piece of her work and have her assess it before you share your rating — this builds calibration through evidence rather than reassurance.
+          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer/buddy independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her buddy also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
         </p>
       </div>
     </div>
