@@ -466,8 +466,8 @@ const CompetencyChecklist: React.FC = () => {
 
 /* ── Perception Gap Analysis View ── */
 const PerceptionGapAnalysis: React.FC = () => {
-  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allBehaviouralGaps.length;
-  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.gap), 0) / allSkillsGaps.length;
+  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allBehaviouralGaps.length;
+  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allSkillsGaps.length;
 
   return (
     <div className="flex flex-col" style={{ gap: 24 }}>
