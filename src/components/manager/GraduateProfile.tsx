@@ -237,7 +237,7 @@ const GapSection: React.FC<GapSectionProps> = ({
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
 
-      <div className="flex items-center" style={{ gap: 16 }}>
+      <div className="flex items-center flex-wrap" style={{ gap: 16 }}>
         <div className="flex items-center" style={{ gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366F1" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Self-rating</span>
@@ -245,6 +245,10 @@ const GapSection: React.FC<GapSectionProps> = ({
         <div className="flex items-center" style={{ gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
+        </div>
+        <div className="flex items-center" style={{ gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer / Buddy rating</span>
         </div>
       </div>
     </div>
