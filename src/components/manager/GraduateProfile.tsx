@@ -480,7 +480,7 @@ const PerceptionGapAnalysis: React.FC = () => {
         background: "#F0FDF4", borderRadius: 8, padding: 14,
       }}>
         <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-          <span style={{ fontWeight: 500 }}>Perception gap analysis</span> compares Sarah's self-assessment against your observations — across both behavioural indicators and role-specific skills. Large gaps suggest she may need recalibration or targeted feedback.
+          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer/buddy's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
         </p>
       </div>
 
