@@ -38,7 +38,7 @@ const PeerCheckIn: React.FC = () => {
     <div className="flex justify-center" style={{ paddingTop: 8 }}>
       <div style={{ maxWidth: 560, width: "100%" }}>
         <h1 className="font-heading" style={{ fontSize: 26, fontWeight: 700, color: "#0F0F0F", letterSpacing: "-0.02em", marginBottom: 4 }}>
-          Peer / Buddy Check-In
+          Peer Check-In
         </h1>
         <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, marginBottom: 8 }}>
           ~3 minutes. Your observations help build a complete picture of how {grad?.name.split(" ")[0]} is settling in.
@@ -51,7 +51,7 @@ const PeerCheckIn: React.FC = () => {
         }}>
           <Users size={16} color="#15803D" style={{ marginTop: 2, flexShrink: 0 }} />
           <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-            As their assigned buddy, your perspective is invaluable during the first 8 weeks. You see things their manager doesn't — how they interact with the team day-to-day, whether they're asking questions, and how they handle the learning curve.
+            As their assigned peer, your perspective is invaluable during the first 8 weeks. You see things their manager doesn't — how they interact with the team day-to-day, whether they're asking questions, and how they handle the learning curve.
           </p>
         </div>
 
