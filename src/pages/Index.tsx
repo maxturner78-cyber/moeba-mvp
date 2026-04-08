@@ -8,10 +8,12 @@ import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
+import PeerCheckIn from "@/components/peer/PeerCheckIn";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-development",
   manager: "team-brief",
+  peer: "peer-checkin",
 };
 
 const Index: React.FC = () => {

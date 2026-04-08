@@ -25,6 +25,9 @@ const navConfig: Record<ViewTab, NavItem[]> = {
     { id: "team-brief", label: "Team Brief", icon: Zap },
     { id: "assess-team", label: "Assess Team", icon: ClipboardList },
   ],
+  peer: [
+    { id: "peer-checkin", label: "Peer Check-In", icon: ClipboardCheck },
+  ],
 };
 
 interface SidebarProps {
