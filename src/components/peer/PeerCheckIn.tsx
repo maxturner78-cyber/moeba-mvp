@@ -51,7 +51,7 @@ const PeerCheckIn: React.FC = () => {
         }}>
           <Users size={16} color="#15803D" style={{ marginTop: 2, flexShrink: 0 }} />
           <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-            As their assigned buddy, your perspective is invaluable during the first 8 weeks. You see things their manager doesn't — how they interact with the team day-to-day, whether they're asking questions, and how they handle the learning curve.
+            As their assigned peer, your perspective is invaluable during the first 8 weeks. You see things their manager doesn't — how they interact with the team day-to-day, whether they're asking questions, and how they handle the learning curve.
           </p>
         </div>
 

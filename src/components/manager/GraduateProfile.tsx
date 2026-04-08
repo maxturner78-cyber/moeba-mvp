@@ -516,7 +516,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           avgColor={getGapColor(behaviouralAvg)}
           trend="Widening over 4 weeks"
           trendColor="#DC2626"
-          insight="Sarah consistently rates herself lower than both you and her peer across behavioural indicators — her buddy rates her closer to your assessment, confirming this isn't just your perspective"
+          insight="Sarah consistently rates herself lower than both you and her peer across behavioural indicators — her peer rates her closer to your assessment, confirming this isn't just your perspective"
         />
         <GapSection
           title="Role-Specific Skills"
@@ -541,7 +541,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           Recommended Action
         </div>
         <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her buddy also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
+          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her peer also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
         </p>
       </div>
     </div>
