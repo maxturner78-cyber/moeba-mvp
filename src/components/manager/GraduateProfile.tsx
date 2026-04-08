@@ -150,7 +150,7 @@ const GapSection: React.FC<GapSectionProps> = ({
     requestAnimationFrame(() => setAnimated(true));
   }, [avgGap]);
 
-  const sorted = [...gaps].sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
+  const sorted = [...gaps].sort((a, b) => Math.abs(b.maxGap) - Math.abs(a.maxGap));
   const visible = expanded ? sorted : sorted.slice(0, defaultCount);
   const remaining = sorted.length - defaultCount;
 
@@ -183,13 +183,13 @@ const GapSection: React.FC<GapSectionProps> = ({
       <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 12 }}>
         {expanded ? "All Gaps" : "Biggest Gaps"}
       </div>
-      <div className="flex flex-col" style={{ gap: 8, marginBottom: 12 }}>
+      <div className="flex flex-col" style={{ gap: 10, marginBottom: 12 }}>
         {visible.map((g, i) => (
-          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 28 }}>
+          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 32 }}>
             <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot self={g.self} others={g.others} gap={Math.abs(g.gap)} delay={i * 60} animated={animated} />
-            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.gap)), textAlign: "right" }}>
-              {Math.abs(g.gap).toFixed(1)} pts
+            <DivergenceDot self={g.self} manager={g.manager} peer={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
+            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.maxGap)), textAlign: "right" }}>
+              {Math.abs(g.maxGap).toFixed(1)} pts
             </span>
           </div>
         ))}
