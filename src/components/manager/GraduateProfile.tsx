@@ -251,7 +251,7 @@ const GapSection: React.FC<GapSectionProps> = ({
         </div>
         <div className="flex items-center" style={{ gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
-          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer / Buddy rating</span>
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer rating</span>
         </div>
       </div>
     </div>
@@ -483,7 +483,7 @@ const PerceptionGapAnalysis: React.FC = () => {
         background: "#F0FDF4", borderRadius: 8, padding: 14,
       }}>
         <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer/buddy's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
+          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
         </p>
       </div>
 
@@ -541,7 +541,7 @@ const PerceptionGapAnalysis: React.FC = () => {
           Recommended Action
         </div>
         <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer/buddy independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her buddy also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
+          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her buddy also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
         </p>
       </div>
     </div>

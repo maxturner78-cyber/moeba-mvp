@@ -38,7 +38,7 @@ const PeerCheckIn: React.FC = () => {
     <div className="flex justify-center" style={{ paddingTop: 8 }}>
       <div style={{ maxWidth: 560, width: "100%" }}>
         <h1 className="font-heading" style={{ fontSize: 26, fontWeight: 700, color: "#0F0F0F", letterSpacing: "-0.02em", marginBottom: 4 }}>
-          Peer / Buddy Check-In
+          Peer Check-In
         </h1>
         <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, marginBottom: 8 }}>
           ~3 minutes. Your observations help build a complete picture of how {grad?.name.split(" ")[0]} is settling in.

@@ -10,7 +10,7 @@ interface TopBarProps {
 const tabs: { id: ViewTab; label: string }[] = [
   { id: "graduate", label: "Graduate" },
   { id: "manager", label: "Manager" },
-  { id: "peer", label: "Peer / Buddy" },
+  { id: "peer", label: "Peer" },
 ];
 
 const TopBar: React.FC<TopBarProps> = ({ activeTab, onTabChange }) => {
