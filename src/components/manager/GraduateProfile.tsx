@@ -56,55 +56,58 @@ const DivergenceDot: React.FC<{
   const width = right - left;
   const center = 50;
 
+  // Sort positions to assign label offsets and avoid overlap
+  type DotInfo = { pos: number; color: string; label: string; z: number };
+  const dots: DotInfo[] = [
+    { pos: selfPos, color: "#6366F1", label: String(self), z: 3 },
+    { pos: managerPos, color: "#22C55E", label: String(manager), z: 2 },
+    ...(peerPos != null && peer != null ? [{ pos: peerPos, color: "#F59E0B", label: String(peer), z: 1 }] : []),
+  ];
+  // Sort by position so we can offset overlapping labels
+  const sorted = [...dots].sort((a, b) => a.pos - b.pos);
+  const labelOffsets: Map<DotInfo, number> = new Map();
+  sorted.forEach((dot, i) => {
+    // default: below the dot
+    let yOff = 20;
+    if (i > 0) {
+      const prev = sorted[i - 1];
+      const gap = Math.abs(dot.pos - prev.pos);
+      // If dots are within 6% of each other, alternate label above/below
+      if (gap < 6) {
+        const prevOff = labelOffsets.get(prev) ?? 20;
+        yOff = prevOff === 20 ? -4 : 20;
+      }
+    }
+    labelOffsets.set(dot, yOff);
+  });
+
   return (
-    <div style={{ position: "relative", height: 24, width: "100%" }}>
-      <div style={{ position: "absolute", top: 11, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
+    <div style={{ position: "relative", height: 32, width: "100%" }}>
+      <div style={{ position: "absolute", top: 14, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
       <div style={{
-        position: "absolute", top: 10, height: 2, background: color, borderRadius: 1, opacity: 0.4,
+        position: "absolute", top: 13, height: 2, background: color, borderRadius: 1, opacity: 0.4,
         left: animated ? `${left}%` : `${center}%`,
         width: animated ? `${width}%` : "0%",
         transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
       }} />
-      {/* Self (indigo) */}
-      <div style={{
-        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
-        background: "#6366F1", boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
-        left: animated ? `calc(${selfPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 3,
-      }} />
-      <span className="font-mono-data" style={{
-        position: "absolute", top: 18, fontSize: 9, color: "#6366F1",
-        left: animated ? `calc(${selfPos}% - 6px)` : `calc(${center}% - 6px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
-      }}>{self}</span>
-      {/* Manager (green) */}
-      <div style={{
-        position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
-        background: "#22C55E", boxShadow: "0 1px 3px rgba(34,197,94,0.3)",
-        left: animated ? `calc(${managerPos}% - 5px)` : `calc(${center}% - 5px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 2,
-      }} />
-      <span className="font-mono-data" style={{
-        position: "absolute", top: 18, fontSize: 9, color: "#22C55E",
-        left: animated ? `calc(${managerPos}% - 6px)` : `calc(${center}% - 6px)`,
-        transition: `left 500ms ease-out ${delay + 800}ms`,
-      }}>{manager}</span>
-      {/* Peer (amber) */}
-      {peerPos != null && peer != null && (
-        <>
-          <div style={{
-            position: "absolute", top: 6, width: 10, height: 10, borderRadius: "50%",
-            background: "#F59E0B", boxShadow: "0 1px 3px rgba(245,158,11,0.3)",
-            left: animated ? `calc(${peerPos}% - 5px)` : `calc(${center}% - 5px)`,
-            transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: 1,
-          }} />
-          <span className="font-mono-data" style={{
-            position: "absolute", top: 18, fontSize: 9, color: "#F59E0B",
-            left: animated ? `calc(${peerPos}% - 6px)` : `calc(${center}% - 6px)`,
-            transition: `left 500ms ease-out ${delay + 800}ms`,
-          }}>{peer}</span>
-        </>
-      )}
+      {dots.map((dot, i) => {
+        const labelY = labelOffsets.get(dot) ?? 20;
+        return (
+          <React.Fragment key={i}>
+            <div style={{
+              position: "absolute", top: 9, width: 10, height: 10, borderRadius: "50%",
+              background: dot.color, boxShadow: `0 1px 3px ${dot.color}44`,
+              left: animated ? `calc(${dot.pos}% - 5px)` : `calc(${center}% - 5px)`,
+              transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: dot.z,
+            }} />
+            <span className="font-mono-data" style={{
+              position: "absolute", top: labelY, fontSize: 9, color: dot.color, whiteSpace: "nowrap",
+              left: animated ? `calc(${dot.pos}% - 6px)` : `calc(${center}% - 6px)`,
+              transition: `left 500ms ease-out ${delay + 800}ms`,
+            }}>{dot.label}</span>
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 };
