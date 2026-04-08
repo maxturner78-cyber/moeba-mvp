@@ -86,33 +86,33 @@ const DivergenceDot: React.FC<{ self: number; others: number; gap: number; delay
   );
 };
 
-/* ── Behavioural Perception Gap Data ── */
+/* ── Behavioural Perception Gap Data (with peer) ── */
 const allBehaviouralGaps = [
-  { dim: "Ownership & Follow-Through", self: 5.2, others: 8.0, gap: 2.8 },
-  { dim: "Confidence", self: 5.5, others: 7.8, gap: 2.3 },
-  { dim: "Curiosity", self: 4.8, others: 5.5, gap: 0.7 },
-  { dim: "Manager Relationship", self: 7.1, others: 7.5, gap: 0.4 },
-  { dim: "Team Connection", self: 7.4, others: 7.8, gap: 0.4 },
-  { dim: "Feedback Application", self: 8.1, others: 8.0, gap: -0.1 },
-  { dim: "Workload Management", self: 6.0, others: 6.8, gap: 0.8 },
-  { dim: "Initiative", self: 5.3, others: 6.5, gap: 1.2 },
-  { dim: "Resilience", self: 6.8, others: 7.2, gap: 0.4 },
+  { dim: "Ownership & Follow-Through", self: 5.2, manager: 8.0, peer: 7.2 as number | undefined, maxGap: 2.8 },
+  { dim: "Confidence", self: 5.5, manager: 7.8, peer: 6.8 as number | undefined, maxGap: 2.3 },
+  { dim: "Curiosity", self: 4.8, manager: 5.5, peer: 5.8 as number | undefined, maxGap: 1.0 },
+  { dim: "Manager Relationship", self: 7.1, manager: 7.5, peer: undefined as number | undefined, maxGap: 0.4 },
+  { dim: "Team Connection", self: 7.4, manager: 7.8, peer: 8.1 as number | undefined, maxGap: 0.7 },
+  { dim: "Feedback Application", self: 8.1, manager: 8.0, peer: 7.5 as number | undefined, maxGap: 0.6 },
+  { dim: "Workload Management", self: 6.0, manager: 6.8, peer: 6.5 as number | undefined, maxGap: 0.8 },
+  { dim: "Initiative", self: 5.3, manager: 6.5, peer: 7.0 as number | undefined, maxGap: 1.7 },
+  { dim: "Resilience", self: 6.8, manager: 7.2, peer: 7.0 as number | undefined, maxGap: 0.4 },
 ];
 
-/* ── Skills Perception Gap Data ── */
+/* ── Skills Perception Gap Data (with peer) ── */
 const allSkillsGaps = [
-  { dim: "Financial Statement Review", self: 5.0, others: 7.5, gap: 2.5 },
-  { dim: "Audit Planning", self: 4.5, others: 6.0, gap: 1.5 },
-  { dim: "Tax Compliance Basics", self: 3.2, others: 5.0, gap: 1.8 },
-  { dim: "Documentation Standards", self: 7.0, others: 6.5, gap: -0.5 },
-  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, others: 8.0, gap: 0.5 },
-  { dim: "Client Communication", self: 3.0, others: 5.5, gap: 2.5 },
-  { dim: "Risk Assessment", self: 3.5, others: 4.8, gap: 1.3 },
-  { dim: "AML/CTF Procedures", self: 5.0, others: 5.5, gap: 0.5 },
-  { dim: "Ethics & Prof. Standards", self: 6.5, others: 7.0, gap: 0.5 },
-  { dim: "Tax Return Preparation", self: 2.8, others: 4.2, gap: 1.4 },
-  { dim: "Journal Entries & Depreciation", self: 4.0, others: 5.5, gap: 1.5 },
-  { dim: "Presentation Skills", self: 4.0, others: 5.0, gap: 1.0 },
+  { dim: "Financial Statement Review", self: 5.0, manager: 7.5, peer: 6.8 as number | undefined, maxGap: 2.5 },
+  { dim: "Audit Planning", self: 4.5, manager: 6.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
+  { dim: "Tax Compliance Basics", self: 3.2, manager: 5.0, peer: 4.8 as number | undefined, maxGap: 1.8 },
+  { dim: "Documentation Standards", self: 7.0, manager: 6.5, peer: 7.2 as number | undefined, maxGap: 0.7 },
+  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, manager: 8.0, peer: 7.8 as number | undefined, maxGap: 0.5 },
+  { dim: "Client Communication", self: 3.0, manager: 5.5, peer: 4.5 as number | undefined, maxGap: 2.5 },
+  { dim: "Risk Assessment", self: 3.5, manager: 4.8, peer: 4.2 as number | undefined, maxGap: 1.3 },
+  { dim: "AML/CTF Procedures", self: 5.0, manager: 5.5, peer: 5.2 as number | undefined, maxGap: 0.5 },
+  { dim: "Ethics & Prof. Standards", self: 6.5, manager: 7.0, peer: 6.8 as number | undefined, maxGap: 0.5 },
+  { dim: "Tax Return Preparation", self: 2.8, manager: 4.2, peer: 3.8 as number | undefined, maxGap: 1.4 },
+  { dim: "Journal Entries & Depreciation", self: 4.0, manager: 5.5, peer: 5.0 as number | undefined, maxGap: 1.5 },
+  { dim: "Presentation Skills", self: 4.0, manager: 5.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
 ];
 
 /* ── Perception Gap Section Component ── */
