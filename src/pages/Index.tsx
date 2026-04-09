@@ -8,6 +8,7 @@ import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
+import TeamSkillsConstellation from "@/components/manager/TeamSkillsConstellation";
 import PeerCheckIn from "@/components/peer/PeerCheckIn";
 
 const defaultNav: Record<ViewTab, string> = {
