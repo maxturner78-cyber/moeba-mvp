@@ -88,6 +88,15 @@ const TeamSkillsConstellation: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedGrad, setSelectedGrad] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: GraphNode } | null>(null);
+  const [highlightedGap, setHighlightedGap] = useState<string | null>(null);
+
+  // Refs to access D3 selections from outside the effect
+  const d3Refs = useRef<{
+    nodeSel: d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown> | null;
+    linkSel: d3.Selection<SVGLineElement, GraphLink, SVGGElement, unknown> | null;
+    nodes: GraphNode[];
+    links: GraphLink[];
+  }>({ nodeSel: null, linkSel: null, nodes: [], links: [] });
 
   const skillGaps = useMemo(() => computeSkillGaps(), []);
 
