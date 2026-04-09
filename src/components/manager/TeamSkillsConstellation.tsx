@@ -333,15 +333,15 @@ const TeamSkillsConstellation: React.FC = () => {
       .force("link", d3.forceLink<GraphNode, GraphLink>(links).id((d) => d.id)
         .distance((l) => {
           const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 100 : 140;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 140 : 180;
         })
         .strength((l) => {
           const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.3 : 0.1;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.25 : 0.08;
         }))
-      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -600 : -40))
-      .force("center", d3.forceCenter(cx, cy).strength(0.05))
-      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 20 : 6)).strength(0.8));
+      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -900 : -80))
+      .force("center", d3.forceCenter(cx, cy).strength(0.03))
+      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 30 : 12)).strength(0.9));
 
     // Run simulation silently for 120 ticks to settle before rendering
     sim.stop();
