@@ -238,17 +238,26 @@ const TeamSkillsConstellation: React.FC = () => {
           .attr("dy", d.radius + 18).attr("font-size", 11).attr("font-weight", 500)
           .attr("fill", "#374151").attr("pointer-events", "none").attr("class", "emp-label");
       } else {
-        const color = clusterColors[d.cluster!] || "#6B7280";
+        // Match individual constellation node style
         const isShared = (d.sharedBy?.length || 0) > 1;
-        el.append("circle").attr("r", d.radius).attr("fill", color)
-          .attr("fill-opacity", isShared ? 0.6 : 0.3)
-          .attr("stroke", isShared ? color : "none")
-          .attr("stroke-width", isShared ? 1 : 0).attr("stroke-opacity", 0.5)
-          .attr("class", "main-circle");
-        if (isShared) {
+        if (d.skillStatus === "developed") {
+          el.append("circle").attr("r", d.radius)
+            .attr("fill", "#22C55E").attr("fill-opacity", 1)
+            .attr("stroke", "#FFFFFF").attr("stroke-width", 2)
+            .attr("class", "main-circle");
+        } else {
+          // developing
+          el.append("circle").attr("r", d.radius)
+            .attr("fill", "#22C55E").attr("fill-opacity", 0.5)
+            .attr("stroke", "#22C55E").attr("stroke-width", 1)
+            .attr("stroke-opacity", 0.3)
+            .attr("class", "main-circle");
+        }
+        // Show label for shared or larger nodes
+        if (isShared || d.radius > 12) {
           el.append("text").text(d.label).attr("text-anchor", "middle")
-            .attr("dy", d.radius + 12).attr("font-size", 9).attr("fill", "#6B7280")
-            .attr("pointer-events", "none").attr("class", "skill-label").attr("opacity", 0.7);
+            .attr("dy", d.radius + 13).attr("font-size", 10).attr("fill", "#6B7280")
+            .attr("pointer-events", "none").attr("class", "skill-label").attr("opacity", 0.8);
         }
       }
     });
