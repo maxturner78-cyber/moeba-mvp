@@ -88,6 +88,15 @@ const TeamSkillsConstellation: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedGrad, setSelectedGrad] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: GraphNode } | null>(null);
+  const [highlightedGap, setHighlightedGap] = useState<string | null>(null);
+
+  // Refs to access D3 selections from outside the effect
+  const d3Refs = useRef<{
+    nodeSel: d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown> | null;
+    linkSel: d3.Selection<SVGLineElement, GraphLink, SVGGElement, unknown> | null;
+    nodes: GraphNode[];
+    links: GraphLink[];
+  }>({ nodeSel: null, linkSel: null, nodes: [], links: [] });
 
   const skillGaps = useMemo(() => computeSkillGaps(), []);
 
@@ -361,8 +370,75 @@ const TeamSkillsConstellation: React.FC = () => {
         })
     );
 
+    // Store refs for external highlight
+    d3Refs.current = { nodeSel: nodeSel as any, linkSel: linkSel as any, nodes, links };
+
     return () => { sim.stop(); };
   }, [selectedGrad]);
+
+  // Effect to highlight graduates missing a selected gap skill
+  useEffect(() => {
+    const { nodeSel, linkSel, links } = d3Refs.current;
+    if (!nodeSel || !linkSel || selectedGrad) return;
+
+    if (!highlightedGap) {
+      // Reset all
+      linkSel.attr("stroke", "#E5E5E5").attr("stroke-width", 0.6).attr("stroke-opacity", 0.3);
+      nodeSel.selectAll<SVGCircleElement, GraphNode>(".main-circle")
+        .attr("fill-opacity", (nd: GraphNode) => {
+          if (nd.type === "employee") return undefined as any;
+          return (nd.sharedBy?.length || 0) > 1 ? 0.6 : 0.3;
+        });
+      nodeSel.selectAll<SVGTextElement, GraphNode>(".skill-label").attr("opacity", 0.7);
+      nodeSel.selectAll<SVGTextElement, GraphNode>(".emp-label").attr("opacity", 1);
+      nodeSel.selectAll<SVGCircleElement, GraphNode>(".emp-glow").attr("stroke-opacity", 0.2);
+      nodeSel.transition().duration(200).style("opacity", 1);
+      return;
+    }
+
+    const gap = skillGaps.find((g) => g.id === highlightedGap);
+    if (!gap) return;
+
+    // Find grad IDs missing this skill
+    const missingGradIds = new Set<string>();
+    teamGraduates.forEach((g) => {
+      const month = gradSkillMonths[g.id] || 3;
+      const snap = getSnapshot(month);
+      const node = snap.nodes.find((n) => n.id === highlightedGap);
+      const prof = node ? Math.max(0, node.proficiency + (profJitter[g.id] || 0)) : 0;
+      if (prof < 3) missingGradIds.add(g.id);
+    });
+
+    const missingEmpIds = new Set([...missingGradIds].map((id) => `emp-${id}`));
+    const targetSkillId = `skill-${highlightedGap}`;
+
+    // Dim everything, highlight missing grads and the skill node
+    nodeSel.transition().duration(200).style("opacity", (d: GraphNode) => {
+      if (missingEmpIds.has(d.id)) return 1;
+      if (d.id === targetSkillId) return 1;
+      return 0.12;
+    });
+
+    linkSel
+      .attr("stroke-opacity", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return 0.6;
+        return 0.03;
+      })
+      .attr("stroke-width", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return 1.5;
+        return 0.3;
+      })
+      .attr("stroke", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return "#EF4444";
+        return "#E5E5E5";
+      });
+  }, [highlightedGap, selectedGrad, skillGaps]);
 
   // Drill-down
   const selectedGradData = selectedGrad ? teamGraduates.find((g) => g.id === selectedGrad) : null;
@@ -461,7 +537,20 @@ const TeamSkillsConstellation: React.FC = () => {
 
             <div className="flex flex-col gap-4">
               {skillGaps.map((gap, i) => (
-                <div key={gap.id}>
+                <div key={gap.id}
+                  onClick={() => setHighlightedGap(highlightedGap === gap.id ? null : gap.id)}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: 8,
+                    padding: "8px 10px",
+                    margin: "-8px -10px",
+                    background: highlightedGap === gap.id ? "#FEF2F2" : "transparent",
+                    border: highlightedGap === gap.id ? "1px solid rgba(239,68,68,0.15)" : "1px solid transparent",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => { if (highlightedGap !== gap.id) e.currentTarget.style.background = "#F9FAFB"; }}
+                  onMouseLeave={(e) => { if (highlightedGap !== gap.id) e.currentTarget.style.background = "transparent"; }}
+                >
                   <div className="flex items-start justify-between mb-1.5">
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "#111", marginBottom: 2 }}>{gap.label}</div>
