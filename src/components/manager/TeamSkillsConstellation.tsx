@@ -164,11 +164,13 @@ const TeamSkillsConstellation: React.FC = () => {
           const owners = skillOwners.get(sk.id) || [];
           const isShared = owners.length > 1;
           const status: "developed" | "developing" | "seed" = jp > 6 ? "developed" : "developing";
-          const baseRadius = isShared ? 7 + owners.length * 1.5 : 5 + (jp / 10) * 4;
+          // Match individual graph sizing: radius 8-22 based on proficiency
+          const baseRadius = isShared
+            ? 10 + owners.length * 2 + (jp / 10) * 6
+            : 8 + (jp / 10) * 14;
 
-          // Position skill nodes near their first owner
-          const skAngle = empAngle + ((si - snap.nodes.length / 2) / snap.nodes.length) * 1.2;
-          const skDist = 60 + Math.random() * 40;
+          const skAngle = empAngle + ((si - snap.nodes.length / 2) / snap.nodes.length) * 1.6;
+          const skDist = 120 + Math.random() * 60;
 
           const skillNode: GraphNode = {
             id: `skill-${sk.id}`,
