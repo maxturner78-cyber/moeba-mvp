@@ -1,15 +1,14 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import * as d3 from "d3";
 import { teamGraduates, statusColors } from "@/data/teamData";
 import { getSnapshot, type SkillNode } from "@/data/skillsData";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, AlertTriangle } from "lucide-react";
 import SkillsGraph from "@/components/skills/SkillsGraph";
 
 const gradSkillMonths: Record<string, number> = {
   g1: 3, g2: 3, g3: 2, g4: 3, g5: 2, g6: 3,
 };
 
-/* Proficiency jitter per grad so shared skills differ slightly */
 const profJitter: Record<string, number> = {
   g1: 0, g2: 0.8, g3: -0.5, g4: 0.3, g5: -0.3, g6: 0.5,
 };
@@ -19,16 +18,14 @@ interface GraphNode extends d3.SimulationNodeDatum {
   label: string;
   type: "employee" | "skill";
   radius: number;
-  /* employee fields */
   initials?: string;
   status?: string;
   role?: string;
   week?: number;
   gradId?: string;
-  /* skill fields */
   proficiency?: number;
   cluster?: string;
-  sharedBy?: string[]; // grad ids that share this skill
+  sharedBy?: string[];
   skillStatus?: "developed" | "developing" | "seed";
 }
 
@@ -45,11 +42,54 @@ const clusterColors: Record<string, string> = {
   compliance: "#8B5CF6",
 };
 
+/* ── Skill Gap Analysis ── */
+interface SkillGap {
+  id: string;
+  label: string;
+  cluster: string;
+  missingCount: number; // grads who don't have it or are underdeveloped
+  totalGrads: number;
+  gradsMissing: string[]; // names
+}
+
+function computeSkillGaps(): SkillGap[] {
+  // Get all possible skills from month 3 (full set)
+  const fullSnap = getSnapshot(3);
+  const allSkillIds = fullSnap.nodes.map((n) => ({ id: n.id, label: n.label, cluster: n.cluster }));
+
+  const gaps: SkillGap[] = allSkillIds.map((sk) => {
+    const gradsMissing: string[] = [];
+    teamGraduates.forEach((g) => {
+      const month = gradSkillMonths[g.id] || 3;
+      const snap = getSnapshot(month);
+      const node = snap.nodes.find((n) => n.id === sk.id);
+      const prof = node ? Math.max(0, node.proficiency + (profJitter[g.id] || 0)) : 0;
+      if (prof < 3) {
+        gradsMissing.push(g.name.split(" ")[0]);
+      }
+    });
+    return {
+      id: sk.id,
+      label: sk.label,
+      cluster: sk.cluster,
+      missingCount: gradsMissing.length,
+      totalGrads: teamGraduates.length,
+      gradsMissing,
+    };
+  });
+
+  return gaps
+    .filter((g) => g.missingCount > 0)
+    .sort((a, b) => b.missingCount - a.missingCount)
+    .slice(0, 5);
+}
+
 const TeamSkillsConstellation: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedGrad, setSelectedGrad] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: GraphNode } | null>(null);
-  const [hoveredEmployee, setHoveredEmployee] = useState<string | null>(null);
+
+  const skillGaps = useMemo(() => computeSkillGaps(), []);
 
   useEffect(() => {
     if (selectedGrad) return;
@@ -57,30 +97,34 @@ const TeamSkillsConstellation: React.FC = () => {
     if (!svg) return;
 
     const rect = svg.getBoundingClientRect();
-    const width = rect.width || 900;
+    const width = rect.width || 700;
     const height = rect.height || 600;
 
-    // Build unified graph: employees + skills
     const nodes: GraphNode[] = [];
     const links: GraphLink[] = [];
-    const skillMap = new Map<string, GraphNode>(); // skillId -> node
-    const skillOwners = new Map<string, string[]>(); // skillId -> gradIds
+    const skillMap = new Map<string, GraphNode>();
+    const skillOwners = new Map<string, string[]>();
 
-    // First pass: collect which grads have which skills
     teamGraduates.forEach((g) => {
       const month = gradSkillMonths[g.id] || 3;
       const snap = getSnapshot(month);
       snap.nodes.forEach((sk) => {
-        const jitteredProf = Math.max(0, Math.min(10, sk.proficiency + (profJitter[g.id] || 0)));
-        if (jitteredProf > 0) {
+        const jp = Math.max(0, Math.min(10, sk.proficiency + (profJitter[g.id] || 0)));
+        if (jp > 0) {
           if (!skillOwners.has(sk.id)) skillOwners.set(sk.id, []);
           skillOwners.get(sk.id)!.push(g.id);
         }
       });
     });
 
-    // Employee nodes
-    teamGraduates.forEach((g) => {
+    // Pre-compute employee positions in a circle for stable initial layout
+    const empCount = teamGraduates.length;
+    const cx = width / 2;
+    const cy = height / 2;
+    const orbitRadius = Math.min(width, height) * 0.3;
+
+    teamGraduates.forEach((g, i) => {
+      const angle = (i / empCount) * Math.PI * 2 - Math.PI / 2;
       nodes.push({
         id: `emp-${g.id}`,
         label: g.name,
@@ -91,43 +135,49 @@ const TeamSkillsConstellation: React.FC = () => {
         role: g.role,
         week: g.week,
         gradId: g.id,
+        x: cx + Math.cos(angle) * orbitRadius,
+        y: cy + Math.sin(angle) * orbitRadius,
       });
     });
 
-    // Skill nodes + links
-    teamGraduates.forEach((g) => {
+    teamGraduates.forEach((g, gi) => {
       const month = gradSkillMonths[g.id] || 3;
       const snap = getSnapshot(month);
-      snap.nodes.forEach((sk) => {
-        const jitteredProf = Math.max(0, Math.min(10, sk.proficiency + (profJitter[g.id] || 0)));
-        if (jitteredProf <= 0) return;
+      const empAngle = (gi / empCount) * Math.PI * 2 - Math.PI / 2;
+      const empX = cx + Math.cos(empAngle) * orbitRadius;
+      const empY = cy + Math.sin(empAngle) * orbitRadius;
+
+      snap.nodes.forEach((sk, si) => {
+        const jp = Math.max(0, Math.min(10, sk.proficiency + (profJitter[g.id] || 0)));
+        if (jp <= 0) return;
 
         if (!skillMap.has(sk.id)) {
           const owners = skillOwners.get(sk.id) || [];
           const isShared = owners.length > 1;
-          const avgProf = jitteredProf;
-          const status: "developed" | "developing" | "seed" = avgProf > 6 ? "developed" : avgProf > 0 ? "developing" : "seed";
-          const baseRadius = isShared ? 7 + owners.length * 1.5 : 5 + (avgProf / 10) * 4;
+          const status: "developed" | "developing" | "seed" = jp > 6 ? "developed" : "developing";
+          const baseRadius = isShared ? 7 + owners.length * 1.5 : 5 + (jp / 10) * 4;
+
+          // Position skill nodes near their first owner
+          const skAngle = empAngle + ((si - snap.nodes.length / 2) / snap.nodes.length) * 1.2;
+          const skDist = 60 + Math.random() * 40;
 
           const skillNode: GraphNode = {
             id: `skill-${sk.id}`,
             label: sk.label,
             type: "skill",
             radius: baseRadius,
-            proficiency: avgProf,
+            proficiency: jp,
             cluster: sk.cluster,
             sharedBy: owners,
             skillStatus: status,
+            x: empX + Math.cos(skAngle) * skDist,
+            y: empY + Math.sin(skAngle) * skDist,
           };
           skillMap.set(sk.id, skillNode);
           nodes.push(skillNode);
         }
 
-        // Link employee to skill
-        links.push({
-          source: `emp-${g.id}`,
-          target: `skill-${sk.id}`,
-        });
+        links.push({ source: `emp-${g.id}`, target: `skill-${sk.id}` });
       });
     });
 
@@ -135,7 +185,6 @@ const TeamSkillsConstellation: React.FC = () => {
     sel.selectAll("*").remove();
 
     const defs = sel.append("defs");
-    // Employee gradients
     teamGraduates.forEach((g) => {
       const colors = statusColors[g.status];
       const grad = defs.append("radialGradient").attr("id", `tsc-emp-${g.id}`);
@@ -143,24 +192,22 @@ const TeamSkillsConstellation: React.FC = () => {
       grad.append("stop").attr("offset", "100%").attr("stop-color", colors.line).attr("stop-opacity", 0.7);
     });
 
-    const g = sel.append("g");
+    const gEl = sel.append("g");
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.3, 3])
-      .on("zoom", (event) => g.attr("transform", event.transform));
+      .on("zoom", (event) => gEl.attr("transform", event.transform));
     sel.call(zoom);
-    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.9));
+    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.85));
 
-    // Links
-    const linkSel = g.append("g")
+    const linkSel = gEl.append("g")
       .selectAll<SVGLineElement, GraphLink>("line")
       .data(links)
       .join("line")
       .attr("stroke", "#E5E5E5")
       .attr("stroke-width", 0.6)
-      .attr("stroke-opacity", 0.35);
+      .attr("stroke-opacity", 0.3);
 
-    // Nodes
-    const nodeSel = g.append("g")
+    const nodeSel = gEl.append("g")
       .selectAll<SVGGElement, GraphNode>("g")
       .data(nodes, (d) => d.id)
       .join("g")
@@ -168,76 +215,37 @@ const TeamSkillsConstellation: React.FC = () => {
 
     nodeSel.each(function (d) {
       const el = d3.select(this);
-
       if (d.type === "employee") {
-        // Outer glow
-        el.append("circle")
-          .attr("r", d.radius + 4)
-          .attr("fill", "none")
+        el.append("circle").attr("r", d.radius + 4).attr("fill", "none")
           .attr("stroke", statusColors[d.status!]?.line || "#666")
-          .attr("stroke-width", 1.5)
-          .attr("stroke-opacity", 0.2)
-          .attr("class", "emp-glow");
-
-        el.append("circle")
-          .attr("r", d.radius)
-          .attr("fill", `url(#tsc-emp-${d.gradId})`)
-          .attr("stroke", "#fff")
-          .attr("stroke-width", 2.5)
-          .attr("class", "main-circle");
-
-        el.append("text")
-          .text(d.initials!)
-          .attr("text-anchor", "middle")
-          .attr("dy", "0.35em")
-          .attr("font-size", 14)
-          .attr("font-weight", 600)
-          .attr("fill", "#fff")
-          .attr("pointer-events", "none");
-
-        el.append("text")
-          .text(d.label.split(" ")[0])
-          .attr("text-anchor", "middle")
-          .attr("dy", d.radius + 18)
-          .attr("font-size", 11)
-          .attr("font-weight", 500)
-          .attr("fill", "#374151")
-          .attr("pointer-events", "none")
-          .attr("class", "emp-label");
+          .attr("stroke-width", 1.5).attr("stroke-opacity", 0.2).attr("class", "emp-glow");
+        el.append("circle").attr("r", d.radius).attr("fill", `url(#tsc-emp-${d.gradId})`)
+          .attr("stroke", "#fff").attr("stroke-width", 2.5).attr("class", "main-circle");
+        el.append("text").text(d.initials!).attr("text-anchor", "middle").attr("dy", "0.35em")
+          .attr("font-size", 14).attr("font-weight", 600).attr("fill", "#fff").attr("pointer-events", "none");
+        el.append("text").text(d.label.split(" ")[0]).attr("text-anchor", "middle")
+          .attr("dy", d.radius + 18).attr("font-size", 11).attr("font-weight", 500)
+          .attr("fill", "#374151").attr("pointer-events", "none").attr("class", "emp-label");
       } else {
-        // Skill node
         const color = clusterColors[d.cluster!] || "#6B7280";
         const isShared = (d.sharedBy?.length || 0) > 1;
-
-        el.append("circle")
-          .attr("r", d.radius)
-          .attr("fill", color)
+        el.append("circle").attr("r", d.radius).attr("fill", color)
           .attr("fill-opacity", isShared ? 0.6 : 0.3)
           .attr("stroke", isShared ? color : "none")
-          .attr("stroke-width", isShared ? 1 : 0)
-          .attr("stroke-opacity", 0.5)
+          .attr("stroke-width", isShared ? 1 : 0).attr("stroke-opacity", 0.5)
           .attr("class", "main-circle");
-
-        // Show label for shared skills
         if (isShared) {
-          el.append("text")
-            .text(d.label)
-            .attr("text-anchor", "middle")
-            .attr("dy", d.radius + 12)
-            .attr("font-size", 9)
-            .attr("fill", "#6B7280")
-            .attr("pointer-events", "none")
-            .attr("class", "skill-label")
-            .attr("opacity", 0.7);
+          el.append("text").text(d.label).attr("text-anchor", "middle")
+            .attr("dy", d.radius + 12).attr("font-size", 9).attr("fill", "#6B7280")
+            .attr("pointer-events", "none").attr("class", "skill-label").attr("opacity", 0.7);
         }
       }
     });
 
-    // Hover handlers
+    // Hover
     nodeSel
       .on("mouseenter", function (event, d) {
         if (d.type === "employee") {
-          // Highlight this employee's skill network
           const empId = d.id;
           const connectedSkills = new Set<string>();
           links.forEach((l) => {
@@ -246,39 +254,32 @@ const TeamSkillsConstellation: React.FC = () => {
             if (sId === empId) connectedSkills.add(tId);
             if (tId === empId) connectedSkills.add(sId);
           });
-
           linkSel
             .attr("stroke-opacity", (l) => {
               const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
               const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
-              return sId === empId || tId === empId ? 0.6 : 0.05;
+              return sId === empId || tId === empId ? 0.5 : 0.03;
             })
             .attr("stroke-width", (l) => {
               const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
               const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
-              return sId === empId || tId === empId ? 1.2 : 0.4;
+              return sId === empId || tId === empId ? 1.2 : 0.3;
             })
             .attr("stroke", (l) => {
               const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
               const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
               return sId === empId || tId === empId ? (statusColors[d.status!]?.line || "#666") : "#E5E5E5";
             });
-
           nodeSel.selectAll<SVGCircleElement, GraphNode>(".main-circle")
             .attr("fill-opacity", (nd) => {
-              if (nd.id === empId) return undefined as any; // keep gradient
-              if (nd.type === "employee") return undefined as any;
-              return connectedSkills.has(nd.id) ? 0.8 : 0.08;
+              if (nd.id === empId || nd.type === "employee") return undefined as any;
+              return connectedSkills.has(nd.id) ? 0.8 : 0.06;
             });
-
           nodeSel.selectAll<SVGTextElement, GraphNode>(".skill-label")
-            .attr("opacity", (nd) => connectedSkills.has(nd.id) ? 1 : 0.1);
-
+            .attr("opacity", (nd) => connectedSkills.has(nd.id) ? 1 : 0.05);
           d3.select(this).select(".main-circle").transition().duration(150).attr("r", d.radius * 1.12);
           d3.select(this).select(".emp-glow").transition().duration(150).attr("r", (d.radius * 1.12) + 4).attr("stroke-opacity", 0.4);
         }
-
-        // Tooltip
         const svgRect = svg.getBoundingClientRect();
         setTooltip({ x: event.clientX - svgRect.left, y: event.clientY - svgRect.top - 10, node: d });
       })
@@ -287,7 +288,7 @@ const TeamSkillsConstellation: React.FC = () => {
         setTooltip((prev) => prev ? { ...prev, x: event.clientX - svgRect.left, y: event.clientY - svgRect.top - 10 } : null);
       })
       .on("mouseleave", function (_event, d) {
-        linkSel.attr("stroke", "#E5E5E5").attr("stroke-width", 0.6).attr("stroke-opacity", 0.35);
+        linkSel.attr("stroke", "#E5E5E5").attr("stroke-width", 0.6).attr("stroke-opacity", 0.3);
         nodeSel.selectAll<SVGCircleElement, GraphNode>(".main-circle")
           .attr("fill-opacity", (nd) => {
             if (nd.type === "employee") return undefined as any;
@@ -307,23 +308,35 @@ const TeamSkillsConstellation: React.FC = () => {
         }
       });
 
-    // Simulation
+    // Simulation — warm start to avoid spasm
     const sim = d3.forceSimulation<GraphNode>(nodes)
-      .force("link", d3.forceLink<GraphNode, GraphLink>(links).id((d) => d.id).distance((l) => {
-        const s = typeof l.source === "string" ? nodes.find((n) => n.id === l.source)! : l.source as GraphNode;
-        const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-        // Shared skills pull closer
-        if (t.type === "skill" && (t.sharedBy?.length || 0) > 1) return 60;
-        return 90;
-      }).strength((l) => {
-        const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-        return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.4 : 0.15;
-      }))
-      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -400 : -30))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 12 : 4)))
-      .alpha(0.9)
-      .alphaDecay(0.015)
+      .force("link", d3.forceLink<GraphNode, GraphLink>(links).id((d) => d.id)
+        .distance((l) => {
+          const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 100 : 140;
+        })
+        .strength((l) => {
+          const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.3 : 0.1;
+        }))
+      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -600 : -40))
+      .force("center", d3.forceCenter(cx, cy).strength(0.05))
+      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 20 : 6)).strength(0.8));
+
+    // Run simulation silently for 120 ticks to settle before rendering
+    sim.stop();
+    for (let i = 0; i < 120; i++) sim.tick();
+
+    // Position nodes at settled state
+    linkSel
+      .attr("x1", (d: any) => d.source.x)
+      .attr("y1", (d: any) => d.source.y)
+      .attr("x2", (d: any) => d.target.x)
+      .attr("y2", (d: any) => d.target.y);
+    nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+    // Then restart with low alpha for gentle settling
+    sim.alpha(0.15).alphaDecay(0.04)
       .on("tick", () => {
         linkSel
           .attr("x1", (d: any) => d.source.x)
@@ -331,7 +344,8 @@ const TeamSkillsConstellation: React.FC = () => {
           .attr("x2", (d: any) => d.target.x)
           .attr("y2", (d: any) => d.target.y);
         nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
-      });
+      })
+      .restart();
 
     // Drag
     nodeSel.call(
@@ -350,19 +364,16 @@ const TeamSkillsConstellation: React.FC = () => {
     return () => { sim.stop(); };
   }, [selectedGrad]);
 
-  // Drill-down view
+  // Drill-down
   const selectedGradData = selectedGrad ? teamGraduates.find((g) => g.id === selectedGrad) : null;
   if (selectedGrad && selectedGradData) {
     const month = gradSkillMonths[selectedGrad] || 3;
     return (
       <div>
-        <button
-          onClick={() => setSelectedGrad(null)}
-          className="flex items-center gap-2 mb-4"
+        <button onClick={() => setSelectedGrad(null)} className="flex items-center gap-2 mb-4"
           style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "#6B7280", padding: "4px 0" }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "#111"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#6B7280"; }}
-        >
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#6B7280"; }}>
           <ArrowLeft size={16} /> Back to Team Constellation
         </button>
         <div className="flex items-center gap-3 mb-5">
@@ -381,7 +392,7 @@ const TeamSkillsConstellation: React.FC = () => {
     );
   }
 
-  // Tooltip renderer
+  // Tooltip
   const renderTooltip = () => {
     if (!tooltip) return null;
     const d = tooltip.node;
@@ -394,7 +405,6 @@ const TeamSkillsConstellation: React.FC = () => {
         </div>
       );
     }
-    // Skill node
     const shared = d.sharedBy || [];
     const gradNames = shared.map((gid) => teamGraduates.find((tg) => tg.id === gid)?.name.split(" ")[0] || gid);
     return (
@@ -405,9 +415,7 @@ const TeamSkillsConstellation: React.FC = () => {
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "capitalize" }}>{d.cluster}</span>
         </div>
         {shared.length > 1 && (
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>
-            Shared by: {gradNames.join(", ")}
-          </div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>Shared by: {gradNames.join(", ")}</div>
         )}
       </div>
     );
@@ -420,25 +428,79 @@ const TeamSkillsConstellation: React.FC = () => {
         <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111" }}>Team Skills Constellation</h2>
       </div>
       <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 16 }}>
-        Employees are central nodes surrounded by their skills. Shared skills naturally cluster between graduates — revealing team strengths and gaps at a glance. Click any employee to drill into their constellation.
+        Employees are central nodes surrounded by their skills. Shared skills naturally cluster between graduates — revealing team strengths and gaps at a glance.
       </p>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 mb-3" style={{ fontSize: 11, color: "#6B7280" }}>
+      <div className="flex flex-wrap items-center gap-4 mb-4" style={{ fontSize: 11, color: "#6B7280" }}>
         {Object.entries(clusterColors).map(([key, color]) => (
           <div key={key} className="flex items-center gap-1.5">
             <span style={{ width: 8, height: 8, borderRadius: "50%", background: color, display: "inline-block" }} />
             <span style={{ textTransform: "capitalize" }}>{key}</span>
           </div>
         ))}
-        <div style={{ marginLeft: "auto", fontSize: 11, color: "#9CA3AF" }}>
-          Larger skill nodes = shared by more graduates
-        </div>
       </div>
 
-      <div style={{ position: "relative", height: 560, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
-        <svg ref={svgRef} style={{ width: "100%", height: "100%", display: "block" }} />
-        {renderTooltip()}
+      <div className="flex gap-5" style={{ alignItems: "flex-start" }}>
+        {/* Graph */}
+        <div style={{ position: "relative", flex: 1, height: 580, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
+          <svg ref={svgRef} style={{ width: "100%", height: "100%", display: "block" }} />
+          {renderTooltip()}
+        </div>
+
+        {/* Skill Gap Panel */}
+        <div style={{ width: 280, flexShrink: 0 }}>
+          <div style={{ background: "#fff", borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", padding: "20px 18px" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle size={15} style={{ color: "#F59E0B" }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>Team Skill Gaps</span>
+            </div>
+            <p style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 16, lineHeight: 1.5 }}>
+              Skills where the most graduates are underdeveloped (proficiency below 3/10).
+            </p>
+
+            <div className="flex flex-col gap-4">
+              {skillGaps.map((gap, i) => (
+                <div key={gap.id}>
+                  <div className="flex items-start justify-between mb-1.5">
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: "#111", marginBottom: 2 }}>{gap.label}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: clusterColors[gap.cluster] || "#6B7280", display: "inline-block" }} />
+                        <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "capitalize" }}>{gap.cluster}</span>
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: 12, fontWeight: 600,
+                      color: gap.missingCount >= 4 ? "#DC2626" : gap.missingCount >= 3 ? "#F59E0B" : "#6B7280",
+                      background: gap.missingCount >= 4 ? "#FEF2F2" : gap.missingCount >= 3 ? "#FFFBEB" : "#F3F4F6",
+                      borderRadius: 6, padding: "2px 8px",
+                      whiteSpace: "nowrap",
+                    }}>
+                      {gap.missingCount}/{gap.totalGrads}
+                    </div>
+                  </div>
+                  {/* Bar */}
+                  <div style={{ height: 4, borderRadius: 2, background: "#F3F4F6", marginBottom: 4 }}>
+                    <div style={{
+                      height: "100%", borderRadius: 2,
+                      width: `${(gap.missingCount / gap.totalGrads) * 100}%`,
+                      background: gap.missingCount >= 4 ? "#EF4444" : gap.missingCount >= 3 ? "#F59E0B" : "#9CA3AF",
+                      opacity: 0.7,
+                    }} />
+                  </div>
+                  <div style={{ fontSize: 10, color: "#9CA3AF", lineHeight: 1.4 }}>
+                    {gap.gradsMissing.join(", ")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginTop: 12, fontSize: 11, color: "#9CA3AF", textAlign: "center", lineHeight: 1.5 }}>
+            Click any employee node to explore their individual skill constellation
+          </div>
+        </div>
       </div>
     </div>
   );
