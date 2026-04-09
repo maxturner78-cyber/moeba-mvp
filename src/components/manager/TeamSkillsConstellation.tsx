@@ -130,7 +130,7 @@ const TeamSkillsConstellation: React.FC = () => {
     const empCount = teamGraduates.length;
     const cx = width / 2;
     const cy = height / 2;
-    const orbitRadius = Math.min(width, height) * 0.3;
+    const orbitRadius = Math.min(width, height) * 0.38;
 
     teamGraduates.forEach((g, i) => {
       const angle = (i / empCount) * Math.PI * 2 - Math.PI / 2;
@@ -164,11 +164,13 @@ const TeamSkillsConstellation: React.FC = () => {
           const owners = skillOwners.get(sk.id) || [];
           const isShared = owners.length > 1;
           const status: "developed" | "developing" | "seed" = jp > 6 ? "developed" : "developing";
-          const baseRadius = isShared ? 7 + owners.length * 1.5 : 5 + (jp / 10) * 4;
+          // Match individual graph sizing: radius 8-22 based on proficiency
+          const baseRadius = isShared
+            ? 10 + owners.length * 2 + (jp / 10) * 6
+            : 8 + (jp / 10) * 14;
 
-          // Position skill nodes near their first owner
-          const skAngle = empAngle + ((si - snap.nodes.length / 2) / snap.nodes.length) * 1.2;
-          const skDist = 60 + Math.random() * 40;
+          const skAngle = empAngle + ((si - snap.nodes.length / 2) / snap.nodes.length) * 1.6;
+          const skDist = 120 + Math.random() * 60;
 
           const skillNode: GraphNode = {
             id: `skill-${sk.id}`,
@@ -206,7 +208,7 @@ const TeamSkillsConstellation: React.FC = () => {
       .scaleExtent([0.3, 3])
       .on("zoom", (event) => gEl.attr("transform", event.transform));
     sel.call(zoom);
-    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.85));
+    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.7));
 
     const linkSel = gEl.append("g")
       .selectAll<SVGLineElement, GraphLink>("line")
@@ -236,17 +238,26 @@ const TeamSkillsConstellation: React.FC = () => {
           .attr("dy", d.radius + 18).attr("font-size", 11).attr("font-weight", 500)
           .attr("fill", "#374151").attr("pointer-events", "none").attr("class", "emp-label");
       } else {
-        const color = clusterColors[d.cluster!] || "#6B7280";
+        // Match individual constellation node style
         const isShared = (d.sharedBy?.length || 0) > 1;
-        el.append("circle").attr("r", d.radius).attr("fill", color)
-          .attr("fill-opacity", isShared ? 0.6 : 0.3)
-          .attr("stroke", isShared ? color : "none")
-          .attr("stroke-width", isShared ? 1 : 0).attr("stroke-opacity", 0.5)
-          .attr("class", "main-circle");
-        if (isShared) {
+        if (d.skillStatus === "developed") {
+          el.append("circle").attr("r", d.radius)
+            .attr("fill", "#22C55E").attr("fill-opacity", 1)
+            .attr("stroke", "#FFFFFF").attr("stroke-width", 2)
+            .attr("class", "main-circle");
+        } else {
+          // developing
+          el.append("circle").attr("r", d.radius)
+            .attr("fill", "#22C55E").attr("fill-opacity", 0.5)
+            .attr("stroke", "#22C55E").attr("stroke-width", 1)
+            .attr("stroke-opacity", 0.3)
+            .attr("class", "main-circle");
+        }
+        // Show label for shared or larger nodes
+        if (isShared || d.radius > 12) {
           el.append("text").text(d.label).attr("text-anchor", "middle")
-            .attr("dy", d.radius + 12).attr("font-size", 9).attr("fill", "#6B7280")
-            .attr("pointer-events", "none").attr("class", "skill-label").attr("opacity", 0.7);
+            .attr("dy", d.radius + 13).attr("font-size", 10).attr("fill", "#6B7280")
+            .attr("pointer-events", "none").attr("class", "skill-label").attr("opacity", 0.8);
         }
       }
     });
@@ -322,15 +333,15 @@ const TeamSkillsConstellation: React.FC = () => {
       .force("link", d3.forceLink<GraphNode, GraphLink>(links).id((d) => d.id)
         .distance((l) => {
           const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 100 : 140;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 140 : 180;
         })
         .strength((l) => {
           const t = typeof l.target === "string" ? nodes.find((n) => n.id === l.target)! : l.target as GraphNode;
-          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.3 : 0.1;
+          return (t.type === "skill" && (t.sharedBy?.length || 0) > 1) ? 0.25 : 0.08;
         }))
-      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -600 : -40))
-      .force("center", d3.forceCenter(cx, cy).strength(0.05))
-      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 20 : 6)).strength(0.8));
+      .force("charge", d3.forceManyBody<GraphNode>().strength((d) => d.type === "employee" ? -900 : -80))
+      .force("center", d3.forceCenter(cx, cy).strength(0.03))
+      .force("collide", d3.forceCollide<GraphNode>().radius((d) => d.radius + (d.type === "employee" ? 30 : 12)).strength(0.9));
 
     // Run simulation silently for 120 ticks to settle before rendering
     sim.stop();
@@ -519,7 +530,7 @@ const TeamSkillsConstellation: React.FC = () => {
 
       <div className="flex gap-5" style={{ alignItems: "flex-start" }}>
         {/* Graph */}
-        <div style={{ position: "relative", flex: 1, height: 580, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
+        <div style={{ position: "relative", flex: 1, height: 650, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
           <svg ref={svgRef} style={{ width: "100%", height: "100%", display: "block" }} />
           {renderTooltip()}
         </div>
