@@ -130,7 +130,7 @@ const TeamSkillsConstellation: React.FC = () => {
     const empCount = teamGraduates.length;
     const cx = width / 2;
     const cy = height / 2;
-    const orbitRadius = Math.min(width, height) * 0.3;
+    const orbitRadius = Math.min(width, height) * 0.38;
 
     teamGraduates.forEach((g, i) => {
       const angle = (i / empCount) * Math.PI * 2 - Math.PI / 2;
