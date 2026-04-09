@@ -208,7 +208,7 @@ const TeamSkillsConstellation: React.FC = () => {
       .scaleExtent([0.3, 3])
       .on("zoom", (event) => gEl.attr("transform", event.transform));
     sel.call(zoom);
-    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.85));
+    sel.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(0.7));
 
     const linkSel = gEl.append("g")
       .selectAll<SVGLineElement, GraphLink>("line")
