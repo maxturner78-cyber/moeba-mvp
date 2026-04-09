@@ -530,7 +530,7 @@ const TeamSkillsConstellation: React.FC = () => {
 
       <div className="flex gap-5" style={{ alignItems: "flex-start" }}>
         {/* Graph */}
-        <div style={{ position: "relative", flex: 1, height: 580, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
+        <div style={{ position: "relative", flex: 1, height: 650, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff", overflow: "hidden" }}>
           <svg ref={svgRef} style={{ width: "100%", height: "100%", display: "block" }} />
           {renderTooltip()}
         </div>
