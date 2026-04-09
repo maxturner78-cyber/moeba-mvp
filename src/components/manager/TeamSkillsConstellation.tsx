@@ -370,8 +370,75 @@ const TeamSkillsConstellation: React.FC = () => {
         })
     );
 
+    // Store refs for external highlight
+    d3Refs.current = { nodeSel: nodeSel as any, linkSel: linkSel as any, nodes, links };
+
     return () => { sim.stop(); };
   }, [selectedGrad]);
+
+  // Effect to highlight graduates missing a selected gap skill
+  useEffect(() => {
+    const { nodeSel, linkSel, links } = d3Refs.current;
+    if (!nodeSel || !linkSel || selectedGrad) return;
+
+    if (!highlightedGap) {
+      // Reset all
+      linkSel.attr("stroke", "#E5E5E5").attr("stroke-width", 0.6).attr("stroke-opacity", 0.3);
+      nodeSel.selectAll<SVGCircleElement, GraphNode>(".main-circle")
+        .attr("fill-opacity", (nd: GraphNode) => {
+          if (nd.type === "employee") return undefined as any;
+          return (nd.sharedBy?.length || 0) > 1 ? 0.6 : 0.3;
+        });
+      nodeSel.selectAll<SVGTextElement, GraphNode>(".skill-label").attr("opacity", 0.7);
+      nodeSel.selectAll<SVGTextElement, GraphNode>(".emp-label").attr("opacity", 1);
+      nodeSel.selectAll<SVGCircleElement, GraphNode>(".emp-glow").attr("stroke-opacity", 0.2);
+      nodeSel.transition().duration(200).style("opacity", 1);
+      return;
+    }
+
+    const gap = skillGaps.find((g) => g.id === highlightedGap);
+    if (!gap) return;
+
+    // Find grad IDs missing this skill
+    const missingGradIds = new Set<string>();
+    teamGraduates.forEach((g) => {
+      const month = gradSkillMonths[g.id] || 3;
+      const snap = getSnapshot(month);
+      const node = snap.nodes.find((n) => n.id === highlightedGap);
+      const prof = node ? Math.max(0, node.proficiency + (profJitter[g.id] || 0)) : 0;
+      if (prof < 3) missingGradIds.add(g.id);
+    });
+
+    const missingEmpIds = new Set([...missingGradIds].map((id) => `emp-${id}`));
+    const targetSkillId = `skill-${highlightedGap}`;
+
+    // Dim everything, highlight missing grads and the skill node
+    nodeSel.transition().duration(200).style("opacity", (d: GraphNode) => {
+      if (missingEmpIds.has(d.id)) return 1;
+      if (d.id === targetSkillId) return 1;
+      return 0.12;
+    });
+
+    linkSel
+      .attr("stroke-opacity", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return 0.6;
+        return 0.03;
+      })
+      .attr("stroke-width", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return 1.5;
+        return 0.3;
+      })
+      .attr("stroke", (l: GraphLink) => {
+        const sId = typeof l.source === "string" ? l.source : (l.source as GraphNode).id;
+        const tId = typeof l.target === "string" ? l.target : (l.target as GraphNode).id;
+        if ((missingEmpIds.has(sId) && tId === targetSkillId) || (missingEmpIds.has(tId) && sId === targetSkillId)) return "#EF4444";
+        return "#E5E5E5";
+      });
+  }, [highlightedGap, selectedGrad, skillGaps]);
 
   // Drill-down
   const selectedGradData = selectedGrad ? teamGraduates.find((g) => g.id === selectedGrad) : null;
