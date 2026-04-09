@@ -537,7 +537,20 @@ const TeamSkillsConstellation: React.FC = () => {
 
             <div className="flex flex-col gap-4">
               {skillGaps.map((gap, i) => (
-                <div key={gap.id}>
+                <div key={gap.id}
+                  onClick={() => setHighlightedGap(highlightedGap === gap.id ? null : gap.id)}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: 8,
+                    padding: "8px 10px",
+                    margin: "-8px -10px",
+                    background: highlightedGap === gap.id ? "#FEF2F2" : "transparent",
+                    border: highlightedGap === gap.id ? "1px solid rgba(239,68,68,0.15)" : "1px solid transparent",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => { if (highlightedGap !== gap.id) e.currentTarget.style.background = "#F9FAFB"; }}
+                  onMouseLeave={(e) => { if (highlightedGap !== gap.id) e.currentTarget.style.background = "transparent"; }}
+                >
                   <div className="flex items-start justify-between mb-1.5">
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "#111", marginBottom: 2 }}>{gap.label}</div>
