@@ -23,7 +23,6 @@ const navConfig: Record<ViewTab, NavItem[]> = {
   ],
   manager: [
     { id: "team-brief", label: "Team Brief", icon: Zap },
-    { id: "team-skills", label: "Team Skills", icon: Sparkles },
     { id: "assess-team", label: "Assess Team", icon: ClipboardList },
   ],
   peer: [
