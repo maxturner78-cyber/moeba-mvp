@@ -30,7 +30,7 @@ const TopBar: React.FC<TopBarProps> = ({ activeTab, onTabChange }) => {
           className="font-heading"
           style={{ fontWeight: 700, fontSize: 17, color: "#0F0F0F" }}
         >
-          GradSense
+          Moeba
         </span>
         <div
           style={{
