@@ -47,7 +47,7 @@ const MyCoach: React.FC = () => {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #E8E8E8", marginBottom: 24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="live-dot" />
-              <span style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F" }}>gradsense — development agent</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F" }}><span style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F" }}>Moeba — development coach</span></span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 12, color: "#9CA3AF" }}>sarah.chen@swangroup.com.au</span>
