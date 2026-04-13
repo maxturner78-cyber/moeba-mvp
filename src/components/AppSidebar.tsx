@@ -64,7 +64,7 @@ const AppSidebar: React.FC<SidebarProps> = ({ activeTab, activeNav, onNavChange 
           paddingLeft: 14,
         }}
       >
-        {activeTab === "graduate" ? "INSIGHTS" : "TEAM"}
+        {{ graduate: "INSIGHTS", manager: "TEAM", peer: "COLLEAGUES" }[activeTab]}
       </div>
 
       <nav className="flex flex-col gap-1 px-2">
