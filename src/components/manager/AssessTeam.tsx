@@ -1,20 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle, Check, ChevronRight } from "lucide-react";
-
-interface GradOption {
-  name: string;
-  role: string;
-  week: number;
-}
-
-const graduates: GradOption[] = [
-  { name: "Sarah Chen", role: "Graduate Associate", week: 12 },
-  { name: "Emily Zhang", role: "Graduate Associate", week: 13 },
-  { name: "Tyler Morrison", role: "Graduate Consultant", week: 14 },
-  { name: "Priya Patel", role: "Graduate Analyst", week: 10 },
-  { name: "Marcus Johnson", role: "Senior Associate", week: 16 },
-  { name: "James Park", role: "Graduate Analyst", week: 11 },
-];
+import { graduates } from "@/data/sampleData";
 
 interface DimRow {
   key: string;
