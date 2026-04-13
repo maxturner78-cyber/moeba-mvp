@@ -559,10 +559,11 @@ interface Props {
 type ProfileView = "overview" | "skills" | "perception-gap";
 
 const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
-  const graduate = graduates.find(g => g.id === graduateId);
-  if (!graduate) return null;
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
   const [profileView, setProfileView] = useState<ProfileView>("overview");
+
+  const graduate = graduates.find(g => g.id === graduateId);
+  if (!graduate) return null;
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
