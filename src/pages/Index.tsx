@@ -42,7 +42,7 @@ const Index: React.FC = () => {
     if (activeNav === "weekly-checkin") return <WeeklyCheckIn />;
     if (activeNav === "team-brief") {
       if (selectedGraduateId) {
-        return <GraduateProfile onBack={() => { setSelectedGraduateId(null); setPageKey((k) => k + 1); }} />;
+        return <GraduateProfile graduateId={selectedGraduateId!} onBack={() => { setSelectedGraduateId(null); setPageKey((k) => k + 1); }} />;
       }
       return <TeamBrief onSelectGraduate={(id) => { setSelectedGraduateId(id); setPageKey((k) => k + 1); }} />;
     }

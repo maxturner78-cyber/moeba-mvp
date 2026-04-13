@@ -7,6 +7,8 @@ import {
   BarChart, Bar, Cell, Line, ComposedChart,
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
+import { graduates } from "@/data/sampleData";
+import { statusLabels } from "@/data/teamData";
 
 /* ── Data ── */
 const weeks = Array.from({ length: 12 }, (_, i) => ({ week: `W${i + 1}` }));
@@ -550,14 +552,18 @@ const PerceptionGapAnalysis: React.FC = () => {
 
 /* ── Main Component ── */
 interface Props {
+  graduateId: string;
   onBack: () => void;
 }
 
 type ProfileView = "overview" | "skills" | "perception-gap";
 
-const GraduateProfile: React.FC<Props> = ({ onBack }) => {
+const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
   const [profileView, setProfileView] = useState<ProfileView>("overview");
+
+  const graduate = graduates.find(g => g.id === graduateId);
+  if (!graduate) return null;
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
@@ -589,11 +595,11 @@ const GraduateProfile: React.FC<Props> = ({ onBack }) => {
       <div style={{ marginBottom: 24 }}>
         <div className="flex items-center gap-3" style={{ marginBottom: 4 }}>
           <h1 className="font-heading" style={{ fontSize: 22, fontWeight: 500, color: "#0F0F0F", letterSpacing: "-0.02em" }}>
-            Sarah Chen
+            {graduate.name}
           </h1>
-          <StatusBadge status="attention" />
+          <StatusBadge status={graduate.status} />
         </div>
-        <p style={{ fontSize: 13, color: "#9CA3AF" }}>Graduate Associate · Week 12 · Manager: David Liu</p>
+        <p style={{ fontSize: 13, color: "#9CA3AF" }}>{graduate.role} · Week {graduate.week} · Manager: {graduate.managerName}</p>
 
         {/* View Tabs */}
         <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
