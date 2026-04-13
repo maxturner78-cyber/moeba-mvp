@@ -1,9 +1,13 @@
 
 
-## Plan: Rename header string in MyCoach.tsx
+## Plan: Update sidebar section label to use object lookup
 
 ### Change
-**`src/components/graduate/MyCoach.tsx`** — Line 51: Replace `"gradsense — development agent"` with `"Moeba — development coach"`.
+**`src/components/AppSidebar.tsx`** — Line 68: Replace the ternary `{activeTab === "graduate" ? "INSIGHTS" : "TEAM"}` with an object lookup:
 
-Single string replacement. No other changes.
+```ts
+{{ graduate: "INSIGHTS", manager: "TEAM", peer: "COLLEAGUES" }[activeTab]}
+```
+
+Single-line replacement. No other changes.
 
