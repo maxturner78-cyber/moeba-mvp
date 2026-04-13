@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles, ChevronDown, ChevronUp, BarChart3, FileText } from "lucide-react";
+import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import SkillsGraph from "@/components/skills/SkillsGraph";
 import { getSnapshot } from "@/data/skillsData";
 import {
