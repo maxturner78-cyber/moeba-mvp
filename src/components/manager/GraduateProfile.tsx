@@ -827,58 +827,6 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
             </div>
           </div>
 
-          {/* Generate Performance Review */}
-          <div style={{
-            background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-          }}>
-            <div className="flex items-center gap-3" style={{ marginBottom: 8 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 8, background: "#F0FDF4",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <FileText size={18} color="#22C55E" />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>
-                  Generate Performance Review Draft
-                </div>
-                <div style={{ fontSize: 12, color: "#9CA3AF" }}>
-                  12 weeks of data → ready-to-edit review
-                </div>
-              </div>
-            </div>
-            <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.5, marginBottom: 16 }}>
-              Auto-populate a quarterly or annual performance review using Sarah's check-in data, perception gaps, and development trajectory. Edit before submitting — save hours of prep.
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                style={{
-                  padding: "9px 20px", background: "#22C55E", color: "#fff",
-                  fontSize: 13, fontWeight: 600, border: "none", borderRadius: 100,
-                  cursor: "pointer", transition: "background 150ms ease",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
-              >
-                Quarterly Review
-              </button>
-              <button
-                style={{
-                  padding: "9px 20px", background: "#fff", color: "#374151",
-                  fontSize: 13, fontWeight: 500, border: "1px solid #E8E8E8", borderRadius: 100,
-                  cursor: "pointer", transition: "all 150ms ease",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#22C55E"; e.currentTarget.style.color = "#22C55E"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E8E8E8"; e.currentTarget.style.color = "#374151"; }}
-              >
-                Annual Review
-              </button>
-            </div>
-            <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 10 }}>
-              Coming soon — this feature is currently in development
-            </p>
-          </div>
         </div>
       </div>
       ) : profileView === "perception-gap" ? (
