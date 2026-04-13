@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Copy, TrendingUp, CheckCircle, Sparkles, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import SkillsGraph from "@/components/skills/SkillsGraph";
+import { DivergenceDot } from "@/components/shared/DivergenceDot";
 import { getSnapshot } from "@/data/skillsData";
 import {
   AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -45,74 +46,6 @@ const getGapColor = (gap: number) => {
   return "#22C55E";
 };
 
-const DivergenceDot: React.FC<{
-  self: number; manager: number; peer?: number; maxGap: number; delay: number; animated: boolean;
-}> = ({ self, manager, peer, maxGap, delay, animated }) => {
-  const color = getGapColor(maxGap);
-  const selfPos = (self / 10) * 100;
-  const managerPos = (manager / 10) * 100;
-  const peerPos = peer != null ? (peer / 10) * 100 : null;
-  const allPositions = [selfPos, managerPos, ...(peerPos != null ? [peerPos] : [])];
-  const left = Math.min(...allPositions);
-  const right = Math.max(...allPositions);
-  const width = right - left;
-  const center = 50;
-
-  // Sort positions to assign label offsets and avoid overlap
-  type DotInfo = { pos: number; color: string; label: string; z: number };
-  const dots: DotInfo[] = [
-    { pos: selfPos, color: "#6366F1", label: String(self), z: 3 },
-    { pos: managerPos, color: "#22C55E", label: String(manager), z: 2 },
-    ...(peerPos != null && peer != null ? [{ pos: peerPos, color: "#F59E0B", label: String(peer), z: 1 }] : []),
-  ];
-  // Sort by position so we can offset overlapping labels
-  const sorted = [...dots].sort((a, b) => a.pos - b.pos);
-  const labelOffsets: Map<DotInfo, number> = new Map();
-  sorted.forEach((dot, i) => {
-    // default: below the dot
-    let yOff = 20;
-    if (i > 0) {
-      const prev = sorted[i - 1];
-      const gap = Math.abs(dot.pos - prev.pos);
-      // If dots are within 6% of each other, alternate label above/below
-      if (gap < 6) {
-        const prevOff = labelOffsets.get(prev) ?? 20;
-        yOff = prevOff === 20 ? -4 : 20;
-      }
-    }
-    labelOffsets.set(dot, yOff);
-  });
-
-  return (
-    <div style={{ position: "relative", height: 32, width: "100%" }}>
-      <div style={{ position: "absolute", top: 14, left: 0, right: 0, height: 1, background: "#E8E8E8" }} />
-      <div style={{
-        position: "absolute", top: 13, height: 2, background: color, borderRadius: 1, opacity: 0.4,
-        left: animated ? `${left}%` : `${center}%`,
-        width: animated ? `${width}%` : "0%",
-        transition: `left 500ms ease-out ${delay + 800}ms, width 500ms ease-out ${delay + 800}ms`,
-      }} />
-      {dots.map((dot, i) => {
-        const labelY = labelOffsets.get(dot) ?? 20;
-        return (
-          <React.Fragment key={i}>
-            <div style={{
-              position: "absolute", top: 9, width: 10, height: 10, borderRadius: "50%",
-              background: dot.color, boxShadow: `0 1px 3px ${dot.color}44`,
-              left: animated ? `calc(${dot.pos}% - 5px)` : `calc(${center}% - 5px)`,
-              transition: `left 500ms ease-out ${delay + 800}ms`, zIndex: dot.z,
-            }} />
-            <span className="font-mono-data" style={{
-              position: "absolute", top: labelY, fontSize: 9, color: dot.color, whiteSpace: "nowrap",
-              left: animated ? `calc(${dot.pos}% - 6px)` : `calc(${center}% - 6px)`,
-              transition: `left 500ms ease-out ${delay + 800}ms`,
-            }}>{dot.label}</span>
-          </React.Fragment>
-        );
-      })}
-    </div>
-  );
-};
 
 /* ── Behavioural Perception Gap Data (with peer) ── */
 const allBehaviouralGaps = [
@@ -215,7 +148,7 @@ const GapSection: React.FC<GapSectionProps> = ({
         {visible.map((g, i) => (
           <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 40 }}>
             <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot self={g.self} manager={g.manager} peer={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
+            <DivergenceDot selfScore={g.self} managerScore={g.manager} peerScore={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
             <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.maxGap)), textAlign: "right" }}>
               {Math.abs(g.maxGap).toFixed(1)} pts
             </span>
