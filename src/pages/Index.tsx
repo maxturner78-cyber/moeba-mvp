@@ -66,15 +66,6 @@ const Index: React.FC = () => {
           style={{ padding: 32, background: "#FAFAFA" }}
         >
           <div key={pageKey} className="gs-page-enter" style={{ maxWidth: 1200, margin: "0 auto" }}>
-              <button
-                onClick={async () => {
-                  const result = await supabase.auth.getSession();
-                  console.log("Supabase getSession result:", result);
-                }}
-                style={{ marginBottom: 16, padding: "8px 16px", background: "#e0e0e0", borderRadius: 6, cursor: "pointer" }}
-              >
-                🧪 Test Supabase Connection
-              </button>
               {renderPage()}
             </div>
         </main>
