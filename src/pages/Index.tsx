@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -9,7 +9,6 @@ import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import PeerCheckIn from "@/components/peer/PeerCheckIn";
-import { useGraduates } from "@/lib/queries";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-development",
@@ -18,12 +17,6 @@ const defaultNav: Record<ViewTab, string> = {
 };
 
 const Index: React.FC = () => {
-  // ── Temporary debug ──
-  const graduatesQuery = useGraduates();
-  useEffect(() => {
-    console.log('useGraduates result:', graduatesQuery.data, 'loading:', graduatesQuery.isLoading, 'error:', graduatesQuery.error);
-  }, [graduatesQuery.data, graduatesQuery.isLoading, graduatesQuery.error]);
-  // ── End debug ──
 
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
   const [activeNav, setActiveNav] = useState<string>("my-development");
