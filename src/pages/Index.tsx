@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -9,8 +8,8 @@ import WeeklyCheckIn from "@/components/graduate/WeeklyCheckIn";
 import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
-
 import PeerCheckIn from "@/components/peer/PeerCheckIn";
+import { useGraduates } from "@/lib/queries";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-development",
@@ -20,11 +19,10 @@ const defaultNav: Record<ViewTab, string> = {
 
 const Index: React.FC = () => {
   // ── Temporary debug ──
+  const graduatesQuery = useGraduates();
   useEffect(() => {
-    supabase.from('users').select('id, full_name, role').then(result => {
-      console.log('Direct users query:', result);
-    });
-  }, []);
+    console.log('useGraduates result:', graduatesQuery.data, 'loading:', graduatesQuery.isLoading, 'error:', graduatesQuery.error);
+  }, [graduatesQuery.data, graduatesQuery.isLoading, graduatesQuery.error]);
   // ── End debug ──
 
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
