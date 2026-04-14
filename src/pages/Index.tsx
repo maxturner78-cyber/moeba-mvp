@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
