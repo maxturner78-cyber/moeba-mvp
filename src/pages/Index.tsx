@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -18,6 +19,13 @@ const defaultNav: Record<ViewTab, string> = {
 };
 
 const Index: React.FC = () => {
+  // ── Temporary debug ──
+  useEffect(() => {
+    supabase.from('users').select('id, full_name, role').then(result => {
+      console.log('Direct users query:', result);
+    });
+  }, []);
+  // ── End debug ──
 
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
   const [activeNav, setActiveNav] = useState<string>("my-development");
