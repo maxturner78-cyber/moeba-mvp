@@ -66,8 +66,8 @@ const Index: React.FC = () => {
           style={{ padding: 32, background: "#FAFAFA" }}
         >
           <div key={pageKey} className="gs-page-enter" style={{ maxWidth: 1200, margin: "0 auto" }}>
-            {renderPage()}
-          </div>
+              {renderPage()}
+            </div>
         </main>
       </div>
     </div>
