@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useGraduates } from "@/lib/queries";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -18,6 +19,13 @@ const defaultNav: Record<ViewTab, string> = {
 };
 
 const Index: React.FC = () => {
+  // ── Temporary test block ──
+  const { data: grads, isLoading, error } = useGraduates();
+  useEffect(() => {
+    console.log("[useGraduates]", { grads, isLoading, error });
+  }, [grads, isLoading, error]);
+  // ── End test block ──
+
   const [activeTab, setActiveTab] = useState<ViewTab>("graduate");
   const [activeNav, setActiveNav] = useState<string>("my-development");
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
