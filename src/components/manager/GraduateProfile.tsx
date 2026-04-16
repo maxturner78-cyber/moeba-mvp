@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
 
@@ -25,18 +25,45 @@ function deriveStatus(fullName: string): Status {
   }
 }
 
-/* ── Data ── */
-const weeks = Array.from({ length: 12 }, (_, i) => ({ week: `W${i + 1}` }));
-const confidenceArr = [8, 8, 7, 5, 6, 7, 7, 6, 5, 5, 5, 5];
-const selfRatingArr = [7, 7, 6, 5, 6, 6, 6, 5, 5, 5, 5, 5];
-const managerRatingArr = [7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8];
-const questionsArr = [6, 7, 5, 4, 6, 5, 5, 4, 3, 2, 2, 1];
-const workloadArr = [6, 6, 7, 7, 7, 7, 6, 7, 9, 7, 7, 6];
+/* ── Chart Data Types ── */
+interface ChartRow {
+  week: string;
+  selfRating?: number;
+  managerRating?: number;
+  confidence?: number;
+  workload?: number;
+  questionsAsked?: number;
+  questionsObserved?: number;
+}
 
-const confData = weeks.map((w, i) => ({ ...w, value: confidenceArr[i] }));
-const perfData = weeks.map((w, i) => ({ ...w, self: selfRatingArr[i], manager: managerRatingArr[i] }));
-const qData = weeks.map((w, i) => ({ ...w, value: questionsArr[i] }));
-const wlData = weeks.map((w, i) => ({ ...w, value: workloadArr[i] }));
+function buildChartData(
+  selfCheckIns: any[],
+  managerCheckIns: any[],
+): ChartRow[] {
+  const weekMap = new Map<number, ChartRow>();
+
+  for (const ci of selfCheckIns) {
+    const ds = typeof ci.dimension_scores === "string" ? JSON.parse(ci.dimension_scores) : ci.dimension_scores;
+    const row: ChartRow = weekMap.get(ci.week_number) ?? { week: `W${ci.week_number}` };
+    row.selfRating = ds?.selfRating;
+    row.confidence = ds?.confidence;
+    row.workload = ds?.workload;
+    row.questionsAsked = ds?.questionsAsked;
+    weekMap.set(ci.week_number, row);
+  }
+
+  for (const ci of managerCheckIns) {
+    const ds = typeof ci.dimension_scores === "string" ? JSON.parse(ci.dimension_scores) : ci.dimension_scores;
+    const row: ChartRow = weekMap.get(ci.week_number) ?? { week: `W${ci.week_number}` };
+    row.managerRating = ds?.overallRating;
+    row.questionsObserved = ci.questions_observed;
+    weekMap.set(ci.week_number, row);
+  }
+
+  return Array.from(weekMap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([, row]) => row);
+}
 
 const DarkTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -210,7 +237,7 @@ const GapSection: React.FC<GapSectionProps> = ({
 /* ── Trend Chart ── */
 type TrendTab = "performance" | "confidence" | "questions" | "workload";
 
-const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
+const TrendChart: React.FC<{ tab: TrendTab; chartData: ChartRow[] }> = ({ tab, chartData }) => {
   const common = {
     xAxis: <XAxis dataKey="week" axisLine={{ stroke: "#E8E8E8" }} tickLine={false} tick={{ fontSize: 11, fill: "#9CA3AF" }} />,
     grid: <CartesianGrid horizontal vertical={false} stroke="#F3F4F6" strokeDasharray="4 4" />,
@@ -220,7 +247,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "confidence") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={confData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="confGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#EF4444" stopOpacity={0.15} />
@@ -228,7 +255,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
             </linearGradient>
           </defs>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Area type="monotone" dataKey="value" stroke="#EF4444" strokeWidth={2} fill="url(#confGrad)" dot={false}
+          <Area type="monotone" dataKey="confidence" stroke="#EF4444" strokeWidth={2} fill="url(#confGrad)" dot={false}
             activeDot={{ r: 4, fill: "#fff", stroke: "#EF4444", strokeWidth: 2 }} />
         </AreaChart>
       </ResponsiveContainer>
@@ -238,7 +265,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "performance") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={perfData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gapFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.12} />
@@ -246,10 +273,10 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
             </linearGradient>
           </defs>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Area type="monotone" dataKey="manager" stroke="transparent" fill="url(#gapFill)" />
-          <Line type="monotone" dataKey="self" stroke="#6366F1" strokeWidth={2} dot={false}
+          <Area type="monotone" dataKey="managerRating" stroke="transparent" fill="url(#gapFill)" />
+          <Line type="monotone" dataKey="selfRating" stroke="#6366F1" strokeWidth={2} dot={false}
             activeDot={{ r: 3, fill: "#fff", stroke: "#6366F1", strokeWidth: 2 }} />
-          <Line type="monotone" dataKey="manager" stroke="#22C55E" strokeWidth={2} dot={false}
+          <Line type="monotone" dataKey="managerRating" stroke="#22C55E" strokeWidth={2} dot={false}
             activeDot={{ r: 3, fill: "#fff", stroke: "#22C55E", strokeWidth: 2 }} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -259,13 +286,14 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "questions") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={qData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Bar dataKey="value" radius={[3, 3, 0, 0]} barSize={18}>
-            {qData.map((d, i) => (
-              <Cell key={i} fill={d.value >= 3 ? "#22C55E" : d.value === 2 ? "#F59E0B" : "#EF4444"} />
+          <Bar dataKey="questionsAsked" name="Self-reported" radius={[3, 3, 0, 0]} barSize={12}>
+            {chartData.map((d, i) => (
+              <Cell key={i} fill={(d.questionsAsked ?? 0) >= 3 ? "#22C55E" : (d.questionsAsked ?? 0) === 2 ? "#F59E0B" : "#EF4444"} />
             ))}
           </Bar>
+          <Bar dataKey="questionsObserved" name="Manager observed" radius={[3, 3, 0, 0]} barSize={12} fill="#6366F1" opacity={0.6} />
         </BarChart>
       </ResponsiveContainer>
     );
@@ -273,7 +301,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={wlData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+      <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="wlGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.15} />
@@ -281,7 +309,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
           </linearGradient>
         </defs>
         {common.grid}{common.xAxis}{common.tooltip}
-        <Area type="monotone" dataKey="value" stroke="#F59E0B" strokeWidth={2} fill="url(#wlGrad)" dot={false}
+        <Area type="monotone" dataKey="workload" stroke="#F59E0B" strokeWidth={2} fill="url(#wlGrad)" dot={false}
           activeDot={{ r: 4, fill: "#fff", stroke: "#F59E0B", strokeWidth: 2 }} />
       </AreaChart>
     </ResponsiveContainer>
@@ -510,6 +538,15 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const [profileView, setProfileView] = useState<ProfileView>("overview");
 
   const { data: graduate, isLoading, error } = useGraduate(graduateId);
+  const { data: selfCheckIns, isLoading: selfLoading } = useSelfCheckIns(graduateId);
+  const { data: mgrCheckIns, isLoading: mgrLoading } = useManagerCheckIns(graduateId);
+
+  const chartData = React.useMemo(
+    () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
+    [selfCheckIns, mgrCheckIns],
+  );
+  const chartsLoading = selfLoading || mgrLoading;
+  const notEnoughHistory = !chartsLoading && chartData.length <= 1;
 
   if (isLoading) {
     return (
@@ -633,7 +670,21 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
                 );
               })}
             </div>
-            <TrendChart tab={trendTab} />
+            {chartsLoading ? (
+              <div className="flex flex-col gap-2" style={{ height: 200, justifyContent: "center" }}>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ) : notEnoughHistory ? (
+              <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <p style={{ fontSize: 13, color: "#9CA3AF", textAlign: "center", maxWidth: 280 }}>
+                  Not enough history yet — come back in a few weeks.
+                </p>
+              </div>
+            ) : (
+              <TrendChart tab={trendTab} chartData={chartData} />
+            )}
             {trendTab === "performance" && (
               <div className="flex items-center gap-4 justify-center" style={{ marginTop: 8 }}>
                 <div className="flex items-center gap-1.5">
