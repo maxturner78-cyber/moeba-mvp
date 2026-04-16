@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { CheckCircle, Users } from "lucide-react";
 import FormSlider from "@/components/forms/FormSlider";
-import { graduates } from "@/data/sampleData";
+import { usePeerAssignedGraduates } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const CURRENT_PEER_ID = 'bbbb0001-0000-0000-0000-000000000001'; // Alex Wright
 
 const PeerCheckIn: React.FC = () => {
-  const [selectedGrad, setSelectedGrad] = useState(graduates[0].id);
+  const { data: assignedGrads = [], isLoading } = usePeerAssignedGraduates(CURRENT_PEER_ID);
+  const [selectedGradId, setSelectedGradId] = useState<string | null>(null);
   const [collaboration, setCollaboration] = useState(5);
   const [reliability, setReliability] = useState(5);
   const [communication, setCommunication] = useState(5);
@@ -16,7 +20,31 @@ const PeerCheckIn: React.FC = () => {
   const [overall, setOverall] = useState(5);
   const [submitted, setSubmitted] = useState(false);
 
-  const grad = graduates.find((g) => g.id === selectedGrad);
+  // Default to first assigned graduate once loaded
+  const activeId = selectedGradId ?? assignedGrads[0]?.graduate_id ?? null;
+  const grad = assignedGrads.find((g) => g.graduate_id === activeId);
+  const firstName = grad?.full_name?.split(" ")[0] ?? "them";
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center" style={{ paddingTop: 8 }}>
+        <div style={{ maxWidth: 560, width: "100%" }}>
+          <Skeleton className="h-8 w-48 mb-4" />
+          <Skeleton className="h-4 w-64 mb-6" />
+          <Skeleton className="h-10 w-full mb-6" />
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!assignedGrads.length) {
+    return (
+      <div className="flex justify-center" style={{ paddingTop: 48 }}>
+        <div style={{ fontSize: 14, color: "#9CA3AF" }}>No graduates currently assigned to you.</div>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -27,7 +55,7 @@ const PeerCheckIn: React.FC = () => {
             Peer feedback submitted ✓
           </div>
           <div style={{ fontSize: 14, color: "#374151" }}>
-            Thanks for supporting {grad?.name.split(" ")[0]}'s development
+            Thanks for supporting {firstName}'s development
           </div>
         </div>
       </div>
@@ -41,7 +69,7 @@ const PeerCheckIn: React.FC = () => {
           Peer Check-In
         </h1>
         <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, marginBottom: 8 }}>
-          ~3 minutes. Your observations help build a complete picture of how {grad?.name.split(" ")[0]} is settling in.
+          ~3 minutes. Your observations help build a complete picture of how {firstName} is settling in.
         </p>
 
         {/* Info card */}
@@ -61,17 +89,17 @@ const PeerCheckIn: React.FC = () => {
             Who are you providing feedback for?
           </label>
           <select
-            value={selectedGrad}
-            onChange={(e) => setSelectedGrad(e.target.value)}
+            value={activeId ?? ""}
+            onChange={(e) => setSelectedGradId(e.target.value)}
             style={{
               width: "100%", padding: "10px 14px", fontSize: 14,
               border: "1px solid #E8E8E8", borderRadius: 8, outline: "none",
               background: "#fff", color: "#0F0F0F", cursor: "pointer",
             }}
           >
-            {graduates.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name} — {g.role} · Week {g.week}
+            {assignedGrads.map((g) => (
+              <option key={g.graduate_id} value={g.graduate_id}>
+                {g.full_name} — {g.job_title}
               </option>
             ))}
           </select>
@@ -82,31 +110,31 @@ const PeerCheckIn: React.FC = () => {
           boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
         }}>
           <FormSlider
-            label={`How well does ${grad?.name.split(" ")[0]} collaborate with the team?`}
+            label={`How well does ${firstName} collaborate with the team?`}
             value={collaboration} onChange={setCollaboration}
             leftLabel="Keeps to themselves" rightLabel="Fully integrated"
           />
 
           <FormSlider
-            label={`How reliable is ${grad?.name.split(" ")[0]} when given tasks?`}
+            label={`How reliable is ${firstName} when given tasks?`}
             value={reliability} onChange={setReliability}
             leftLabel="Needs chasing" rightLabel="Always delivers"
           />
 
           <FormSlider
-            label={`How effectively does ${grad?.name.split(" ")[0]} communicate?`}
+            label={`How effectively does ${firstName} communicate?`}
             value={communication} onChange={setCommunication}
             leftLabel="Unclear / hesitant" rightLabel="Clear & confident"
           />
 
           <FormSlider
-            label={`Does ${grad?.name.split(" ")[0]} take initiative or wait to be told?`}
+            label={`Does ${firstName} take initiative or wait to be told?`}
             value={initiative} onChange={setInitiative}
             leftLabel="Waits for direction" rightLabel="Proactively contributes"
           />
 
           <FormSlider
-            label={`How confident does ${grad?.name.split(" ")[0]} seem day-to-day?`}
+            label={`How confident does ${firstName} seem day-to-day?`}
             value={confidence} onChange={setConfidence}
             leftLabel="Seems uncertain" rightLabel="Comfortable & assured"
           />
@@ -119,7 +147,7 @@ const PeerCheckIn: React.FC = () => {
 
           {/* Textareas */}
           {[
-            { label: `What's ${grad?.name.split(" ")[0]} doing really well?`, value: strengths, onChange: setStrengths },
+            { label: `What's ${firstName} doing really well?`, value: strengths, onChange: setStrengths },
             { label: `Where could they use more support or guidance?`, value: support, onChange: setSupport },
           ].map((f) => (
             <div key={f.label} style={{ marginBottom: 28 }}>
@@ -140,7 +168,7 @@ const PeerCheckIn: React.FC = () => {
           ))}
 
           <FormSlider
-            label={`Overall, how is ${grad?.name.split(" ")[0]} tracking in their first weeks?`}
+            label={`Overall, how is ${firstName} tracking in their first weeks?`}
             value={overall} onChange={setOverall}
             leftLabel="Struggling" rightLabel="Thriving"
           />

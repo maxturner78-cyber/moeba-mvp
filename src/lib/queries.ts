@@ -350,3 +350,27 @@ export function useTeamBrief(managerId: string, weekNumber?: number) {
 export function useCheckInBrief(graduateId: string, weekNumber?: number) {
   return useGeneratedInsight(graduateId, "check_in_brief", weekNumber);
 }
+
+/* ── Peer Assignments ──────────────────────────────────────────── */
+
+export function usePeerAssignedGraduates(peerId: string) {
+  return useQuery({
+    queryKey: ["peer-assigned-graduates", peerId],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("peer_assignments")
+        .select("graduate_id, users!peer_assignments_graduate_id_fkey(full_name, job_title)")
+        .eq("peer_id", peerId)
+        .eq("active", true);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        graduate_id: row.graduate_id as string,
+        full_name: (row.users?.full_name ?? "") as string,
+        job_title: (row.users?.job_title ?? "") as string,
+      }));
+    },
+  });
+}
