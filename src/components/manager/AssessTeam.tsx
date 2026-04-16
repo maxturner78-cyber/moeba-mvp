@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CheckCircle, Check, ChevronRight } from "lucide-react";
-import { graduates } from "@/data/sampleData";
+import { useGraduates } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DimRow {
   key: string;
@@ -21,7 +22,10 @@ const getDimensions = (name: string): DimRow[] => {
   ];
 };
 
+const CURRENT_MANAGER_ID = 'dddd0001-0000-0000-0000-000000000001'; // David Liu
+
 const AssessTeam: React.FC = () => {
+  const { data: graduates = [], isLoading } = useGraduates(CURRENT_MANAGER_ID);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
   const [adjusting, setAdjusting] = useState<Record<string, boolean>>({});
@@ -32,9 +36,36 @@ const AssessTeam: React.FC = () => {
   const [understanding, setUnderstanding] = useState(5);
   const [submitted, setSubmitted] = useState(false);
 
-  const grad = graduates[selectedIdx];
-  const dims = getDimensions(grad.name);
+  if (isLoading) {
+    return (
+      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+        <Skeleton className="h-8 w-48 mb-4" />
+        <Skeleton className="h-4 w-64 mb-6" />
+        <Skeleton className="h-10 w-full mb-6" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (!graduates.length) {
+    return <div style={{ maxWidth: 680, margin: "0 auto", color: "#9CA3AF", fontSize: 14 }}>No graduates assigned.</div>;
+  }
+
+  const grad = graduates[selectedIdx] ?? graduates[0];
+  const gradName = grad.full_name ?? '';
+  const dims = getDimensions(gradName);
   const confirmedCount = Object.values(confirmed).filter(Boolean).length + (questions !== "" ? 1 : 0);
+
+  const resetForm = () => {
+    setConfirmed({});
+    setAdjusting({});
+    setValues({});
+    setQuestions("");
+    setDidWell("");
+    setImprove("");
+    setUnderstanding(5);
+    setSubmitted(false);
+  };
 
   const handleConfirm = (key: string) => {
     setConfirmed((p) => ({ ...p, [key]: true }));
@@ -47,38 +78,24 @@ const AssessTeam: React.FC = () => {
   };
 
   const handleNext = () => {
-    const nextIdx = (selectedIdx + 1) % graduates.length;
-    setSelectedIdx(nextIdx);
-    setConfirmed({});
-    setAdjusting({});
-    setValues({});
-    setQuestions("");
-    setDidWell("");
-    setImprove("");
-    setUnderstanding(5);
-    setSubmitted(false);
+    setSelectedIdx((selectedIdx + 1) % graduates.length);
+    resetForm();
   };
 
   const handleSelectChange = (idx: number) => {
     setSelectedIdx(idx);
-    setConfirmed({});
-    setAdjusting({});
-    setValues({});
-    setQuestions("");
-    setDidWell("");
-    setImprove("");
-    setUnderstanding(5);
-    setSubmitted(false);
+    resetForm();
   };
 
   if (submitted) {
     const nextGrad = graduates[(selectedIdx + 1) % graduates.length];
+    const nextGradName = nextGrad.full_name ?? '';
     return (
       <div className="flex justify-center" style={{ paddingTop: 48 }}>
         <div className="flex flex-col items-center animate-fade-in" style={{ maxWidth: 400, textAlign: "center" }}>
           <CheckCircle size={48} color="#22C55E" strokeWidth={1.5} style={{ marginBottom: 16 }} />
           <div className="font-heading" style={{ fontSize: 18, fontWeight: 500, color: "#15803D", marginBottom: 8 }}>
-            Assessment for {grad.name} submitted ✓
+            Assessment for {gradName} submitted ✓
           </div>
           <button
             onClick={handleNext}
@@ -93,7 +110,7 @@ const AssessTeam: React.FC = () => {
             onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
             onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
           >
-            Next: {nextGrad.name} <ChevronRight size={16} />
+            Next: {nextGradName} <ChevronRight size={16} />
           </button>
         </div>
       </div>
@@ -120,7 +137,7 @@ const AssessTeam: React.FC = () => {
           }}
         >
           {graduates.map((g, i) => (
-            <option key={g.name} value={i}>{g.name} — {g.role} · W{g.week}</option>
+            <option key={g.id} value={i}>{g.full_name} — {g.job_title} · W{g.week_number}</option>
           ))}
         </select>
       </div>
@@ -128,7 +145,7 @@ const AssessTeam: React.FC = () => {
       {/* Info card */}
       <div style={{ background: "#F0FDF4", borderRadius: 8, padding: 14, marginBottom: 20 }}>
         <p style={{ fontSize: 13, color: "#166534", margin: 0 }}>
-          Based on {grad.name.split(" ")[0]}'s patterns from the Meridian audit engagement, here's what I'd expect this week.{" "}
+          Based on {gradName.split(" ")[0]}'s patterns from the Meridian audit engagement, here's what I'd expect this week.{" "}
           <span style={{ fontWeight: 500 }}>Confirm or adjust.</span>
         </p>
       </div>
@@ -272,7 +289,7 @@ const AssessTeam: React.FC = () => {
         <label style={{ fontSize: 13, fontWeight: 500, color: "#0F0F0F", display: "block", marginBottom: 8 }}>
           One area to improve or support
         </label>
-        <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 6 }}>Not shown to {grad.name.split(" ")[0]} directly</div>
+        <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 6 }}>Not shown to {gradName.split(" ")[0]} directly</div>
         <textarea
           value={improve}
           onChange={(e) => setImprove(e.target.value)}
