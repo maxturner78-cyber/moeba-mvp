@@ -1,16 +1,39 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
-import { teamGraduates, statusColors } from "@/data/teamData";
+import { statusColors } from "@/data/teamData";
 import StatusBadge from "@/components/StatusBadge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGraduates } from "@/lib/queries";
+import { type Status } from "@/data/sampleData";
 
 interface TeamBriefProps {
   onSelectGraduate: (id: string) => void;
 }
 
+const CURRENT_MANAGER_ID = "dddd0001-0000-0000-0000-000000000001"; // David Liu
+
+function deriveStatus(fullName: string): Status {
+  switch (fullName) {
+    case "Sarah Chen": return "attention";
+    case "Emily Zhang": return "attention";
+    case "Tyler Morrison": return "stalling";
+    case "Marcus Johnson": return "accelerating";
+    case "James Park": return "accelerating";
+    case "Priya Patel": return "steady";
+    default: return "steady";
+  }
+}
+
+function getInitials(name: string): string {
+  return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+}
+
 const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
+  const { data: graduates, isLoading, error } = useGraduates(CURRENT_MANAGER_ID);
+
   return (
     <div>
-      {/* SECTION 1: Team Summary */}
+      {/* SECTION 1: Team Summary (hardcoded narrative — replaced in Phase 7) */}
       <div
         style={{
           background: "#F0FDF4",
@@ -29,7 +52,6 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           }}
         />
 
-        {/* Header */}
         <div className="flex items-center gap-2" style={{ marginBottom: 4 }}>
           <div
             className="pulse-dot"
@@ -46,7 +68,6 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           Monday w14 · 2 items need attention
         </div>
 
-        {/* Body */}
         <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7 }}>
           <p style={{ marginBottom: 12 }}>Two people need your attention this week.</p>
           <p style={{ marginBottom: 12 }}>
@@ -60,7 +81,6 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           <p>The other 4 graduates are stable. Assessment forms are pre-populated and ready.</p>
         </div>
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2" style={{ marginTop: 20 }}>
           {[
             { label: "Open Sarah's brief →", id: "g1" },
@@ -89,7 +109,7 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
         </div>
       </div>
 
-      {/* SECTION 2: Graduate List */}
+      {/* SECTION 2: Graduate List (live from DB) */}
       <div
         style={{
           background: "#fff",
@@ -100,8 +120,31 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           marginBottom: 20,
         }}
       >
-        {teamGraduates.map((g, i) => {
-          const sc = statusColors[g.status];
+        {isLoading && (
+          <div className="flex flex-col gap-0">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4" style={{ padding: "16px 20px", borderBottom: i < 3 ? "1px solid #F3F4F6" : "none" }}>
+                <Skeleton className="h-9 w-9 rounded-full shrink-0" />
+                <div className="flex flex-col gap-1" style={{ width: 200 }}>
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-4 flex-1" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <div style={{ padding: "24px 20px", color: "#DC2626", fontSize: 14 }}>
+            Failed to load team data. Please try again.
+          </div>
+        )}
+
+        {!isLoading && !error && graduates?.map((g, i) => {
+          const status = deriveStatus(g.full_name);
+          const sc = statusColors[status];
           return (
             <div
               key={g.id}
@@ -109,14 +152,13 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
               className="flex items-center transition-colors"
               style={{
                 padding: "16px 20px",
-                borderBottom: i < teamGraduates.length - 1 ? "1px solid #F3F4F6" : "none",
+                borderBottom: i < (graduates.length - 1) ? "1px solid #F3F4F6" : "none",
                 cursor: "pointer",
                 gap: 16,
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "#FAFAFA"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
             >
-              {/* Avatar */}
               <div
                 className="flex items-center justify-center shrink-0"
                 style={{
@@ -125,43 +167,35 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
                   fontSize: 12, fontWeight: 600,
                 }}
               >
-                {g.initials}
+                {getInitials(g.full_name)}
               </div>
 
-              {/* Name + role */}
               <div style={{ width: 200, flexShrink: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>{g.name}</div>
-                <div style={{ fontSize: 12, color: "#9CA3AF" }}>{g.role} · W{g.week}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>{g.full_name}</div>
+                <div style={{ fontSize: 12, color: "#9CA3AF" }}>{g.job_title} · W{g.week_number}</div>
               </div>
 
-              {/* Status badge */}
               <div style={{ width: 130, flexShrink: 0 }}>
-                <StatusBadge status={g.status} />
+                <StatusBadge status={status} />
               </div>
 
-              {/* Signal */}
               <div
                 style={{
                   flex: 1, fontSize: 13, color: "#374151",
                   whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 }}
-              >
-                {g.signal}
-              </div>
+              />
 
-              {/* Chevron */}
               <ChevronRight size={16} color="#D1D5DB" style={{ flexShrink: 0 }} />
             </div>
           );
         })}
       </div>
 
-      {/* Time saved callout */}
       <p style={{ fontSize: 12, color: "#9CA3AF", textAlign: "center" }}>
         Time saved this quarter: ~10 hours of review preparation auto-generated from continuous data
       </p>
 
-      {/* Pulse animation keyframes */}
       <style>{`
         @keyframes pulse-scale {
           0%, 100% { transform: scale(1); opacity: 1; }
