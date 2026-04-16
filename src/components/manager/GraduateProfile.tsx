@@ -237,7 +237,7 @@ const GapSection: React.FC<GapSectionProps> = ({
 /* ── Trend Chart ── */
 type TrendTab = "performance" | "confidence" | "questions" | "workload";
 
-const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
+const TrendChart: React.FC<{ tab: TrendTab; chartData: ChartRow[] }> = ({ tab, chartData }) => {
   const common = {
     xAxis: <XAxis dataKey="week" axisLine={{ stroke: "#E8E8E8" }} tickLine={false} tick={{ fontSize: 11, fill: "#9CA3AF" }} />,
     grid: <CartesianGrid horizontal vertical={false} stroke="#F3F4F6" strokeDasharray="4 4" />,
@@ -247,7 +247,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "confidence") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={confData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="confGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#EF4444" stopOpacity={0.15} />
@@ -255,7 +255,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
             </linearGradient>
           </defs>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Area type="monotone" dataKey="value" stroke="#EF4444" strokeWidth={2} fill="url(#confGrad)" dot={false}
+          <Area type="monotone" dataKey="confidence" stroke="#EF4444" strokeWidth={2} fill="url(#confGrad)" dot={false}
             activeDot={{ r: 4, fill: "#fff", stroke: "#EF4444", strokeWidth: 2 }} />
         </AreaChart>
       </ResponsiveContainer>
@@ -265,7 +265,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "performance") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={perfData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gapFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.12} />
@@ -273,10 +273,10 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
             </linearGradient>
           </defs>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Area type="monotone" dataKey="manager" stroke="transparent" fill="url(#gapFill)" />
-          <Line type="monotone" dataKey="self" stroke="#6366F1" strokeWidth={2} dot={false}
+          <Area type="monotone" dataKey="managerRating" stroke="transparent" fill="url(#gapFill)" />
+          <Line type="monotone" dataKey="selfRating" stroke="#6366F1" strokeWidth={2} dot={false}
             activeDot={{ r: 3, fill: "#fff", stroke: "#6366F1", strokeWidth: 2 }} />
-          <Line type="monotone" dataKey="manager" stroke="#22C55E" strokeWidth={2} dot={false}
+          <Line type="monotone" dataKey="managerRating" stroke="#22C55E" strokeWidth={2} dot={false}
             activeDot={{ r: 3, fill: "#fff", stroke: "#22C55E", strokeWidth: 2 }} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -286,13 +286,14 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
   if (tab === "questions") {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={qData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
           {common.grid}{common.xAxis}{common.tooltip}
-          <Bar dataKey="value" radius={[3, 3, 0, 0]} barSize={18}>
-            {qData.map((d, i) => (
-              <Cell key={i} fill={d.value >= 3 ? "#22C55E" : d.value === 2 ? "#F59E0B" : "#EF4444"} />
+          <Bar dataKey="questionsAsked" name="Self-reported" radius={[3, 3, 0, 0]} barSize={12}>
+            {chartData.map((d, i) => (
+              <Cell key={i} fill={(d.questionsAsked ?? 0) >= 3 ? "#22C55E" : (d.questionsAsked ?? 0) === 2 ? "#F59E0B" : "#EF4444"} />
             ))}
           </Bar>
+          <Bar dataKey="questionsObserved" name="Manager observed" radius={[3, 3, 0, 0]} barSize={12} fill="#6366F1" opacity={0.6} />
         </BarChart>
       </ResponsiveContainer>
     );
@@ -300,7 +301,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={wlData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+      <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="wlGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.15} />
@@ -308,7 +309,7 @@ const TrendChart: React.FC<{ tab: TrendTab }> = ({ tab }) => {
           </linearGradient>
         </defs>
         {common.grid}{common.xAxis}{common.tooltip}
-        <Area type="monotone" dataKey="value" stroke="#F59E0B" strokeWidth={2} fill="url(#wlGrad)" dot={false}
+        <Area type="monotone" dataKey="workload" stroke="#F59E0B" strokeWidth={2} fill="url(#wlGrad)" dot={false}
           activeDot={{ r: 4, fill: "#fff", stroke: "#F59E0B", strokeWidth: 2 }} />
       </AreaChart>
     </ResponsiveContainer>
