@@ -191,6 +191,50 @@ export function useSkillNodes(companyId: string) {
   });
 }
 
+export type SkillNodeRow = {
+  id: string;
+  slug: string;
+  name: string;
+  cluster: string;
+  framework_id: string;
+  promotion_required: boolean;
+};
+
+export type SkillNodesGrouped = Record<string, SkillNodeRow[]>;
+
+export function useSkillNodesGrouped(companyId: string) {
+  return useQuery({
+    queryKey: ["skillNodesGrouped", companyId],
+    staleTime: STALE,
+    enabled: !!companyId,
+    queryFn: async () => {
+      const { data: fw, error: fwErr } = await supabase
+        .from("competency_frameworks")
+        .select("id")
+        .eq("company_id", companyId)
+        .eq("active", true)
+        .maybeSingle();
+      if (fwErr) throw fwErr;
+      if (!fw) return {} as SkillNodesGrouped;
+
+      const { data, error } = await supabase
+        .from("skill_nodes")
+        .select("id, slug, name, cluster, framework_id, promotion_required")
+        .eq("framework_id", fw.id)
+        .order("name");
+      if (error) throw error;
+
+      const grouped: SkillNodesGrouped = {};
+      for (const node of data ?? []) {
+        const cluster = node.cluster ?? "other";
+        if (!grouped[cluster]) grouped[cluster] = [];
+        grouped[cluster].push(node as SkillNodeRow);
+      }
+      return grouped;
+    },
+  });
+}
+
 export function useSkillEdges(companyId: string) {
   return useQuery({
     queryKey: ["skillEdges", companyId],
