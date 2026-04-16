@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
-import { getSnapshot, getNodeRadius, getNodeStatus, type SkillNode, type SkillEdge } from "@/data/skillsData";
+import { getNodeRadius, getNodeStatus, type SkillNode, type SkillEdge } from "@/data/skillsData";
 
 interface SimNode extends d3.SimulationNodeDatum {
   id: string;
@@ -25,7 +25,12 @@ const clusterCenters: Record<string, { x: number; y: number }> = {
   compliance: { x: -180, y: 140 },
 };
 
-const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
+interface Props {
+  nodes: SkillNode[];
+  edges: SkillEdge[];
+}
+
+const SkillsGraph: React.FC<Props> = ({ nodes: inputNodes, edges: inputEdges }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const simRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
   const [tooltip, setTooltip] = useState<{
