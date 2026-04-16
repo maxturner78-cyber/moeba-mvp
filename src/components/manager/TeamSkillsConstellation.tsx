@@ -473,7 +473,7 @@ const TeamSkillsConstellation: React.FC = () => {
           </div>
         </div>
         <div style={{ height: 500, borderRadius: 12, border: "1px solid rgba(0,0,0,0.06)", background: "#fff" }}>
-          <SkillsGraph month={month} />
+          <SkillsGraph nodes={getSnapshot(month).nodes} edges={getSnapshot(month).edges} />
         </div>
       </div>
     );
