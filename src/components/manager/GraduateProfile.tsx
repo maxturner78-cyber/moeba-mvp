@@ -25,18 +25,45 @@ function deriveStatus(fullName: string): Status {
   }
 }
 
-/* ── Data ── */
-const weeks = Array.from({ length: 12 }, (_, i) => ({ week: `W${i + 1}` }));
-const confidenceArr = [8, 8, 7, 5, 6, 7, 7, 6, 5, 5, 5, 5];
-const selfRatingArr = [7, 7, 6, 5, 6, 6, 6, 5, 5, 5, 5, 5];
-const managerRatingArr = [7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8];
-const questionsArr = [6, 7, 5, 4, 6, 5, 5, 4, 3, 2, 2, 1];
-const workloadArr = [6, 6, 7, 7, 7, 7, 6, 7, 9, 7, 7, 6];
+/* ── Chart Data Types ── */
+interface ChartRow {
+  week: string;
+  selfRating?: number;
+  managerRating?: number;
+  confidence?: number;
+  workload?: number;
+  questionsAsked?: number;
+  questionsObserved?: number;
+}
 
-const confData = weeks.map((w, i) => ({ ...w, value: confidenceArr[i] }));
-const perfData = weeks.map((w, i) => ({ ...w, self: selfRatingArr[i], manager: managerRatingArr[i] }));
-const qData = weeks.map((w, i) => ({ ...w, value: questionsArr[i] }));
-const wlData = weeks.map((w, i) => ({ ...w, value: workloadArr[i] }));
+function buildChartData(
+  selfCheckIns: any[],
+  managerCheckIns: any[],
+): ChartRow[] {
+  const weekMap = new Map<number, ChartRow>();
+
+  for (const ci of selfCheckIns) {
+    const ds = typeof ci.dimension_scores === "string" ? JSON.parse(ci.dimension_scores) : ci.dimension_scores;
+    const row: ChartRow = weekMap.get(ci.week_number) ?? { week: `W${ci.week_number}` };
+    row.selfRating = ds?.selfRating;
+    row.confidence = ds?.confidence;
+    row.workload = ds?.workload;
+    row.questionsAsked = ds?.questionsAsked;
+    weekMap.set(ci.week_number, row);
+  }
+
+  for (const ci of managerCheckIns) {
+    const ds = typeof ci.dimension_scores === "string" ? JSON.parse(ci.dimension_scores) : ci.dimension_scores;
+    const row: ChartRow = weekMap.get(ci.week_number) ?? { week: `W${ci.week_number}` };
+    row.managerRating = ds?.overallRating;
+    row.questionsObserved = ci.questions_observed;
+    weekMap.set(ci.week_number, row);
+  }
+
+  return Array.from(weekMap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([, row]) => row);
+}
 
 const DarkTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
