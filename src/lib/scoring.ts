@@ -152,10 +152,12 @@ export function runScoringTests(): void {
     { delta: -1, label: "declining" },
   );
 
+  // Note: spec example listed 6.2, but 0.4*5 + 0.4*8 + 0.2*7 = 6.6.
+  // Formula is the source of truth.
   check(
     "computeCombinedDimensionScore(5, 8, 7)",
     computeCombinedDimensionScore(5, 8, 7),
-    { score: 6.2, confidence: "high" },
+    { score: 6.6, confidence: "high" },
   );
 
   check(
