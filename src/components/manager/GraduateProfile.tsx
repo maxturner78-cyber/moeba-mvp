@@ -868,7 +868,7 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
             boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
             position: "relative", overflow: "hidden", height: 520,
           }}>
-            <SkillsGraph month={3} />
+            <SkillsGraph nodes={getSnapshot(3).nodes} edges={getSnapshot(3).edges} />
 
             {/* Legend */}
             <div style={{

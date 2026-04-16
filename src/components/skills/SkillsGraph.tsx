@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
-import { getSnapshot, getNodeRadius, getNodeStatus, type SkillNode, type SkillEdge } from "@/data/skillsData";
+import { getNodeRadius, getNodeStatus, type SkillNode, type SkillEdge } from "@/data/skillsData";
 
 interface SimNode extends d3.SimulationNodeDatum {
   id: string;
@@ -25,7 +25,12 @@ const clusterCenters: Record<string, { x: number; y: number }> = {
   compliance: { x: -180, y: 140 },
 };
 
-const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
+interface Props {
+  nodes: SkillNode[];
+  edges: SkillEdge[];
+}
+
+const SkillsGraph: React.FC<Props> = ({ nodes: inputNodes, edges: inputEdges }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const simRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
   const [tooltip, setTooltip] = useState<{
@@ -36,13 +41,17 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const dimensionsRef = useRef({ width: 900, height: 600 });
 
-  const buildSimNodes = useCallback((snapshot: ReturnType<typeof getSnapshot>) => {
-    const nodes: SimNode[] = snapshot.nodes.map((n) => ({
-      ...n,
+  const buildSimNodes = useCallback((snapshotNodes: SkillNode[]) => {
+    const nodes: SimNode[] = snapshotNodes.map((n) => ({
+      id: n.id,
+      label: n.label,
+      proficiency: n.proficiency,
+      cluster: n.cluster,
+      promotionRequired: n.promotionRequired,
       radius: getNodeRadius(n.proficiency, n.promotionRequired),
       status: getNodeStatus(n),
-      x: dimensionsRef.current.width / 2 + clusterCenters[n.cluster].x + (Math.random() - 0.5) * 40,
-      y: dimensionsRef.current.height / 2 + clusterCenters[n.cluster].y + (Math.random() - 0.5) * 40,
+      x: dimensionsRef.current.width / 2 + (clusterCenters[n.cluster]?.x ?? 0) + (Math.random() - 0.5) * 40,
+      y: dimensionsRef.current.height / 2 + (clusterCenters[n.cluster]?.y ?? 0) + (Math.random() - 0.5) * 40,
     }));
     return nodes;
   }, []);
@@ -56,11 +65,10 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
     const height = rect.height || 600;
     dimensionsRef.current = { width, height };
 
-    const snapshot = getSnapshot(month);
-    const nodes = buildSimNodes(snapshot);
+    const nodes = buildSimNodes(inputNodes);
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
-    const links: SimLink[] = snapshot.edges
+    const links: SimLink[] = inputEdges
       .filter((e) => nodeMap.has(e.source) && nodeMap.has(e.target))
       .map((e) => ({ source: e.source, target: e.target }));
 
@@ -284,7 +292,7 @@ const SkillsGraph: React.FC<{ month: number }> = ({ month }) => {
     return () => {
       sim.stop();
     };
-  }, [month, buildSimNodes]);
+  }, [inputNodes, inputEdges, buildSimNodes]);
 
   const clusterLabels: Record<string, string> = {
     core: "Core Behavioural",
