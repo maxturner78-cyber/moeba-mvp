@@ -9,7 +9,6 @@ import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import PeerCheckIn from "@/components/peer/PeerCheckIn";
-import { runScoringTests } from "@/lib/scoring";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-development",
@@ -55,24 +54,6 @@ const Index: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "#FAFAFA" }}>
-      <button
-        onClick={() => runScoringTests()}
-        style={{
-          position: "fixed",
-          bottom: 16,
-          right: 16,
-          zIndex: 50,
-          padding: "8px 12px",
-          background: "#22C55E",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          fontSize: 12,
-          cursor: "pointer",
-        }}
-      >
-        Run scoring tests
-      </button>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar
