@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
 
