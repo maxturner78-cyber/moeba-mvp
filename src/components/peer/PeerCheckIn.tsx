@@ -22,6 +22,8 @@ const PeerCheckIn: React.FC = () => {
   const [support, setSupport] = useState("");
   const [overall, setOverall] = useState(5);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   // Default to first assigned graduate once loaded
   const activeId = selectedGradId ?? assignedGrads[0]?.graduate_id ?? null;
