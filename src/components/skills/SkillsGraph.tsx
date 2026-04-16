@@ -292,7 +292,7 @@ const SkillsGraph: React.FC<Props> = ({ nodes: inputNodes, edges: inputEdges }) 
     return () => {
       sim.stop();
     };
-  }, [month, buildSimNodes]);
+  }, [inputNodes, inputEdges, buildSimNodes]);
 
   const clusterLabels: Record<string, string> = {
     core: "Core Behavioural",
