@@ -670,7 +670,21 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
                 );
               })}
             </div>
-            <TrendChart tab={trendTab} />
+            {chartsLoading ? (
+              <div className="flex flex-col gap-2" style={{ height: 200, justifyContent: "center" }}>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ) : notEnoughHistory ? (
+              <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <p style={{ fontSize: 13, color: "#9CA3AF", textAlign: "center", maxWidth: 280 }}>
+                  Not enough history yet — come back in a few weeks.
+                </p>
+              </div>
+            ) : (
+              <TrendChart tab={trendTab} chartData={chartData} />
+            )}
             {trendTab === "performance" && (
               <div className="flex items-center gap-4 justify-center" style={{ marginTop: 8 }}>
                 <div className="flex items-center gap-1.5">
