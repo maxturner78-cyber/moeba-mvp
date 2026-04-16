@@ -1,6 +1,49 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
-import DevelopmentBarStack from "@/components/vitals/DevelopmentBarStack";
+import DevelopmentBarStack, { type DimensionRow } from "@/components/vitals/DevelopmentBarStack";
+import { useSelfCheckIns } from "@/lib/queries";
+
+const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
+
+const DIMENSION_KEYS = [
+  { key: "ownershipFollowThrough", label: "Ownership & Follow-Through" },
+  { key: "confidence", label: "Confidence Stability" },
+  { key: "curiosity", label: "Curiosity & Learning" },
+  { key: "managerRelationship", label: "Manager Relationship" },
+  { key: "teamConnection", label: "Team Connection" },
+  { key: "feedbackApplication", label: "Feedback Application" },
+  { key: "workloadMgmt", label: "Workload Management" },
+  { key: "initiative", label: "Initiative & Voice" },
+  { key: "resilience", label: "Resilience" },
+] as const;
+
+function computeDimensions(checkIns: any[]): DimensionRow[] {
+  if (!checkIns.length) return [];
+
+  // checkIns are ordered desc by week_number, so [0] is most recent
+  const latest = checkIns[0];
+  const prior = checkIns.length > 1 ? checkIns[1] : null;
+
+  const latestScores = typeof latest.dimension_scores === "string"
+    ? JSON.parse(latest.dimension_scores)
+    : latest.dimension_scores;
+
+  const priorScores = prior
+    ? typeof prior.dimension_scores === "string"
+      ? JSON.parse(prior.dimension_scores)
+      : prior.dimension_scores
+    : null;
+
+  return DIMENSION_KEYS.map(({ key, label }) => {
+    const currentScore = latestScores?.[key] ?? 0;
+    const priorScore = priorScores?.[key] ?? currentScore;
+    const delta = currentScore - priorScore;
+    const status: DimensionRow["status"] =
+      delta >= 0.5 ? "improving" : delta <= -0.5 ? "declining" : "steady";
+
+    return { key, label, currentScore, priorScore, delta, status };
+  });
+}
 
 /* ─── Weekly Insight Card ─── */
 const WeeklyInsightCard: React.FC<{ onStartCheckIn: () => void }> = ({ onStartCheckIn }) => (
@@ -90,6 +133,10 @@ interface MyVitalsProps {
 }
 
 const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
+  const { data: checkIns, isLoading } = useSelfCheckIns(CURRENT_GRADUATE_ID, 5);
+
+  const dimensions = useMemo(() => computeDimensions(checkIns ?? []), [checkIns]);
+
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
       {/* SECTION 1: Weekly Insight + Check-In */}
@@ -97,7 +144,7 @@ const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
 
       {/* SECTION 2: Development Profile */}
       <div style={{ marginBottom: 40 }}>
-        <DevelopmentBarStack />
+        <DevelopmentBarStack dimensions={dimensions.length > 0 ? dimensions : undefined} isLoading={isLoading} />
       </div>
 
       {/* SECTION 3: Focus Areas */}
