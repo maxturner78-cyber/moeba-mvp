@@ -112,6 +112,7 @@ const AssessTeam: React.FC = () => {
         area_to_improve: improve,
       },
       manager_confidence: understanding,
+      carried_forward: [],
     };
   };
 

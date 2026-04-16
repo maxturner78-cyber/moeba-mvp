@@ -56,6 +56,7 @@ const PeerCheckIn: React.FC = () => {
       week_number: graduateDetail.week_number,
       dimension_scores,
       free_text,
+      carried_forward: [],
     };
 
     const { error } = await supabase.from("weekly_check_ins_peer").insert(row);
