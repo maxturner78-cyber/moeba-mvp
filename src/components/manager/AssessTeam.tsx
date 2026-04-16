@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CheckCircle, Check, ChevronRight } from "lucide-react";
-import { graduates } from "@/data/sampleData";
+import { useGraduates } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DimRow {
   key: string;
@@ -21,7 +22,10 @@ const getDimensions = (name: string): DimRow[] => {
   ];
 };
 
+const CURRENT_MANAGER_ID = 'dddd0001-0000-0000-0000-000000000001'; // David Liu
+
 const AssessTeam: React.FC = () => {
+  const { data: graduates = [], isLoading } = useGraduates(CURRENT_MANAGER_ID);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
   const [adjusting, setAdjusting] = useState<Record<string, boolean>>({});
@@ -32,8 +36,24 @@ const AssessTeam: React.FC = () => {
   const [understanding, setUnderstanding] = useState(5);
   const [submitted, setSubmitted] = useState(false);
 
-  const grad = graduates[selectedIdx];
-  const dims = getDimensions(grad.name);
+  if (isLoading) {
+    return (
+      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+        <Skeleton className="h-8 w-48 mb-4" />
+        <Skeleton className="h-4 w-64 mb-6" />
+        <Skeleton className="h-10 w-full mb-6" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (!graduates.length) {
+    return <div style={{ maxWidth: 680, margin: "0 auto", color: "#9CA3AF", fontSize: 14 }}>No graduates assigned.</div>;
+  }
+
+  const grad = graduates[selectedIdx] ?? graduates[0];
+  const gradName = `${grad.first_name} ${grad.last_name}`;
+  const dims = getDimensions(gradName);
   const confirmedCount = Object.values(confirmed).filter(Boolean).length + (questions !== "" ? 1 : 0);
 
   const handleConfirm = (key: string) => {
