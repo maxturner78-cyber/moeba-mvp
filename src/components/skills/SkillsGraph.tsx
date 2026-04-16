@@ -41,13 +41,17 @@ const SkillsGraph: React.FC<Props> = ({ nodes: inputNodes, edges: inputEdges }) 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const dimensionsRef = useRef({ width: 900, height: 600 });
 
-  const buildSimNodes = useCallback((snapshot: ReturnType<typeof getSnapshot>) => {
-    const nodes: SimNode[] = snapshot.nodes.map((n) => ({
-      ...n,
+  const buildSimNodes = useCallback((snapshotNodes: SkillNode[]) => {
+    const nodes: SimNode[] = snapshotNodes.map((n) => ({
+      id: n.id,
+      label: n.label,
+      proficiency: n.proficiency,
+      cluster: n.cluster,
+      promotionRequired: n.promotionRequired,
       radius: getNodeRadius(n.proficiency, n.promotionRequired),
       status: getNodeStatus(n),
-      x: dimensionsRef.current.width / 2 + clusterCenters[n.cluster].x + (Math.random() - 0.5) * 40,
-      y: dimensionsRef.current.height / 2 + clusterCenters[n.cluster].y + (Math.random() - 0.5) * 40,
+      x: dimensionsRef.current.width / 2 + (clusterCenters[n.cluster]?.x ?? 0) + (Math.random() - 0.5) * 40,
+      y: dimensionsRef.current.height / 2 + (clusterCenters[n.cluster]?.y ?? 0) + (Math.random() - 0.5) * 40,
     }));
     return nodes;
   }, []);
