@@ -571,11 +571,11 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
       <div style={{ marginBottom: 24 }}>
         <div className="flex items-center gap-3" style={{ marginBottom: 4 }}>
           <h1 className="font-heading" style={{ fontSize: 22, fontWeight: 500, color: "#0F0F0F", letterSpacing: "-0.02em" }}>
-            {graduate.name}
+            {graduate.full_name}
           </h1>
-          <StatusBadge status={graduate.status} />
+          <StatusBadge status={status} />
         </div>
-        <p style={{ fontSize: 13, color: "#9CA3AF" }}>{graduate.role} · Week {graduate.week} · Manager: {graduate.managerName}</p>
+        <p style={{ fontSize: 13, color: "#9CA3AF" }}>{graduate.job_title} · Week {graduate.week_number} · Manager: {graduate.manager_name}</p>
 
         {/* View Tabs */}
         <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
