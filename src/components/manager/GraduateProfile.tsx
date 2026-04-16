@@ -509,8 +509,37 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
   const [profileView, setProfileView] = useState<ProfileView>("overview");
 
-  const graduate = graduates.find(g => g.id === graduateId);
-  if (!graduate) return null;
+  const { data: graduate, isLoading, error } = useGraduate(graduateId);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-4" style={{ padding: "20px 0" }}>
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <Skeleton className="h-[200px] w-full rounded-lg" style={{ marginTop: 16 }} />
+      </div>
+    );
+  }
+
+  if (error || !graduate) {
+    return (
+      <div>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 transition-colors"
+          style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", marginBottom: 16, padding: 0 }}
+        >
+          <ArrowLeft size={14} /> Team Brief
+        </button>
+        <div style={{ padding: "24px 0", color: "#DC2626", fontSize: 14 }}>
+          {error ? "Failed to load graduate profile." : "Graduate not found."}
+        </div>
+      </div>
+    );
+  }
+
+  const status = deriveStatus(graduate.full_name);
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
