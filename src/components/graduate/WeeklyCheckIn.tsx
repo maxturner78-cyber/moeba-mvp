@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { CheckCircle } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import FormSlider from "@/components/forms/FormSlider";
+import { useGraduate } from "@/lib/queries";
+import { supabase } from "@/integrations/supabase/client";
+
+const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
 
 const WeeklyCheckIn: React.FC = () => {
   const [confidence, setConfidence] = useState(5);
@@ -11,6 +17,72 @@ const WeeklyCheckIn: React.FC = () => {
   const [moreOf, setMoreOf] = useState("");
   const [selfRating, setSelfRating] = useState(5);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { data: graduate } = useGraduate(CURRENT_GRADUATE_ID);
+  const queryClient = useQueryClient();
+
+  const handleSubmit = async () => {
+    if (!graduate || submitting) return;
+    setSubmitting(true);
+
+    const dimension_scores = {
+      confidence,
+      workload,
+      managerSupport: support,
+      selfRating,
+      questionsAsked: questions,
+    };
+
+    const free_text = {
+      stretched_by: stretched,
+      more_of: moreOf,
+    };
+
+    const row = {
+      graduate_id: CURRENT_GRADUATE_ID,
+      week_number: graduate.week_number,
+      check_in_date: new Date().toISOString().split("T")[0],
+      dimension_scores,
+      free_text,
+    };
+
+    const { error } = await supabase.from("weekly_check_ins_self").insert(row);
+
+    if (error) {
+      if (error.code === "23505") {
+        toast("You've already submitted this week's check-in.", {
+          action: {
+            label: "Update instead",
+            onClick: async () => {
+              const { error: updateErr } = await supabase
+                .from("weekly_check_ins_self")
+                .update({ dimension_scores, free_text, check_in_date: row.check_in_date })
+                .eq("graduate_id", CURRENT_GRADUATE_ID)
+                .eq("week_number", graduate.week_number);
+
+              if (updateErr) {
+                toast.error("Failed to update check-in.");
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["selfCheckIns", CURRENT_GRADUATE_ID] });
+                toast.success("Check-in updated.");
+                setSubmitted(true);
+              }
+            },
+          },
+        });
+      } else {
+        toast.error("Something went wrong — please try again.");
+      }
+      setSubmitting(false);
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["selfCheckIns", CURRENT_GRADUATE_ID] });
+    toast.success("Check-in submitted — see you next week.");
+    setSubmitted(true);
+    setSubmitting(false);
+  };
 
   if (submitted) {
     return (
@@ -95,14 +167,17 @@ const WeeklyCheckIn: React.FC = () => {
             leftLabel="Poor" rightLabel="Excellent" />
 
           <button
-            onClick={() => setSubmitted(true)}
+            onClick={handleSubmit}
+            disabled={submitting || !graduate}
             className="gs-btn-primary"
             style={{
               width: "100%", background: "#22C55E", color: "#fff", borderRadius: 8,
-              padding: "12px 20px", fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer",
+              padding: "12px 20px", fontSize: 14, fontWeight: 500, border: "none",
+              cursor: submitting ? "wait" : "pointer",
+              opacity: submitting ? 0.7 : 1,
             }}
           >
-            Submit Check-In
+            {submitting ? "Submitting…" : "Submit Check-In"}
           </button>
         </div>
       </div>
