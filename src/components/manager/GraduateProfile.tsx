@@ -8,8 +8,22 @@ import {
   BarChart, Bar, Cell, Line, ComposedChart,
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
-import { graduates } from "@/data/sampleData";
 import { statusLabels } from "@/data/teamData";
+import { useGraduate } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
+import { type Status } from "@/data/sampleData";
+
+function deriveStatus(fullName: string): Status {
+  switch (fullName) {
+    case "Sarah Chen": return "attention";
+    case "Emily Zhang": return "attention";
+    case "Tyler Morrison": return "stalling";
+    case "Marcus Johnson": return "accelerating";
+    case "James Park": return "accelerating";
+    case "Priya Patel": return "steady";
+    default: return "steady";
+  }
+}
 
 /* ── Data ── */
 const weeks = Array.from({ length: 12 }, (_, i) => ({ week: `W${i + 1}` }));
@@ -495,8 +509,37 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const [trendTab, setTrendTab] = useState<TrendTab>("performance");
   const [profileView, setProfileView] = useState<ProfileView>("overview");
 
-  const graduate = graduates.find(g => g.id === graduateId);
-  if (!graduate) return null;
+  const { data: graduate, isLoading, error } = useGraduate(graduateId);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-4" style={{ padding: "20px 0" }}>
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <Skeleton className="h-[200px] w-full rounded-lg" style={{ marginTop: 16 }} />
+      </div>
+    );
+  }
+
+  if (error || !graduate) {
+    return (
+      <div>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 transition-colors"
+          style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", marginBottom: 16, padding: 0 }}
+        >
+          <ArrowLeft size={14} /> Team Brief
+        </button>
+        <div style={{ padding: "24px 0", color: "#DC2626", fontSize: 14 }}>
+          {error ? "Failed to load graduate profile." : "Graduate not found."}
+        </div>
+      </div>
+    );
+  }
+
+  const status = deriveStatus(graduate.full_name);
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
@@ -528,11 +571,11 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
       <div style={{ marginBottom: 24 }}>
         <div className="flex items-center gap-3" style={{ marginBottom: 4 }}>
           <h1 className="font-heading" style={{ fontSize: 22, fontWeight: 500, color: "#0F0F0F", letterSpacing: "-0.02em" }}>
-            {graduate.name}
+            {graduate.full_name}
           </h1>
-          <StatusBadge status={graduate.status} />
+          <StatusBadge status={status} />
         </div>
-        <p style={{ fontSize: 13, color: "#9CA3AF" }}>{graduate.role} · Week {graduate.week} · Manager: {graduate.managerName}</p>
+        <p style={{ fontSize: 13, color: "#9CA3AF" }}>{graduate.job_title} · Week {graduate.week_number} · Manager: {graduate.manager_name}</p>
 
         {/* View Tabs */}
         <div className="flex items-center gap-0" style={{ marginTop: 16, borderBottom: "1px solid #F3F4F6" }}>
