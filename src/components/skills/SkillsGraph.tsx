@@ -65,11 +65,10 @@ const SkillsGraph: React.FC<Props> = ({ nodes: inputNodes, edges: inputEdges }) 
     const height = rect.height || 600;
     dimensionsRef.current = { width, height };
 
-    const snapshot = getSnapshot(month);
-    const nodes = buildSimNodes(snapshot);
+    const nodes = buildSimNodes(inputNodes);
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
-    const links: SimLink[] = snapshot.edges
+    const links: SimLink[] = inputEdges
       .filter((e) => nodeMap.has(e.source) && nodeMap.has(e.target))
       .map((e) => ({ source: e.source, target: e.target }));
 
