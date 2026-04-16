@@ -538,6 +538,15 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const [profileView, setProfileView] = useState<ProfileView>("overview");
 
   const { data: graduate, isLoading, error } = useGraduate(graduateId);
+  const { data: selfCheckIns, isLoading: selfLoading } = useSelfCheckIns(graduateId);
+  const { data: mgrCheckIns, isLoading: mgrLoading } = useManagerCheckIns(graduateId);
+
+  const chartData = React.useMemo(
+    () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
+    [selfCheckIns, mgrCheckIns],
+  );
+  const chartsLoading = selfLoading || mgrLoading;
+  const notEnoughHistory = !chartsLoading && chartData.length <= 1;
 
   if (isLoading) {
     return (
