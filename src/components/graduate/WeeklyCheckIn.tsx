@@ -117,6 +117,7 @@ const WeeklyCheckIn: React.FC = () => {
       check_in_date: new Date().toISOString().split("T")[0],
       dimension_scores,
       free_text,
+      carried_forward: [],
     };
 
     const skillSlugsArray = [...checkedSlugs];
