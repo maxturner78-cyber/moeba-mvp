@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { CheckCircle, Check, ChevronRight } from "lucide-react";
 import { useGraduates } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DimRow {
   key: string;
@@ -25,6 +28,7 @@ const getDimensions = (name: string): DimRow[] => {
 const CURRENT_MANAGER_ID = 'dddd0001-0000-0000-0000-000000000001'; // David Liu
 
 const AssessTeam: React.FC = () => {
+  const queryClient = useQueryClient();
   const { data: graduates = [], isLoading } = useGraduates(CURRENT_MANAGER_ID);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
@@ -35,6 +39,7 @@ const AssessTeam: React.FC = () => {
   const [improve, setImprove] = useState("");
   const [understanding, setUnderstanding] = useState(5);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (isLoading) {
     return (
@@ -65,6 +70,7 @@ const AssessTeam: React.FC = () => {
     setImprove("");
     setUnderstanding(5);
     setSubmitted(false);
+    setSubmitting(false);
   };
 
   const handleConfirm = (key: string) => {
@@ -87,9 +93,75 @@ const AssessTeam: React.FC = () => {
     resetForm();
   };
 
+  const buildRow = () => {
+    const today = new Date().toISOString().split("T")[0];
+    return {
+      manager_id: CURRENT_MANAGER_ID,
+      graduate_id: grad.id,
+      week_number: grad.week_number,
+      check_in_date: today,
+      dimension_scores: {
+        workQuality: values["quality"] ?? dims.find(d => d.key === "quality")!.value,
+        proactivity: values["proactivity"] ?? dims.find(d => d.key === "proactivity")!.value,
+        feedbackResponse: values["feedback"] ?? dims.find(d => d.key === "feedback")!.value,
+        overallRating: values["overall"] ?? dims.find(d => d.key === "overall")!.value,
+      },
+      questions_observed: questions === "" ? 0 : questions,
+      free_text: {
+        did_well: didWell,
+        area_to_improve: improve,
+      },
+      manager_confidence: understanding,
+    };
+  };
+
+  const nextGrad = graduates[(selectedIdx + 1) % graduates.length];
+  const nextGradName = nextGrad?.full_name ?? '';
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    const row = buildRow();
+
+    const { error } = await supabase.from("weekly_check_ins_manager").insert(row);
+
+    if (error) {
+      if (error.code === "23505") {
+        toast("You've already submitted this week's assessment.", {
+          action: {
+            label: "Update instead",
+            onClick: async () => {
+              const { dimension_scores, free_text, questions_observed, manager_confidence } = row;
+              const { error: upErr } = await supabase
+                .from("weekly_check_ins_manager")
+                .update({ dimension_scores, free_text, questions_observed, manager_confidence, check_in_date: row.check_in_date })
+                .eq("manager_id", CURRENT_MANAGER_ID)
+                .eq("graduate_id", grad.id)
+                .eq("week_number", grad.week_number);
+              if (upErr) {
+                toast.error("Update failed: " + upErr.message);
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["managerCheckIns", grad.id] });
+                toast.success(`Assessment updated — next: ${nextGradName}.`);
+                setSubmitted(true);
+              }
+            },
+          },
+        });
+        setSubmitting(false);
+        return;
+      }
+      toast.error("Save failed: " + error.message);
+      setSubmitting(false);
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["managerCheckIns", grad.id] });
+    toast.success(`Assessment saved — next: ${nextGradName}.`);
+    setSubmitting(false);
+    setSubmitted(true);
+  };
+
   if (submitted) {
-    const nextGrad = graduates[(selectedIdx + 1) % graduates.length];
-    const nextGradName = nextGrad.full_name ?? '';
     return (
       <div className="flex justify-center" style={{ paddingTop: 48 }}>
         <div className="flex flex-col items-center animate-fade-in" style={{ maxWidth: 400, textAlign: "center" }}>
@@ -336,18 +408,19 @@ const AssessTeam: React.FC = () => {
           <span className="font-mono-data" style={{ fontWeight: 600 }}>5</span> confirmed · ~45 seconds
         </span>
         <button
-          onClick={() => setSubmitted(true)}
+          onClick={handleSubmit}
+          disabled={submitting}
           style={{
-            padding: "10px 24px", background: "#22C55E", color: "#fff",
+            padding: "10px 24px", background: submitting ? "#86EFAC" : "#22C55E", color: "#fff",
             borderRadius: 100, fontSize: 14, fontWeight: 500, border: "none",
-            cursor: "pointer", transition: "background 120ms ease, transform 80ms ease",
+            cursor: submitting ? "not-allowed" : "pointer", transition: "background 120ms ease, transform 80ms ease",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
+          onMouseEnter={(e) => { if (!submitting) e.currentTarget.style.background = "#16A34A"; }}
+          onMouseLeave={(e) => { if (!submitting) e.currentTarget.style.background = "#22C55E"; }}
           onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
           onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
         >
-          Submit Assessment
+          {submitting ? "Saving…" : "Submit Assessment"}
         </button>
       </div>
     </div>
