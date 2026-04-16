@@ -8,8 +8,22 @@ import {
   BarChart, Bar, Cell, Line, ComposedChart,
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
-import { graduates } from "@/data/sampleData";
 import { statusLabels } from "@/data/teamData";
+import { useGraduate } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
+import { type Status } from "@/data/sampleData";
+
+function deriveStatus(fullName: string): Status {
+  switch (fullName) {
+    case "Sarah Chen": return "attention";
+    case "Emily Zhang": return "attention";
+    case "Tyler Morrison": return "stalling";
+    case "Marcus Johnson": return "accelerating";
+    case "James Park": return "accelerating";
+    case "Priya Patel": return "steady";
+    default: return "steady";
+  }
+}
 
 /* ── Data ── */
 const weeks = Array.from({ length: 12 }, (_, i) => ({ week: `W${i + 1}` }));
