@@ -245,13 +245,16 @@ const PeerCheckIn: React.FC = () => {
           />
 
           <button
-            onClick={() => setSubmitted(true)}
+            onClick={handleSubmit}
+            disabled={submitting || !graduateDetail}
             style={{
               width: "100%", background: "#22C55E", color: "#fff", borderRadius: 8,
-              padding: "12px 20px", fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer",
+              padding: "12px 20px", fontSize: 14, fontWeight: 500, border: "none",
+              cursor: submitting ? "wait" : "pointer",
+              opacity: submitting ? 0.7 : 1,
             }}
           >
-            Submit Peer Feedback
+            {submitting ? "Submitting…" : "Submit Peer Feedback"}
           </button>
         </div>
 
