@@ -28,7 +28,73 @@ const PeerCheckIn: React.FC = () => {
   // Default to first assigned graduate once loaded
   const activeId = selectedGradId ?? assignedGrads[0]?.graduate_id ?? null;
   const grad = assignedGrads.find((g) => g.graduate_id === activeId);
+  const { data: graduateDetail } = useGraduate(activeId ?? "");
   const firstName = grad?.full_name?.split(" ")[0] ?? "them";
+
+  const handleSubmit = async () => {
+    if (!activeId || !graduateDetail || submitting) return;
+    setSubmitting(true);
+
+    const dimension_scores = {
+      collaboration,
+      reliability,
+      communication,
+      initiative,
+      confidence,
+      workQuality,
+      overall,
+    };
+
+    const free_text = {
+      doing_well: strengths,
+      support_needed: support,
+    };
+
+    const row = {
+      peer_id: CURRENT_PEER_ID,
+      graduate_id: activeId,
+      week_number: graduateDetail.week_number,
+      dimension_scores,
+      free_text,
+    };
+
+    const { error } = await supabase.from("weekly_check_ins_peer").insert(row);
+
+    if (error) {
+      if (error.code === "23505") {
+        toast("You've already submitted peer feedback this week.", {
+          action: {
+            label: "Update instead",
+            onClick: async () => {
+              const { error: updateErr } = await supabase
+                .from("weekly_check_ins_peer")
+                .update({ dimension_scores, free_text })
+                .eq("peer_id", CURRENT_PEER_ID)
+                .eq("graduate_id", activeId)
+                .eq("week_number", graduateDetail.week_number);
+
+              if (updateErr) {
+                toast.error("Failed to update peer feedback.");
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["peerCheckIns", activeId] });
+                toast.success("Peer feedback updated.");
+                setSubmitted(true);
+              }
+            },
+          },
+        });
+      } else {
+        toast.error("Something went wrong — please try again.");
+      }
+      setSubmitting(false);
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["peerCheckIns", activeId] });
+    toast.success("Peer feedback submitted. Thank you.");
+    setSubmitted(true);
+    setSubmitting(false);
+  };
 
   if (isLoading) {
     return (
