@@ -176,7 +176,7 @@ export function useSkillNodes(companyId: string) {
         .from("competency_frameworks")
         .select("id")
         .eq("company_id", companyId)
-        .eq("is_active", true)
+        .eq("active", true)
         .maybeSingle();
       if (fwErr) throw fwErr;
       if (!fw) return [];
@@ -201,7 +201,7 @@ export function useSkillEdges(companyId: string) {
         .from("competency_frameworks")
         .select("id")
         .eq("company_id", companyId)
-        .eq("is_active", true)
+        .eq("active", true)
         .maybeSingle();
       if (fwErr) throw fwErr;
       if (!fw) return [];
