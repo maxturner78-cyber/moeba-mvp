@@ -902,7 +902,11 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
         </div>
       </div>
       ) : profileView === "perception-gap" ? (
-      <PerceptionGapAnalysis />
+      <PerceptionGapAnalysis
+        graduateId={graduateId}
+        currentWeek={graduate.week_number}
+        graduateFirstName={graduate.full_name.split(" ")[0]}
+      />
       ) : (
       /* Skills Constellation View */
       <div className="flex flex-col" style={{ gap: 20 }}>
