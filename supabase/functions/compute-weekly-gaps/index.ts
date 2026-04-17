@@ -65,7 +65,7 @@ const MANAGER_KEY_MAP: Record<string, string> = {
 
 function computeWeekNumber(hireDate: string): number {
   const ms = Date.now() - new Date(hireDate).getTime();
-  const weeks = Math.floor(ms / (7 * 24 * 60 * 60 * 1000)) + 1;
+  const weeks = Math.floor(ms / (7 * 24 * 60 * 60 * 1000));
   return Math.max(1, weeks);
 }
 
