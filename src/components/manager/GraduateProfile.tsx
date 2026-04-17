@@ -573,6 +573,7 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const { data: graduate, isLoading, error } = useGraduate(graduateId);
   const { data: selfCheckIns, isLoading: selfLoading } = useSelfCheckIns(graduateId);
   const { data: mgrCheckIns, isLoading: mgrLoading } = useManagerCheckIns(graduateId);
+  const { data: statusData } = useGraduateStatus(graduateId);
 
   const chartData = React.useMemo(
     () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
@@ -609,7 +610,7 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
     );
   }
 
-  const status = deriveStatus(graduate.full_name);
+  const status: Status = statusData ?? "steady";
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;
