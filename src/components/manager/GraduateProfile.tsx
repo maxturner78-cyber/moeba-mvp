@@ -88,50 +88,58 @@ const getGapColor = (gap: number) => {
 };
 
 
-/* ── Behavioural Perception Gap Data (with peer) ── */
-const allBehaviouralGaps = [
-  { dim: "Ownership & Follow-Through", self: 5.2, manager: 8.0, peer: 7.2 as number | undefined, maxGap: 2.8 },
-  { dim: "Confidence", self: 5.5, manager: 7.8, peer: 6.8 as number | undefined, maxGap: 2.3 },
-  { dim: "Curiosity", self: 4.8, manager: 5.5, peer: 5.8 as number | undefined, maxGap: 1.0 },
-  { dim: "Manager Relationship", self: 7.1, manager: 7.5, peer: undefined as number | undefined, maxGap: 0.4 },
-  { dim: "Team Connection", self: 7.4, manager: 7.8, peer: 8.1 as number | undefined, maxGap: 0.7 },
-  { dim: "Feedback Application", self: 8.1, manager: 8.0, peer: 7.5 as number | undefined, maxGap: 0.6 },
-  { dim: "Workload Management", self: 6.0, manager: 6.8, peer: 6.5 as number | undefined, maxGap: 0.8 },
-  { dim: "Initiative", self: 5.3, manager: 6.5, peer: 7.0 as number | undefined, maxGap: 1.7 },
-  { dim: "Resilience", self: 6.8, manager: 7.2, peer: 7.0 as number | undefined, maxGap: 0.4 },
-];
+/* ── Perception Gap Row Type ── */
+type GapRow = {
+  label: string;
+  selfScore: number | null;
+  managerScore: number;
+  peerScore: number | null;
+  gapValue: number;
+};
 
-/* ── Skills Perception Gap Data (with peer) ── */
-const allSkillsGaps = [
-  { dim: "Financial Statement Review", self: 5.0, manager: 7.5, peer: 6.8 as number | undefined, maxGap: 2.5 },
-  { dim: "Audit Planning", self: 4.5, manager: 6.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
-  { dim: "Tax Compliance Basics", self: 3.2, manager: 5.0, peer: 4.8 as number | undefined, maxGap: 1.8 },
-  { dim: "Documentation Standards", self: 7.0, manager: 6.5, peer: 7.2 as number | undefined, maxGap: 0.7 },
-  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, manager: 8.0, peer: 7.8 as number | undefined, maxGap: 0.5 },
-  { dim: "Client Communication", self: 3.0, manager: 5.5, peer: 4.5 as number | undefined, maxGap: 2.5 },
-  { dim: "Risk Assessment", self: 3.5, manager: 4.8, peer: 4.2 as number | undefined, maxGap: 1.3 },
-  { dim: "AML/CTF Procedures", self: 5.0, manager: 5.5, peer: 5.2 as number | undefined, maxGap: 0.5 },
-  { dim: "Ethics & Prof. Standards", self: 6.5, manager: 7.0, peer: 6.8 as number | undefined, maxGap: 0.5 },
-  { dim: "Tax Return Preparation", self: 2.8, manager: 4.2, peer: 3.8 as number | undefined, maxGap: 1.4 },
-  { dim: "Journal Entries & Depreciation", self: 4.0, manager: 5.5, peer: 5.0 as number | undefined, maxGap: 1.5 },
-  { dim: "Presentation Skills", self: 4.0, manager: 5.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
-];
+const DIM_LABELS: Record<string, string> = {
+  confidence: "Confidence",
+  workloadMgmt: "Workload Management",
+  managerRelationship: "Manager Relationship",
+  teamConnection: "Team Connection",
+  curiosity: "Curiosity",
+  initiative: "Initiative",
+  resilience: "Resilience",
+  feedbackApplication: "Feedback Application",
+  ownershipFollowThrough: "Ownership & Follow-Through",
+};
+
+function humanize(slug: string): string {
+  if (DIM_LABELS[slug]) return DIM_LABELS[slug];
+  return slug
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function toGapRow(r: any, kind: "behavioural" | "skill"): GapRow {
+  const slug = r.dimension_or_skill as string;
+  return {
+    label: humanize(slug),
+    selfScore: r.self_score == null ? null : Number(r.self_score),
+    managerScore: Number(r.manager_score),
+    peerScore: r.peer_score == null ? null : Number(r.peer_score),
+    gapValue: Number(r.gap_value ?? 0),
+  };
+}
 
 /* ── Perception Gap Section Component ── */
 interface GapSectionProps {
   title: string;
   subtitle: string;
-  gaps: typeof allBehaviouralGaps;
+  gaps: GapRow[];
   defaultCount: number;
   avgGap: number;
   avgColor: string;
-  trend: string;
-  trendColor: string;
-  insight: string;
+  showPeer: boolean;
 }
 
 const GapSection: React.FC<GapSectionProps> = ({
-  title, subtitle, gaps, defaultCount, avgGap, avgColor, trend, trendColor, insight,
+  title, subtitle, gaps, defaultCount, avgGap, avgColor, showPeer,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [animated, setAnimated] = React.useState(false);
@@ -152,7 +160,7 @@ const GapSection: React.FC<GapSectionProps> = ({
     requestAnimationFrame(() => setAnimated(true));
   }, [avgGap]);
 
-  const sorted = [...gaps].sort((a, b) => Math.abs(b.maxGap) - Math.abs(a.maxGap));
+  const sorted = [...gaps].sort((a, b) => Math.abs(b.gapValue) - Math.abs(a.gapValue));
   const visible = expanded ? sorted : sorted.slice(0, defaultCount);
   const remaining = sorted.length - defaultCount;
 
@@ -166,18 +174,11 @@ const GapSection: React.FC<GapSectionProps> = ({
       </div>
       <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 16 }}>{subtitle}</div>
 
-      <div className="flex items-baseline gap-3" style={{ marginBottom: 4 }}>
+      <div className="flex items-baseline gap-3" style={{ marginBottom: 16 }}>
         <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 500, color: avgColor }}>
           {count.toFixed(1)}
         </span>
         <span style={{ fontSize: 14, color: "#9CA3AF" }}>avg perception gap</span>
-      </div>
-      <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, marginBottom: 8 }}>
-        {insight}
-      </p>
-      <div className="flex items-center gap-1.5">
-        <TrendingUp size={14} color={trendColor} strokeWidth={2} />
-        <span style={{ fontSize: 12, fontWeight: 500, color: trendColor }}>{trend}</span>
       </div>
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
@@ -186,15 +187,25 @@ const GapSection: React.FC<GapSectionProps> = ({
         {expanded ? "All Gaps" : "Biggest Gaps"}
       </div>
       <div className="flex flex-col" style={{ gap: 10, marginBottom: 12 }}>
-        {visible.map((g, i) => (
-          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 40 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot selfScore={g.self} managerScore={g.manager} peerScore={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
-            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.maxGap)), textAlign: "right" }}>
-              {Math.abs(g.maxGap).toFixed(1)} pts
-            </span>
-          </div>
-        ))}
+        {visible.map((g, i) => {
+          const self = g.selfScore ?? g.managerScore;
+          return (
+            <div key={g.label} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 40 }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.label}</span>
+              <DivergenceDot
+                selfScore={self}
+                managerScore={g.managerScore}
+                peerScore={showPeer && g.peerScore != null ? g.peerScore : undefined}
+                maxGap={Math.abs(g.gapValue)}
+                delay={i * 60}
+                animated={animated}
+              />
+              <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.gapValue)), textAlign: "right" }}>
+                {Math.abs(g.gapValue).toFixed(1)} pts
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {remaining > 0 && (
@@ -225,10 +236,12 @@ const GapSection: React.FC<GapSectionProps> = ({
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
         </div>
-        <div className="flex items-center" style={{ gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
-          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer rating</span>
-        </div>
+        {showPeer && (
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
+            <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer rating</span>
+          </div>
+        )}
       </div>
     </div>
   );
