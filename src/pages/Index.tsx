@@ -54,19 +54,32 @@ const Index: React.FC = () => {
     return <PagePlaceholder title="Page" />;
   };
 
-  const handleRecomputeSarah = useCallback(async () => {
-    const result = await supabase.functions.invoke("compute-weekly-gaps", {
-      body: {
-        graduate_id: "cccc0001-0000-0000-0000-000000000001",
-        week_number: 12,
-      },
-    });
-    console.log("compute-weekly-gaps response:", result);
-    if (result.error) {
-      toast.error(`Failed: ${result.error.message}`);
+  const handleRecomputeAll = useCallback(async () => {
+    const graduateIds = [
+      "cccc0001-0000-0000-0000-000000000001",
+      "cccc0002-0000-0000-0000-000000000002",
+      "cccc0003-0000-0000-0000-000000000003",
+      "cccc0004-0000-0000-0000-000000000004",
+      "cccc0005-0000-0000-0000-000000000005",
+      "cccc0006-0000-0000-0000-000000000006",
+    ];
+    let total = 0;
+    const errors: string[] = [];
+    for (const id of graduateIds) {
+      const result = await supabase.functions.invoke("compute-weekly-gaps", {
+        body: { graduate_id: id },
+      });
+      console.log(`compute-weekly-gaps response for ${id}:`, result);
+      if (result.error) {
+        errors.push(`${id.slice(0, 8)}: ${result.error.message}`);
+      } else {
+        total += result.data?.gaps_computed ?? 0;
+      }
+    }
+    if (errors.length > 0) {
+      toast.error(`Completed with ${errors.length} error(s). ${total} gaps computed.`);
     } else {
-      const d = result.data ?? {};
-      toast.success(`Success: ${d.gaps_computed ?? 0} gaps computed`);
+      toast.success(`All done: ${total} gaps computed across ${graduateIds.length} graduates.`);
     }
   }, []);
 
