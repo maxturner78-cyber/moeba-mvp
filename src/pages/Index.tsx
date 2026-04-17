@@ -1,4 +1,6 @@
 import React, { useState, useCallback } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -52,9 +54,42 @@ const Index: React.FC = () => {
     return <PagePlaceholder title="Page" />;
   };
 
+  const handleRecomputeSarah = useCallback(async () => {
+    const result = await supabase.functions.invoke("compute-weekly-gaps", {
+      body: {
+        graduate_id: "cccc0001-0000-0000-0000-000000000001",
+        week_number: 12,
+      },
+    });
+    console.log("compute-weekly-gaps response:", result);
+    if (result.error) {
+      toast.error(`Failed: ${result.error.message}`);
+    } else {
+      const d = result.data ?? {};
+      toast.success(`Success: ${d.gaps_computed ?? 0} gaps computed`);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col h-screen" style={{ background: "#FAFAFA" }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
+      <button
+        onClick={handleRecomputeSarah}
+        style={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          zIndex: 9999,
+          background: "#22C55E",
+          color: "white",
+          padding: "10px 16px",
+          borderRadius: 8,
+          fontWeight: 600,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+        }}
+      >
+        Recompute Sarah gaps
+      </button>
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar
           activeTab={activeTab}
