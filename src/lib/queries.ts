@@ -1,5 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  computeStatus,
+  computeCombinedDimensionScore,
+  computeTrendDelta,
+} from "@/lib/scoring";
+
+export type GraduateStatus = "accelerating" | "steady" | "stalling" | "attention";
 
 /* ── Helper ────────────────────────────────────────────────────── */
 
