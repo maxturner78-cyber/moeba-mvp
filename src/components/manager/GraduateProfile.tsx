@@ -9,21 +9,9 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
-
-function deriveStatus(fullName: string): Status {
-  switch (fullName) {
-    case "Sarah Chen": return "attention";
-    case "Emily Zhang": return "attention";
-    case "Tyler Morrison": return "stalling";
-    case "Marcus Johnson": return "accelerating";
-    case "James Park": return "accelerating";
-    case "Priya Patel": return "steady";
-    default: return "steady";
-  }
-}
 
 /* ── Chart Data Types ── */
 interface ChartRow {
@@ -585,6 +573,7 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const { data: graduate, isLoading, error } = useGraduate(graduateId);
   const { data: selfCheckIns, isLoading: selfLoading } = useSelfCheckIns(graduateId);
   const { data: mgrCheckIns, isLoading: mgrLoading } = useManagerCheckIns(graduateId);
+  const { data: statusData } = useGraduateStatus(graduateId);
 
   const chartData = React.useMemo(
     () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
@@ -621,7 +610,7 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
     );
   }
 
-  const status = deriveStatus(graduate.full_name);
+  const status: Status = statusData ?? "steady";
 
   const snapshot = getSnapshot(3);
   const developed = snapshot.nodes.filter((n) => n.proficiency > 6).length;

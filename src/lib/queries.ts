@@ -1,5 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  computeStatus,
+  computeCombinedDimensionScore,
+  computeTrendDelta,
+} from "@/lib/scoring";
+
+export type GraduateStatus = "accelerating" | "steady" | "stalling" | "attention";
 
 /* ── Helper ────────────────────────────────────────────────────── */
 
@@ -415,6 +422,152 @@ export function usePeerAssignedGraduates(peerId: string) {
         full_name: (row.users?.full_name ?? "") as string,
         job_title: (row.users?.job_title ?? "") as string,
       }));
+    },
+  });
+}
+
+/* ── Status computation ────────────────────────────────────────── */
+
+type GapRowMin = {
+  graduate_id: string;
+  week_number: number;
+  layer: string;
+  dimension_or_skill: string;
+  self_score: number | null;
+  manager_score: number | null;
+  peer_score: number | null;
+  gap_value: number | null;
+};
+
+type SelfRowMin = {
+  graduate_id: string;
+  week_number: number;
+  dimension_scores: any;
+};
+
+function computeStatusFromRows(
+  gapRows: GapRowMin[],
+  currentSelf: SelfRowMin | null,
+  priorSelf: SelfRowMin | null,
+): GraduateStatus {
+  if (!gapRows || gapRows.length === 0) return "steady";
+
+  const behavioural = gapRows.filter((r) => r.layer === "behavioural");
+  const useRows = behavioural.length > 0 ? behavioural : gapRows;
+
+  const combined = useRows
+    .map((r) => {
+      try {
+        return computeCombinedDimensionScore(r.self_score, r.manager_score, r.peer_score).score;
+      } catch {
+        return null;
+      }
+    })
+    .filter((v): v is number => v !== null);
+
+  const avgDimensionScore = combined.length > 0
+    ? combined.reduce((a, b) => a + b, 0) / combined.length
+    : 0;
+
+  const maxGap = Math.max(0, ...gapRows.map((r) => Math.abs(Number(r.gap_value ?? 0))));
+
+  let decliningCount = 0;
+  const curScores = (currentSelf?.dimension_scores ?? {}) as Record<string, number>;
+  const priorScores = (priorSelf?.dimension_scores ?? {}) as Record<string, number>;
+  if (curScores && priorScores) {
+    for (const key of Object.keys(curScores)) {
+      const cur = curScores[key];
+      const prior = priorScores[key];
+      if (typeof cur !== "number" || typeof prior !== "number") continue;
+      const { label } = computeTrendDelta(cur, prior);
+      if (label === "declining") decliningCount++;
+    }
+  }
+
+  return computeStatus({ avgDimensionScore, maxGap, decliningCount });
+}
+
+export function useGraduateStatus(graduateId: string) {
+  return useQuery({
+    queryKey: ["graduateStatus", graduateId],
+    staleTime: STALE,
+    enabled: !!graduateId,
+    queryFn: async (): Promise<GraduateStatus> => {
+      // Resolve current week from latest perception_gaps row
+      const { data: latest, error: latestErr } = await supabase
+        .from("perception_gaps")
+        .select("week_number")
+        .eq("graduate_id", graduateId)
+        .order("week_number", { ascending: false })
+        .limit(1);
+      if (latestErr) throw latestErr;
+      if (!latest || latest.length === 0) return "steady";
+
+      const currentWeek = latest[0].week_number as number;
+
+      const [{ data: gaps, error: gErr }, { data: selfRows, error: sErr }] = await Promise.all([
+        supabase
+          .from("perception_gaps")
+          .select("graduate_id, week_number, layer, dimension_or_skill, self_score, manager_score, peer_score, gap_value")
+          .eq("graduate_id", graduateId)
+          .eq("week_number", currentWeek),
+        supabase
+          .from("weekly_check_ins_self")
+          .select("graduate_id, week_number, dimension_scores")
+          .eq("graduate_id", graduateId)
+          .in("week_number", [currentWeek, currentWeek - 1]),
+      ]);
+      if (gErr) throw gErr;
+      if (sErr) throw sErr;
+
+      const cur = (selfRows ?? []).find((r: any) => r.week_number === currentWeek) ?? null;
+      const prev = (selfRows ?? []).find((r: any) => r.week_number === currentWeek - 1) ?? null;
+
+      return computeStatusFromRows((gaps ?? []) as GapRowMin[], cur as any, prev as any);
+    },
+  });
+}
+
+export function useGraduateStatusBatch(graduateIds: string[]) {
+  const sortedKey = [...graduateIds].sort().join(",");
+  return useQuery({
+    queryKey: ["graduateStatusBatch", sortedKey],
+    staleTime: STALE,
+    enabled: graduateIds.length > 0,
+    queryFn: async (): Promise<Record<string, GraduateStatus>> => {
+      // 1. Latest week per graduate (from perception_gaps)
+      const { data: allGaps, error: gErr } = await supabase
+        .from("perception_gaps")
+        .select("graduate_id, week_number, layer, dimension_or_skill, self_score, manager_score, peer_score, gap_value")
+        .in("graduate_id", graduateIds);
+      if (gErr) throw gErr;
+
+      const latestWeek = new Map<string, number>();
+      for (const r of allGaps ?? []) {
+        const cur = latestWeek.get(r.graduate_id);
+        if (cur === undefined || r.week_number > cur) latestWeek.set(r.graduate_id, r.week_number);
+      }
+
+      // 2. Pull self check-ins for the relevant weeks (latest + prior) per graduate.
+      const { data: allSelf, error: sErr } = await supabase
+        .from("weekly_check_ins_self")
+        .select("graduate_id, week_number, dimension_scores")
+        .in("graduate_id", graduateIds);
+      if (sErr) throw sErr;
+
+      const result: Record<string, GraduateStatus> = {};
+      for (const id of graduateIds) {
+        const week = latestWeek.get(id);
+        if (week === undefined) {
+          result[id] = "steady";
+          continue;
+        }
+        const gaps = (allGaps ?? []).filter((r) => r.graduate_id === id && r.week_number === week) as GapRowMin[];
+        const cur = (allSelf ?? []).find((r) => r.graduate_id === id && r.week_number === week) ?? null;
+        const prev = (allSelf ?? []).find((r) => r.graduate_id === id && r.week_number === week - 1) ?? null;
+        result[id] = computeStatusFromRows(gaps, cur as any, prev as any);
+      }
+      return result;
     },
   });
 }

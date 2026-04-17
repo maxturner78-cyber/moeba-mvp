@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { statusColors } from "@/data/teamData";
 import StatusBadge from "@/components/StatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGraduates } from "@/lib/queries";
+import { useGraduates, useGraduateStatusBatch } from "@/lib/queries";
 import { type Status } from "@/data/sampleData";
 
 interface TeamBriefProps {
@@ -12,24 +12,14 @@ interface TeamBriefProps {
 
 const CURRENT_MANAGER_ID = "dddd0001-0000-0000-0000-000000000001"; // David Liu
 
-function deriveStatus(fullName: string): Status {
-  switch (fullName) {
-    case "Sarah Chen": return "attention";
-    case "Emily Zhang": return "attention";
-    case "Tyler Morrison": return "stalling";
-    case "Marcus Johnson": return "accelerating";
-    case "James Park": return "accelerating";
-    case "Priya Patel": return "steady";
-    default: return "steady";
-  }
-}
-
 function getInitials(name: string): string {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
 const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
   const { data: graduates, isLoading, error } = useGraduates(CURRENT_MANAGER_ID);
+  const graduateIds = React.useMemo(() => (graduates ?? []).map((g) => g.id), [graduates]);
+  const { data: statusMap } = useGraduateStatusBatch(graduateIds);
 
   return (
     <div>
@@ -143,7 +133,9 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
         )}
 
         {!isLoading && !error && graduates?.map((g, i) => {
-          const status = deriveStatus(g.full_name);
+          const computed = statusMap?.[g.id];
+          const status: Status = computed ?? "steady";
+          const awaiting = !computed;
           const sc = statusColors[status];
           return (
             <div
@@ -171,7 +163,12 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
               </div>
 
               <div style={{ width: 200, flexShrink: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>{g.full_name}</div>
+                <div className="flex items-center gap-2">
+                  <span style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F" }}>{g.full_name}</span>
+                  {awaiting && (
+                    <span style={{ fontSize: 11, color: "#9CA3AF", fontStyle: "italic" }}>(awaiting data)</span>
+                  )}
+                </div>
                 <div style={{ fontSize: 12, color: "#9CA3AF" }}>{g.job_title} · W{g.week_number}</div>
               </div>
 
