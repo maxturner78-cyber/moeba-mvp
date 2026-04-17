@@ -77,20 +77,22 @@ const Index: React.FC = () => {
         onClick={handleTestComputeWeeklyGaps}
         style={{
           position: "fixed",
-          bottom: 16,
-          right: 16,
-          zIndex: 9999,
+          top: 8,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 999999,
           background: "#FF00AA",
           color: "white",
-          padding: "12px 16px",
-          border: "2px solid black",
+          padding: "14px 24px",
+          border: "3px solid black",
           borderRadius: 8,
-          fontWeight: 700,
+          fontWeight: 800,
+          fontSize: 14,
           cursor: "pointer",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.35)",
         }}
       >
-        Test compute-weekly-gaps
+        ▶ Test compute-weekly-gaps
       </button>
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar
