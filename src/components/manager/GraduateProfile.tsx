@@ -9,21 +9,9 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
-
-function deriveStatus(fullName: string): Status {
-  switch (fullName) {
-    case "Sarah Chen": return "attention";
-    case "Emily Zhang": return "attention";
-    case "Tyler Morrison": return "stalling";
-    case "Marcus Johnson": return "accelerating";
-    case "James Park": return "accelerating";
-    case "Priya Patel": return "steady";
-    default: return "steady";
-  }
-}
 
 /* ── Chart Data Types ── */
 interface ChartRow {
