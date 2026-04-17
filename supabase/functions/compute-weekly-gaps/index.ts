@@ -168,7 +168,7 @@ Deno.serve(async (req) => {
             {
               graduate_id: grad.id,
               week_number: week,
-              layer: "dimension",
+              layer: "behavioural",
               dimension_or_skill: dim,
               self_score: selfScore,
               manager_score: managerScore,
