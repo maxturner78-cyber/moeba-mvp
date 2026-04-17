@@ -153,11 +153,22 @@ Deno.serve(async (req) => {
       const managerScores = (manager?.dimension_scores ?? {}) as Record<string, number>;
       const peerRows = peers ?? [];
 
+      console.log(
+        `Graduate ${grad.id} week ${week}: self=${!!self}, manager=${!!manager}, peers=${peers?.length ?? 0}`,
+      );
+      console.log(`  selfScores:`, selfScores);
+      console.log(`  managerScores:`, managerScores);
+
       // 4. Behavioural dimension gaps
       for (const dim of BEHAVIOURAL_DIMENSIONS) {
         const selfScore = typeof selfScores[dim] === "number" ? selfScores[dim] : null;
         const managerScore = manager ? getManagerScoreForDim(managerScores, dim) : null;
-        if (selfScore === null || managerScore === null) continue;
+        if (selfScore === null || managerScore === null) {
+          console.log(
+            `  Skipped ${dim}: selfScore=${selfScore}, managerScore=${managerScore}`,
+          );
+          continue;
+        }
 
         const peerScore = avgPeerScore(peerRows, dim);
         const { gap_value, gap_direction } = computePerceptionGap(selfScore, managerScore, peerScore);
@@ -179,6 +190,7 @@ Deno.serve(async (req) => {
             },
             { onConflict: "graduate_id,week_number,layer,dimension_or_skill" },
           );
+        console.log(`  Upsert ${dim}: error=${upErr?.message ?? "none"}`);
         if (!upErr) gapsComputed++;
       }
 
