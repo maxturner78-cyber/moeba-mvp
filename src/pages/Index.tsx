@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from "react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -54,46 +52,9 @@ const Index: React.FC = () => {
     return <PagePlaceholder title="Page" />;
   };
 
-  const handleTestComputeWeeklyGaps = useCallback(async () => {
-    const result = await supabase.functions.invoke("compute-weekly-gaps", {
-      body: {
-        graduate_id: "cccc0001-0000-0000-0000-000000000001",
-        week_number: 12,
-      },
-    });
-    console.log("compute-weekly-gaps response:", result);
-    if (result.error) {
-      toast.error(`Failed: ${result.error.message ?? String(result.error)}`);
-    } else {
-      const gaps = (result.data as any)?.gaps_computed ?? 0;
-      toast.success(`Success: ${gaps} gaps computed`);
-    }
-  }, []);
-
   return (
     <div className="flex flex-col h-screen" style={{ background: "#FAFAFA" }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
-      <button
-        onClick={handleTestComputeWeeklyGaps}
-        style={{
-          position: "fixed",
-          top: 8,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 999999,
-          background: "#FF00AA",
-          color: "white",
-          padding: "14px 24px",
-          border: "3px solid black",
-          borderRadius: 8,
-          fontWeight: 800,
-          fontSize: 14,
-          cursor: "pointer",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.35)",
-        }}
-      >
-        ▶ Test compute-weekly-gaps
-      </button>
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar
           activeTab={activeTab}
