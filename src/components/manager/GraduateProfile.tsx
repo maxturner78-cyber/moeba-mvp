@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
 
@@ -88,50 +88,58 @@ const getGapColor = (gap: number) => {
 };
 
 
-/* ── Behavioural Perception Gap Data (with peer) ── */
-const allBehaviouralGaps = [
-  { dim: "Ownership & Follow-Through", self: 5.2, manager: 8.0, peer: 7.2 as number | undefined, maxGap: 2.8 },
-  { dim: "Confidence", self: 5.5, manager: 7.8, peer: 6.8 as number | undefined, maxGap: 2.3 },
-  { dim: "Curiosity", self: 4.8, manager: 5.5, peer: 5.8 as number | undefined, maxGap: 1.0 },
-  { dim: "Manager Relationship", self: 7.1, manager: 7.5, peer: undefined as number | undefined, maxGap: 0.4 },
-  { dim: "Team Connection", self: 7.4, manager: 7.8, peer: 8.1 as number | undefined, maxGap: 0.7 },
-  { dim: "Feedback Application", self: 8.1, manager: 8.0, peer: 7.5 as number | undefined, maxGap: 0.6 },
-  { dim: "Workload Management", self: 6.0, manager: 6.8, peer: 6.5 as number | undefined, maxGap: 0.8 },
-  { dim: "Initiative", self: 5.3, manager: 6.5, peer: 7.0 as number | undefined, maxGap: 1.7 },
-  { dim: "Resilience", self: 6.8, manager: 7.2, peer: 7.0 as number | undefined, maxGap: 0.4 },
-];
+/* ── Perception Gap Row Type ── */
+type GapRow = {
+  label: string;
+  selfScore: number | null;
+  managerScore: number;
+  peerScore: number | null;
+  gapValue: number;
+};
 
-/* ── Skills Perception Gap Data (with peer) ── */
-const allSkillsGaps = [
-  { dim: "Financial Statement Review", self: 5.0, manager: 7.5, peer: 6.8 as number | undefined, maxGap: 2.5 },
-  { dim: "Audit Planning", self: 4.5, manager: 6.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
-  { dim: "Tax Compliance Basics", self: 3.2, manager: 5.0, peer: 4.8 as number | undefined, maxGap: 1.8 },
-  { dim: "Documentation Standards", self: 7.0, manager: 6.5, peer: 7.2 as number | undefined, maxGap: 0.7 },
-  { dim: "Data Extraction (Xero/MYOB)", self: 7.5, manager: 8.0, peer: 7.8 as number | undefined, maxGap: 0.5 },
-  { dim: "Client Communication", self: 3.0, manager: 5.5, peer: 4.5 as number | undefined, maxGap: 2.5 },
-  { dim: "Risk Assessment", self: 3.5, manager: 4.8, peer: 4.2 as number | undefined, maxGap: 1.3 },
-  { dim: "AML/CTF Procedures", self: 5.0, manager: 5.5, peer: 5.2 as number | undefined, maxGap: 0.5 },
-  { dim: "Ethics & Prof. Standards", self: 6.5, manager: 7.0, peer: 6.8 as number | undefined, maxGap: 0.5 },
-  { dim: "Tax Return Preparation", self: 2.8, manager: 4.2, peer: 3.8 as number | undefined, maxGap: 1.4 },
-  { dim: "Journal Entries & Depreciation", self: 4.0, manager: 5.5, peer: 5.0 as number | undefined, maxGap: 1.5 },
-  { dim: "Presentation Skills", self: 4.0, manager: 5.0, peer: 5.5 as number | undefined, maxGap: 1.5 },
-];
+const DIM_LABELS: Record<string, string> = {
+  confidence: "Confidence",
+  workloadMgmt: "Workload Management",
+  managerRelationship: "Manager Relationship",
+  teamConnection: "Team Connection",
+  curiosity: "Curiosity",
+  initiative: "Initiative",
+  resilience: "Resilience",
+  feedbackApplication: "Feedback Application",
+  ownershipFollowThrough: "Ownership & Follow-Through",
+};
+
+function humanize(slug: string): string {
+  if (DIM_LABELS[slug]) return DIM_LABELS[slug];
+  return slug
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function toGapRow(r: any, kind: "behavioural" | "skill"): GapRow {
+  const slug = r.dimension_or_skill as string;
+  return {
+    label: humanize(slug),
+    selfScore: r.self_score == null ? null : Number(r.self_score),
+    managerScore: Number(r.manager_score),
+    peerScore: r.peer_score == null ? null : Number(r.peer_score),
+    gapValue: Number(r.gap_value ?? 0),
+  };
+}
 
 /* ── Perception Gap Section Component ── */
 interface GapSectionProps {
   title: string;
   subtitle: string;
-  gaps: typeof allBehaviouralGaps;
+  gaps: GapRow[];
   defaultCount: number;
   avgGap: number;
   avgColor: string;
-  trend: string;
-  trendColor: string;
-  insight: string;
+  showPeer: boolean;
 }
 
 const GapSection: React.FC<GapSectionProps> = ({
-  title, subtitle, gaps, defaultCount, avgGap, avgColor, trend, trendColor, insight,
+  title, subtitle, gaps, defaultCount, avgGap, avgColor, showPeer,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [animated, setAnimated] = React.useState(false);
@@ -152,7 +160,7 @@ const GapSection: React.FC<GapSectionProps> = ({
     requestAnimationFrame(() => setAnimated(true));
   }, [avgGap]);
 
-  const sorted = [...gaps].sort((a, b) => Math.abs(b.maxGap) - Math.abs(a.maxGap));
+  const sorted = [...gaps].sort((a, b) => Math.abs(b.gapValue) - Math.abs(a.gapValue));
   const visible = expanded ? sorted : sorted.slice(0, defaultCount);
   const remaining = sorted.length - defaultCount;
 
@@ -166,18 +174,11 @@ const GapSection: React.FC<GapSectionProps> = ({
       </div>
       <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 16 }}>{subtitle}</div>
 
-      <div className="flex items-baseline gap-3" style={{ marginBottom: 4 }}>
+      <div className="flex items-baseline gap-3" style={{ marginBottom: 16 }}>
         <span className="font-mono-data" style={{ fontSize: 40, fontWeight: 500, color: avgColor }}>
           {count.toFixed(1)}
         </span>
         <span style={{ fontSize: 14, color: "#9CA3AF" }}>avg perception gap</span>
-      </div>
-      <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, marginBottom: 8 }}>
-        {insight}
-      </p>
-      <div className="flex items-center gap-1.5">
-        <TrendingUp size={14} color={trendColor} strokeWidth={2} />
-        <span style={{ fontSize: 12, fontWeight: 500, color: trendColor }}>{trend}</span>
       </div>
 
       <div style={{ height: 1, background: "#F3F4F6", margin: "16px 0" }} />
@@ -186,15 +187,25 @@ const GapSection: React.FC<GapSectionProps> = ({
         {expanded ? "All Gaps" : "Biggest Gaps"}
       </div>
       <div className="flex flex-col" style={{ gap: 10, marginBottom: 12 }}>
-        {visible.map((g, i) => (
-          <div key={g.dim} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 40 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.dim}</span>
-            <DivergenceDot selfScore={g.self} managerScore={g.manager} peerScore={g.peer} maxGap={Math.abs(g.maxGap)} delay={i * 60} animated={animated} />
-            <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.maxGap)), textAlign: "right" }}>
-              {Math.abs(g.maxGap).toFixed(1)} pts
-            </span>
-          </div>
-        ))}
+        {visible.map((g, i) => {
+          const self = g.selfScore ?? g.managerScore;
+          return (
+            <div key={g.label} style={{ display: "grid", gridTemplateColumns: "160px 1fr 56px", alignItems: "center", height: 40 }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>{g.label}</span>
+              <DivergenceDot
+                selfScore={self}
+                managerScore={g.managerScore}
+                peerScore={showPeer && g.peerScore != null ? g.peerScore : undefined}
+                maxGap={Math.abs(g.gapValue)}
+                delay={i * 60}
+                animated={animated}
+              />
+              <span className="font-mono-data" style={{ fontSize: 13, fontWeight: 600, color: getGapColor(Math.abs(g.gapValue)), textAlign: "right" }}>
+                {Math.abs(g.gapValue).toFixed(1)} pts
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {remaining > 0 && (
@@ -225,10 +236,12 @@ const GapSection: React.FC<GapSectionProps> = ({
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
           <span style={{ fontSize: 11, color: "#9CA3AF" }}>Manager rating</span>
         </div>
-        <div className="flex items-center" style={{ gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
-          <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer rating</span>
-        </div>
+        {showPeer && (
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F59E0B" }} />
+            <span style={{ fontSize: 11, color: "#9CA3AF" }}>Peer rating</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -449,9 +462,47 @@ const CompetencyChecklist: React.FC = () => {
 };
 
 /* ── Perception Gap Analysis View ── */
-const PerceptionGapAnalysis: React.FC = () => {
-  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allBehaviouralGaps.length;
-  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allSkillsGaps.length;
+const PerceptionGapAnalysis: React.FC<{ graduateId: string; currentWeek: number; graduateFirstName: string }> = ({
+  graduateId, currentWeek, graduateFirstName,
+}) => {
+  const { data: behaviouralRows, isLoading: behLoading } = usePerceptionGaps(graduateId, currentWeek, "behavioural");
+  const { data: skillRows, isLoading: skillLoading } = usePerceptionGaps(graduateId, currentWeek, "skill");
+
+  if (behLoading || skillLoading) {
+    return (
+      <div className="flex flex-col" style={{ gap: 24 }}>
+        <Skeleton className="h-16 w-full rounded-lg" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <Skeleton className="h-[420px] w-full rounded-lg" />
+          <Skeleton className="h-[420px] w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  const behaviouralGaps: GapRow[] = (behaviouralRows ?? []).map((r) => toGapRow(r, "behavioural"));
+  const skillGaps: GapRow[] = (skillRows ?? []).map((r) => toGapRow(r, "skill"));
+
+  const totalRows = behaviouralGaps.length + skillGaps.length;
+  if (totalRows === 0) {
+    return (
+      <div style={{
+        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+        padding: 32, textAlign: "center",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+      }}>
+        <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: 0, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+          Not enough data yet — check-ins from all three sources needed to triangulate. Come back next week.
+        </p>
+      </div>
+    );
+  }
+
+  const avg = (rows: GapRow[]) =>
+    rows.length === 0 ? 0 : rows.reduce((s, g) => s + Math.abs(g.gapValue), 0) / rows.length;
+
+  const behaviouralAvg = avg(behaviouralGaps);
+  const skillsAvg = avg(skillGaps);
 
   return (
     <div className="flex flex-col" style={{ gap: 24 }}>
@@ -460,7 +511,7 @@ const PerceptionGapAnalysis: React.FC = () => {
         background: "#F0FDF4", borderRadius: 8, padding: 14,
       }}>
         <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
+          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — {graduateFirstName}'s self-assessment, your manager observations, and peer day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
         </p>
       </div>
 
@@ -484,42 +535,36 @@ const PerceptionGapAnalysis: React.FC = () => {
 
       {/* Two-column layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <GapSection
-          title="Behavioural Indicators"
-          subtitle="9 dimensions from weekly check-ins"
-          gaps={allBehaviouralGaps}
-          defaultCount={3}
-          avgGap={behaviouralAvg}
-          avgColor={getGapColor(behaviouralAvg)}
-          trend="Widening over 4 weeks"
-          trendColor="#DC2626"
-          insight="Sarah consistently rates herself lower than both you and her peer across behavioural indicators — her peer rates her closer to your assessment, confirming this isn't just your perspective"
-        />
-        <GapSection
-          title="Role-Specific Skills"
-          subtitle="SWN competency framework skills"
-          gaps={allSkillsGaps}
-          defaultCount={3}
-          avgGap={skillsAvg}
-          avgColor={getGapColor(skillsAvg)}
-          trend="Steady over 3 weeks"
-          trendColor="#F59E0B"
-          insight="All three perspectives agree Sarah underestimates her technical progress — peer ratings align closely with yours, particularly in financial statement review"
-        />
-      </div>
-
-      {/* Actionable insight */}
-      <div style={{
-        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
-        borderLeft: "3px solid #22C55E",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-      }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 8 }}>
-          Recommended Action
-        </div>
-        <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her peer also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
-        </p>
+        {behaviouralGaps.length > 0 ? (
+          <GapSection
+            title="Behavioural Indicators"
+            subtitle={`${behaviouralGaps.length} dimensions from weekly check-ins`}
+            gaps={behaviouralGaps}
+            defaultCount={3}
+            avgGap={behaviouralAvg}
+            avgColor={getGapColor(behaviouralAvg)}
+            showPeer={true}
+          />
+        ) : (
+          <div style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24, fontSize: 13, color: "#9CA3AF" }}>
+            No behavioural gap data yet for this week.
+          </div>
+        )}
+        {skillGaps.length > 0 ? (
+          <GapSection
+            title="Role-Specific Skills"
+            subtitle="Competency framework skills"
+            gaps={skillGaps}
+            defaultCount={3}
+            avgGap={skillsAvg}
+            avgColor={getGapColor(skillsAvg)}
+            showPeer={false}
+          />
+        ) : (
+          <div style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24, fontSize: 13, color: "#9CA3AF" }}>
+            No skill gap data yet for this week.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -857,7 +902,11 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
         </div>
       </div>
       ) : profileView === "perception-gap" ? (
-      <PerceptionGapAnalysis />
+      <PerceptionGapAnalysis
+        graduateId={graduateId}
+        currentWeek={graduate.week_number}
+        graduateFirstName={graduate.full_name.split(" ")[0]}
+      />
       ) : (
       /* Skills Constellation View */
       <div className="flex flex-col" style={{ gap: 20 }}>
