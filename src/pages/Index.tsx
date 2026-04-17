@@ -87,7 +87,7 @@ const Index: React.FC = () => {
     <div className="flex flex-col h-screen" style={{ background: "#FAFAFA" }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
       <button
-        onClick={handleRecomputeSarah}
+        onClick={handleRecomputeAll}
         style={{
           position: "fixed",
           bottom: 16,
@@ -101,7 +101,7 @@ const Index: React.FC = () => {
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
       >
-        Recompute Sarah gaps
+        Recompute all gaps
       </button>
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar
