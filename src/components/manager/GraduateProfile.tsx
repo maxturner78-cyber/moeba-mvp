@@ -462,9 +462,47 @@ const CompetencyChecklist: React.FC = () => {
 };
 
 /* ── Perception Gap Analysis View ── */
-const PerceptionGapAnalysis: React.FC = () => {
-  const behaviouralAvg = allBehaviouralGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allBehaviouralGaps.length;
-  const skillsAvg = allSkillsGaps.reduce((s, g) => s + Math.abs(g.maxGap), 0) / allSkillsGaps.length;
+const PerceptionGapAnalysis: React.FC<{ graduateId: string; currentWeek: number; graduateFirstName: string }> = ({
+  graduateId, currentWeek, graduateFirstName,
+}) => {
+  const { data: behaviouralRows, isLoading: behLoading } = usePerceptionGaps(graduateId, currentWeek, "behavioural");
+  const { data: skillRows, isLoading: skillLoading } = usePerceptionGaps(graduateId, currentWeek, "skill");
+
+  if (behLoading || skillLoading) {
+    return (
+      <div className="flex flex-col" style={{ gap: 24 }}>
+        <Skeleton className="h-16 w-full rounded-lg" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <Skeleton className="h-[420px] w-full rounded-lg" />
+          <Skeleton className="h-[420px] w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  const behaviouralGaps: GapRow[] = (behaviouralRows ?? []).map((r) => toGapRow(r, "behavioural"));
+  const skillGaps: GapRow[] = (skillRows ?? []).map((r) => toGapRow(r, "skill"));
+
+  const totalRows = behaviouralGaps.length + skillGaps.length;
+  if (totalRows === 0) {
+    return (
+      <div style={{
+        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10,
+        padding: 32, textAlign: "center",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+      }}>
+        <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: 0, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+          Not enough data yet — check-ins from all three sources needed to triangulate. Come back next week.
+        </p>
+      </div>
+    );
+  }
+
+  const avg = (rows: GapRow[]) =>
+    rows.length === 0 ? 0 : rows.reduce((s, g) => s + Math.abs(g.gapValue), 0) / rows.length;
+
+  const behaviouralAvg = avg(behaviouralGaps);
+  const skillsAvg = avg(skillGaps);
 
   return (
     <div className="flex flex-col" style={{ gap: 24 }}>
@@ -473,7 +511,7 @@ const PerceptionGapAnalysis: React.FC = () => {
         background: "#F0FDF4", borderRadius: 8, padding: 14,
       }}>
         <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
-          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — Sarah's self-assessment, your manager observations, and her peer's day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
+          <span style={{ fontWeight: 500 }}>Triangulated perception gap analysis</span> compares three perspectives — {graduateFirstName}'s self-assessment, your manager observations, and peer day-to-day ratings. Triangulating across all three gives you a robust picture, especially in the first 8 weeks when baseline data is being established.
         </p>
       </div>
 
@@ -497,42 +535,36 @@ const PerceptionGapAnalysis: React.FC = () => {
 
       {/* Two-column layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <GapSection
-          title="Behavioural Indicators"
-          subtitle="9 dimensions from weekly check-ins"
-          gaps={allBehaviouralGaps}
-          defaultCount={3}
-          avgGap={behaviouralAvg}
-          avgColor={getGapColor(behaviouralAvg)}
-          trend="Widening over 4 weeks"
-          trendColor="#DC2626"
-          insight="Sarah consistently rates herself lower than both you and her peer across behavioural indicators — her peer rates her closer to your assessment, confirming this isn't just your perspective"
-        />
-        <GapSection
-          title="Role-Specific Skills"
-          subtitle="SWN competency framework skills"
-          gaps={allSkillsGaps}
-          defaultCount={3}
-          avgGap={skillsAvg}
-          avgColor={getGapColor(skillsAvg)}
-          trend="Steady over 3 weeks"
-          trendColor="#F59E0B"
-          insight="All three perspectives agree Sarah underestimates her technical progress — peer ratings align closely with yours, particularly in financial statement review"
-        />
-      </div>
-
-      {/* Actionable insight */}
-      <div style={{
-        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 20,
-        borderLeft: "3px solid #22C55E",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-      }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 8 }}>
-          Recommended Action
-        </div>
-        <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, margin: 0 }}>
-          The largest gaps are in <span style={{ fontWeight: 500 }}>Ownership & Follow-Through</span> (behavioural) and <span style={{ fontWeight: 500 }}>Financial Statement Review</span> (skills). Critically, her peer independently rates her similarly to you — meaning this perception gap is validated across all three perspectives. In your next 1-on-1, share that her peer also sees strong performance, then walk through a recent piece of work and have her assess it before you share ratings.
-        </p>
+        {behaviouralGaps.length > 0 ? (
+          <GapSection
+            title="Behavioural Indicators"
+            subtitle={`${behaviouralGaps.length} dimensions from weekly check-ins`}
+            gaps={behaviouralGaps}
+            defaultCount={3}
+            avgGap={behaviouralAvg}
+            avgColor={getGapColor(behaviouralAvg)}
+            showPeer={true}
+          />
+        ) : (
+          <div style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24, fontSize: 13, color: "#9CA3AF" }}>
+            No behavioural gap data yet for this week.
+          </div>
+        )}
+        {skillGaps.length > 0 ? (
+          <GapSection
+            title="Role-Specific Skills"
+            subtitle="Competency framework skills"
+            gaps={skillGaps}
+            defaultCount={3}
+            avgGap={skillsAvg}
+            avgColor={getGapColor(skillsAvg)}
+            showPeer={false}
+          />
+        ) : (
+          <div style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: 24, fontSize: 13, color: "#9CA3AF" }}>
+            No skill gap data yet for this week.
+          </div>
+        )}
       </div>
     </div>
   );
