@@ -1,4 +1,7 @@
 import React, { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import TopBar, { type ViewTab } from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import PagePlaceholder from "@/components/PagePlaceholder";
@@ -65,6 +68,30 @@ const Index: React.FC = () => {
           className="flex-1 overflow-y-auto"
           style={{ padding: 32, background: "#FAFAFA" }}
         >
+          <div style={{ maxWidth: 1200, margin: "0 auto 16px" }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const { data, error } = await supabase.functions.invoke("prepare-check-in", {
+                  body: {
+                    graduate_id: "cccc0001-0000-0000-0000-000000000001",
+                    target_role: "self",
+                    week_number: 13,
+                  },
+                });
+                console.log("prepare-check-in response:", { data, error });
+                if (error) {
+                  toast.error(`Error: ${error.message}`);
+                } else {
+                  const count = Array.isArray(data?.questions) ? data.questions.length : 0;
+                  toast.success(`${count} questions returned (week ${data?.week_number})`);
+                }
+              }}
+            >
+              Test prepare-check-in (Sarah, self)
+            </Button>
+          </div>
           <div key={pageKey} className="gs-page-enter" style={{ maxWidth: 1200, margin: "0 auto" }}>
               {renderPage()}
             </div>
