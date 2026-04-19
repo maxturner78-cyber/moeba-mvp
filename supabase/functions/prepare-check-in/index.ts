@@ -489,9 +489,10 @@ Deno.serve(async (req) => {
 
     // Load graduate (for hire_date)
     const { data: graduate, error: gradErr } = await supabase
-      .from("graduates")
+      .from("users")
       .select("id, hire_date")
       .eq("id", graduateId)
+      .eq("role", "graduate")
       .single();
 
     if (gradErr || !graduate) {
