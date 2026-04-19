@@ -9,6 +9,8 @@ import TeamBrief from "@/components/manager/TeamBrief";
 import AssessTeam from "@/components/manager/AssessTeam";
 import GraduateProfile from "@/components/manager/GraduateProfile";
 import PeerCheckIn from "@/components/peer/PeerCheckIn";
+import { Button } from "@/components/ui/button";
+import { runAdaptiveTests } from "@/lib/adaptive";
 
 const defaultNav: Record<ViewTab, string> = {
   graduate: "my-development",
@@ -66,6 +68,15 @@ const Index: React.FC = () => {
           style={{ padding: 32, background: "#FAFAFA" }}
         >
           <div key={pageKey} className="gs-page-enter" style={{ maxWidth: 1200, margin: "0 auto" }}>
+              <div className="mb-4 flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => runAdaptiveTests()}
+                >
+                  Run adaptive tests (temp)
+                </Button>
+              </div>
               {renderPage()}
             </div>
         </main>
