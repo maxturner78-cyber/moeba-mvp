@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
+import { buildCarriedDimensionScores } from "@/lib/carryForward";
 
 const CURRENT_MANAGER_ID = "dddd0001-0000-0000-0000-000000000001"; // David Liu
 
@@ -183,9 +184,9 @@ const AssessTeam: React.FC = () => {
 
   /* ── Submit ────────────────────────────────────────────────── */
 
-  const buildRow = () => {
+  const buildRow = async () => {
     const today = new Date().toISOString().split("T")[0];
-    const dimension_scores: Record<string, number> = {};
+    const askedDimensionScores: Record<string, number> = {};
     const skill_scores: Record<string, number> = {};
     const free_text: Record<string, string> = {};
 
@@ -194,7 +195,7 @@ const AssessTeam: React.FC = () => {
         const q = prepared.questions[i];
         const k = questionKey(q, i);
         if (q.type === "dimension" && q.dimensionKey) {
-          dimension_scores[q.dimensionKey] = values[k] ?? getPrepopValue(q) ?? 5;
+          askedDimensionScores[q.dimensionKey] = values[k] ?? getPrepopValue(q) ?? 5;
         } else if (q.type === "skill" && q.skillSlug) {
           skill_scores[q.skillSlug] = values[k] ?? getPrepopValue(q) ?? 5;
         } else if (q.type === "free_text") {
@@ -203,15 +204,25 @@ const AssessTeam: React.FC = () => {
       }
     }
 
+    const weekNumber = prepared?.week_number ?? grad.week_number;
+    const { dimensionScores: dimension_scores, carriedForward: carried_forward } =
+      await buildCarriedDimensionScores({
+        role: "manager",
+        graduateId: grad.id,
+        weekNumber,
+        actorId: CURRENT_MANAGER_ID,
+        askedDimensionScores,
+      });
+
     const row: Record<string, unknown> = {
       manager_id: CURRENT_MANAGER_ID,
       graduate_id: grad.id,
-      week_number: prepared?.week_number ?? grad.week_number,
+      week_number: weekNumber,
       check_in_date: today,
       dimension_scores,
       free_text,
       manager_confidence: understanding,
-      carried_forward: [],
+      carried_forward,
     };
     if (Object.keys(skill_scores).length > 0) {
       row.skill_scores = skill_scores;
@@ -222,7 +233,7 @@ const AssessTeam: React.FC = () => {
   const handleSubmit = async () => {
     if (!prepared) return;
     setSubmitting(true);
-    const row = buildRow();
+    const row = await buildRow();
 
     const { error } = await supabase.from("weekly_check_ins_manager").insert(row as any);
 
