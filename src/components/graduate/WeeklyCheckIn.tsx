@@ -166,7 +166,7 @@ const WeeklyCheckIn: React.FC = () => {
       selfRow.skill_scores = skill_scores;
     }
 
-    const promises: Promise<any>[] = [
+    const promises: Array<PromiseLike<any>> = [
       supabase.from("weekly_check_ins_self").insert(selfRow as any),
     ];
 
