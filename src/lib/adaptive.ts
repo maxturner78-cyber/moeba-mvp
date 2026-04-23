@@ -12,6 +12,10 @@ export const ALL_DIMENSION_KEYS: DimensionKey[] = [
 // Baseline window: weeks 1-6 inclusive. Week 7 is the first adaptive week.
 export const BASELINE_WEEKS = 6;
 
+// Dimensions with an average score below this floor are never muted,
+// regardless of stability — flat + low still needs attention.
+export const MUTE_FLOOR = 6.0;
+
 export const DIMENSION_QUESTIONS: Record<DimensionKey, {
   label: string;
   selfPrompt: string;
@@ -178,7 +182,11 @@ function detectStability(
   const max = Math.max(...recent);
   const min = Math.min(...recent);
   const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-  return { isStable: (max - min) <= 1.0, avgScore: avg };
+  // Flat + healthy = stable and can be muted.
+  // Flat + low = still needs attention, not stable.
+  const withinRange = (max - min) <= 1.0;
+  const aboveFloor = avg >= MUTE_FLOOR;
+  return { isStable: withinRange && aboveFloor, avgScore: avg };
 }
 
 function detectPatternBreak(
@@ -552,6 +560,22 @@ export function runAdaptiveTests() {
     results.push(`PASS: First-exposure audit-planning → asked in self and manager`);
   } else {
     results.push(`FAIL: First-exposure skill not in self=${t6_has_skill_self}, manager=${t6_has_skill_mgr}`);
+  }
+
+  // Test 7: Week 7 with confidence flat at 5,5,5 → NOT muted (below MUTE_FLOOR)
+  const flatLowHistory: SelfCheckInRow[] = [
+    { week_number: 4, dimension_scores: { confidence: 5 } },
+    { week_number: 5, dimension_scores: { confidence: 5 } },
+    { week_number: 6, dimension_scores: { confidence: 5 } },
+  ];
+  const t7 = planCheckIn(makeInput({ weekNumber: 7, selfHistory: flatLowHistory }));
+  const t7_asks_confidence = t7.selfQuestions.some(q =>
+    q.type === 'dimension' && q.dimensionKey === 'confidence'
+  );
+  if (t7_asks_confidence) {
+    results.push(`PASS: Week 7 flat-low confidence (5,5,5) → asked, not muted (below MUTE_FLOOR)`);
+  } else {
+    results.push(`FAIL: Week 7 flat-low confidence should NOT be muted (avg below MUTE_FLOOR)`);
   }
 
   console.log("=== Adaptive Engine Test Results ===");

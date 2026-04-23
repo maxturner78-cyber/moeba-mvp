@@ -5,6 +5,10 @@
 
 const round1 = (n: number): number => Math.round(n * 10) / 10;
 
+// Dimensions with an average score below this floor are never muted,
+// regardless of stability — flat + low still needs attention.
+export const MUTE_FLOOR = 6.0;
+
 export function computeCombinedDimensionScore(
   selfScore: number | null,
   managerScore: number | null,
