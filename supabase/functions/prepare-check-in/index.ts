@@ -27,6 +27,10 @@ const ALL_DIMENSION_KEYS: DimensionKey[] = [
 
 const BASELINE_WEEKS = 6;
 
+// Dimensions with an average score below this floor are never muted,
+// regardless of stability — flat + low still needs attention.
+const MUTE_FLOOR = 6.0;
+
 const DIMENSION_QUESTIONS: Record<DimensionKey, {
   label: string;
   selfPrompt: string;
@@ -191,7 +195,11 @@ function detectStability(
   const max = Math.max(...recent);
   const min = Math.min(...recent);
   const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-  return { isStable: (max - min) <= 1.0, avgScore: avg };
+  // Flat + healthy = stable and can be muted.
+  // Flat + low = still needs attention, not stable.
+  const withinRange = (max - min) <= 1.0;
+  const aboveFloor = avg >= MUTE_FLOOR;
+  return { isStable: withinRange && aboveFloor, avgScore: avg };
 }
 
 function detectPatternBreak(
