@@ -14,7 +14,7 @@ export const BASELINE_WEEKS = 6;
 
 // Dimensions with an average score below this floor are never muted,
 // regardless of stability — flat + low still needs attention.
-export const MUTE_FLOOR = 6.0;
+export const MUTE_FLOOR = 7.0;
 
 export const DIMENSION_QUESTIONS: Record<DimensionKey, {
   label: string;
