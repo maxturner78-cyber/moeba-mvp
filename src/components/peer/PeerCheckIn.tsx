@@ -7,6 +7,7 @@ import { usePeerAssignedGraduates, useGraduate, usePreparedCheckIn } from "@/lib
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
+import { buildCarriedDimensionScores } from "@/lib/carryForward";
 
 const CURRENT_PEER_ID = 'bbbb0001-0000-0000-0000-000000000001'; // Alex Wright
 
@@ -58,12 +59,21 @@ const PeerCheckIn: React.FC = () => {
     if (!activeId || !graduateDetail || !prepared || submitting) return;
     setSubmitting(true);
 
-    const dimension_scores: Record<string, number> = {};
+    const askedDimensionScores: Record<string, number> = {};
     dimensionQuestions.forEach((q, idx) => {
       const k = keyFor(q, idx);
       const v = scores[k];
-      if (typeof v === "number") dimension_scores[k] = v;
+      if (typeof v === "number") askedDimensionScores[k] = v;
     });
+
+    const { dimensionScores: dimension_scores, carriedForward: carried_forward } =
+      await buildCarriedDimensionScores({
+        role: "peer",
+        graduateId: activeId,
+        weekNumber: prepared.week_number,
+        actorId: CURRENT_PEER_ID,
+        askedDimensionScores,
+      });
 
     const free_text: Record<string, string> = {};
     freeTextQuestions.forEach((q, idx) => {
@@ -78,7 +88,7 @@ const PeerCheckIn: React.FC = () => {
       week_number: prepared.week_number,
       dimension_scores,
       free_text,
-      carried_forward: [],
+      carried_forward,
     };
 
     const { error } = await supabase.from("weekly_check_ins_peer").insert(row);

@@ -11,6 +11,7 @@ import {
 } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
+import { buildCarriedDimensionScores } from "@/lib/carryForward";
 
 const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
 const COMPANY_ID = "11111111-1111-1111-1111-111111111111";
@@ -131,12 +132,22 @@ const WeeklyCheckIn: React.FC = () => {
     setSubmitting(true);
 
     // Build dimension_scores from only the asked dimensions
-    const dimension_scores: Record<string, number> = {};
+    const askedDimensionScores: Record<string, number> = {};
     for (const q of prepared.questions) {
       if (q.type === "dimension" && q.dimensionKey) {
-        dimension_scores[q.dimensionKey] = dimensionScores[q.dimensionKey] ?? 5;
+        askedDimensionScores[q.dimensionKey] = dimensionScores[q.dimensionKey] ?? 5;
       }
     }
+
+    // Carry-forward unasked dimensions from the prior self check-in
+    const weekNumber = prepared.week_number || graduate.week_number;
+    const { dimensionScores: dimension_scores, carriedForward: carried_forward } =
+      await buildCarriedDimensionScores({
+        role: "self",
+        graduateId: CURRENT_GRADUATE_ID,
+        weekNumber,
+        askedDimensionScores,
+      });
 
     const skill_scores: Record<string, number> = {};
     for (const q of prepared.questions) {
@@ -156,11 +167,11 @@ const WeeklyCheckIn: React.FC = () => {
 
     const selfRow: Record<string, unknown> = {
       graduate_id: CURRENT_GRADUATE_ID,
-      week_number: prepared.week_number || graduate.week_number,
+      week_number: weekNumber,
       check_in_date: new Date().toISOString().split("T")[0],
       dimension_scores,
       free_text,
-      carried_forward: [],
+      carried_forward,
     };
     if (Object.keys(skill_scores).length > 0) {
       selfRow.skill_scores = skill_scores;
