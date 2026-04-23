@@ -5,6 +5,7 @@ import {
   computeCombinedDimensionScore,
   computeTrendDelta,
 } from "@/lib/scoring";
+import type { AdaptiveQuestion } from "@/lib/adaptive";
 
 export type GraduateStatus = "accelerating" | "steady" | "stalling" | "attention";
 
@@ -568,6 +569,35 @@ export function useGraduateStatusBatch(graduateIds: string[]) {
         result[id] = computeStatusFromRows(gaps, cur as any, prev as any);
       }
       return result;
+    },
+  });
+}
+
+/* ── Prepared Check-In (Edge Function) ─────────────────────────── */
+
+export interface PreparedCheckIn {
+  questions: AdaptiveQuestion[];
+  week_number: number;
+}
+
+export function usePreparedCheckIn(
+  graduateId: string,
+  targetRole: "self" | "manager" | "peer",
+) {
+  return useQuery<PreparedCheckIn>({
+    queryKey: ["preparedCheckIn", graduateId, targetRole],
+    staleTime: STALE,
+    enabled: !!graduateId && !!targetRole,
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("prepare-check-in", {
+        body: { graduate_id: graduateId, target_role: targetRole },
+      });
+      if (error) throw error;
+      if (!data) throw new Error("No data returned from prepare-check-in");
+      return {
+        questions: (data.questions ?? []) as AdaptiveQuestion[],
+        week_number: data.week_number ?? 0,
+      };
     },
   });
 }
