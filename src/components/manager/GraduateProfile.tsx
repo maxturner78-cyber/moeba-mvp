@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus, useCheckInBrief } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Status } from "@/data/sampleData";
 
@@ -574,6 +574,16 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   const { data: selfCheckIns, isLoading: selfLoading } = useSelfCheckIns(graduateId);
   const { data: mgrCheckIns, isLoading: mgrLoading } = useManagerCheckIns(graduateId);
   const { data: statusData } = useGraduateStatus(graduateId);
+  const currentWeek = graduate?.week_number;
+  const { data: checkInBrief, isLoading: briefLoading } = useCheckInBrief(graduateId, currentWeek);
+  const briefPayload = (checkInBrief?.payload ?? null) as {
+    week_number?: number;
+    what_changed?: string[];
+    what_this_suggests?: string;
+    what_to_say?: string;
+    one_question_to_ask?: string;
+  } | null;
+  const graduateFirstName = graduate?.full_name?.split(" ")[0] ?? "";
 
   const chartData = React.useMemo(
     () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
@@ -823,56 +833,78 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
             }}
           >
             <div style={{ fontSize: 14, fontWeight: 500, color: "#0F0F0F", marginBottom: 2 }}>
-              Check-in brief — week 12
+              Check-in brief — week {currentWeek ?? "—"}
             </div>
             <div style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 16 }}>
-              Prepared for your 1-on-1 with Sarah
+              Prepared for your 1-on-1 with {graduateFirstName}
             </div>
 
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              What Changed
-            </div>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px 0" }}>
-              {[
-                <>Confidence dropped <span className="font-mono-data" style={{ fontWeight: 500 }}>7</span> → <span className="font-mono-data" style={{ fontWeight: 500 }}>5</span> (second consecutive decline)</>,
-                <>Questions dropped <span className="font-mono-data" style={{ fontWeight: 500 }}>4</span> → <span className="font-mono-data" style={{ fontWeight: 500 }}>1</span> (lowest in 8 weeks)</>,
-                <>You rated her <span className="font-mono-data" style={{ fontWeight: 500 }}>8</span>, she rated herself <span className="font-mono-data" style={{ fontWeight: 500 }}>5</span> — 3-point gap</>,
-              ].map((t, i) => (
-                <li key={i} className="flex items-start gap-2" style={{ fontSize: 13, color: "#374151", marginBottom: 6 }}>
-                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#D1D5DB", marginTop: 7, flexShrink: 0 }} />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
-
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              What This Suggests
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
-              Sarah may be experiencing imposter syndrome. She's performing well by your assessment but doesn't see it. Declining confidence + reduced questions = someone withdrawing because they believe they're failing.
-            </p>
-
-            <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
-
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              What To Say
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
-              Open with specific recognition — reference the client deliverable you rated 8/10. Then ask how she thinks it went. Listen for the gap. If she rates herself lower, name it gently: "That's interesting — from my side, I thought it was excellent."
-            </p>
-
-            <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
-
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
-              One Question To Ask
-            </div>
-            <div style={{ background: "#F0FDF4", borderRadius: 8, padding: 12, marginBottom: 16 }}>
-              <p style={{ fontSize: 14, fontWeight: 500, color: "#166534", margin: 0 }}>
-                "What's one thing you're unsure about right now that you haven't asked anyone about yet?"
+            {briefLoading ? (
+              <>
+                <Skeleton style={{ height: 14, width: "40%", marginBottom: 12 }} />
+                <Skeleton style={{ height: 12, width: "100%", marginBottom: 6 }} />
+                <Skeleton style={{ height: 12, width: "90%", marginBottom: 6 }} />
+                <Skeleton style={{ height: 12, width: "85%", marginBottom: 16 }} />
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+                <Skeleton style={{ height: 14, width: "45%", marginBottom: 12 }} />
+                <Skeleton style={{ height: 12, width: "100%", marginBottom: 6 }} />
+                <Skeleton style={{ height: 12, width: "92%", marginBottom: 16 }} />
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+                <Skeleton style={{ height: 14, width: "35%", marginBottom: 12 }} />
+                <Skeleton style={{ height: 12, width: "100%", marginBottom: 6 }} />
+                <Skeleton style={{ height: 12, width: "88%", marginBottom: 16 }} />
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+                <Skeleton style={{ height: 14, width: "50%", marginBottom: 12 }} />
+                <Skeleton style={{ height: 56, width: "100%", marginBottom: 16 }} />
+              </>
+            ) : !briefPayload ? (
+              <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.6, marginBottom: 16 }}>
+                Brief not yet generated. This will appear after the weekly regeneration runs.
               </p>
-            </div>
+            ) : (
+              <>
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
+                  What Changed
+                </div>
+                <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px 0" }}>
+                  {(briefPayload.what_changed ?? []).map((t, i) => (
+                    <li key={i} className="flex items-start gap-2" style={{ fontSize: 13, color: "#374151", marginBottom: 6 }}>
+                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#D1D5DB", marginTop: 7, flexShrink: 0 }} />
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
+                  What This Suggests
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
+                  {briefPayload.what_this_suggests}
+                </p>
+
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
+                  What To Say
+                </div>
+                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 16 }}>
+                  {briefPayload.what_to_say}
+                </p>
+
+                <div style={{ height: 1, background: "#F3F4F6", marginBottom: 16 }} />
+
+                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#9CA3AF", marginBottom: 8 }}>
+                  One Question To Ask
+                </div>
+                <div style={{ background: "#F0FDF4", borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: "#166534", margin: 0 }}>
+                    "{briefPayload.one_question_to_ask}"
+                  </p>
+                </div>
+              </>
+            )}
 
             <div className="flex items-center justify-between">
               <span style={{ fontSize: 11, color: "#9CA3AF" }}>Estimated conversation: ~10 min</span>
