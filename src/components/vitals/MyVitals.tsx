@@ -173,13 +173,43 @@ interface MyVitalsProps {
 
 const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
   const { data: checkIns, isLoading } = useSelfCheckIns(CURRENT_GRADUATE_ID, 5);
+  const { data: graduate } = useGraduate(CURRENT_GRADUATE_ID);
+  const currentWeek = graduate?.week_number ?? 0;
+  const { data: insight, isLoading: insightLoading } = useWeeklyInsight(
+    CURRENT_GRADUATE_ID,
+    currentWeek,
+  );
 
   const dimensions = useMemo(() => computeDimensions(checkIns ?? []), [checkIns]);
+
+  const payload = (insight?.payload ?? null) as
+    | { paragraphs?: string[]; call_to_action?: string }
+    | null;
+  const status = insight?.generation_status ?? null;
+  const hasUsableInsight =
+    !!payload &&
+    Array.isArray(payload.paragraphs) &&
+    payload.paragraphs.length > 0 &&
+    (status === "success" || status === "fallback");
+
+  const cardLoading = insightLoading || currentWeek === 0;
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
       {/* SECTION 1: Weekly Insight + Check-In */}
-      <WeeklyInsightCard onStartCheckIn={onStartCheckIn} />
+      <WeeklyInsightCard
+        onStartCheckIn={onStartCheckIn}
+        weekNumber={currentWeek}
+        isLoading={cardLoading}
+        paragraphs={hasUsableInsight ? payload!.paragraphs! : null}
+        ctaLabel={
+          hasUsableInsight && payload?.call_to_action
+            ? payload.call_to_action
+            : "Start this week's check-in"
+        }
+        generatedAt={hasUsableInsight ? insight?.generated_at ?? null : null}
+        isFallback={!cardLoading && !hasUsableInsight}
+      />
 
       {/* SECTION 2: Development Profile */}
       <div style={{ marginBottom: 40 }}>
