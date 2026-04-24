@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import DevelopmentBarStack, { type DimensionRow } from "@/components/vitals/DevelopmentBarStack";
-import { useSelfCheckIns } from "@/lib/queries";
+import { useSelfCheckIns, useGraduate, useWeeklyInsight } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
 
