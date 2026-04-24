@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import DevelopmentBarStack, { type DimensionRow } from "@/components/vitals/DevelopmentBarStack";
-import { useSelfCheckIns } from "@/lib/queries";
+import { useSelfCheckIns, useGraduate, useWeeklyInsight } from "@/lib/queries";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
 
@@ -46,7 +47,41 @@ function computeDimensions(checkIns: any[]): DimensionRow[] {
 }
 
 /* ─── Weekly Insight Card ─── */
-const WeeklyInsightCard: React.FC<{ onStartCheckIn: () => void }> = ({ onStartCheckIn }) => (
+function formatRelativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diffMs = Date.now() - then;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 0) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+}
+
+interface WeeklyInsightCardProps {
+  onStartCheckIn: () => void;
+  weekNumber: number;
+  isLoading: boolean;
+  paragraphs: string[] | null;
+  ctaLabel: string;
+  generatedAt: string | null;
+  isFallback: boolean;
+}
+
+const WeeklyInsightCard: React.FC<WeeklyInsightCardProps> = ({
+  onStartCheckIn,
+  weekNumber,
+  isLoading,
+  paragraphs,
+  ctaLabel,
+  generatedAt,
+  isFallback,
+}) => (
   <div
     style={{
       background: "#F0FDF4",
@@ -73,26 +108,32 @@ const WeeklyInsightCard: React.FC<{ onStartCheckIn: () => void }> = ({ onStartCh
           animation: "pulse-scale 2s ease-in-out infinite",
         }}
       />
-      <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#15803D" }}>
+      <span className="font-heading" style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#15803D" }}>
         Weekly Insight
       </span>
       <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: "auto" }}>
-        Week 12 · Generated today
+        {`Week ${weekNumber}`}
+        {generatedAt ? ` · Generated ${formatRelativeTime(generatedAt)}` : ""}
       </span>
     </div>
 
     {/* Insight body */}
-    <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7, marginTop: 14 }}>
-      <p style={{ marginBottom: 12 }}>
-        Your work on the Meridian audit workpapers landed really well this week — the quality is clearly there, and it's being noticed. You might not feel it yet, but you're performing stronger than you give yourself credit for. Trust that a bit more.
-      </p>
-      <p style={{ marginBottom: 12 }}>
-        One thing to watch: you went quieter this week — fewer questions, less reaching out. Your best weeks tend to be the ones where you're actively pulling people in. Try picking one thing you're unsure about before your next team meeting and just asking. That habit compounds.
-      </p>
-      <p>
-        Your confidence is solid, which is great. But your workload is creeping up — it's the highest it's been in{" "}
-        <span className="font-mono-data" style={{ fontWeight: 600 }}>6</span> weeks. If things are piling up, flag it now rather than pushing through silently. Raising it early is a sign of good judgement, not weakness.
-      </p>
+    <div className="font-body" style={{ fontSize: 15, color: "#374151", lineHeight: 1.7, marginTop: 14 }}>
+      {isLoading ? (
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-4 w-full bg-emerald-100" />
+          <Skeleton className="h-4 w-[92%] bg-emerald-100" />
+          <Skeleton className="h-4 w-[78%] bg-emerald-100" />
+        </div>
+      ) : isFallback ? (
+        <p>Your weekly insight is being prepared. Check back soon.</p>
+      ) : (
+        paragraphs?.map((p, i) => (
+          <p key={i} style={{ marginBottom: i === paragraphs.length - 1 ? 0 : 12 }}>
+            {p}
+          </p>
+        ))
+      )}
     </div>
 
     {/* Divider */}
@@ -105,7 +146,7 @@ const WeeklyInsightCard: React.FC<{ onStartCheckIn: () => void }> = ({ onStartCh
       </div>
       <button
         onClick={onStartCheckIn}
-        className="flex items-center gap-1"
+        className="flex items-center gap-1 gs-btn-primary"
         style={{
           padding: "9px 22px",
           background: "#22C55E",
@@ -118,10 +159,8 @@ const WeeklyInsightCard: React.FC<{ onStartCheckIn: () => void }> = ({ onStartCh
           transition: "background 150ms ease",
           flexShrink: 0,
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
       >
-        Start Check-In <ChevronRight size={16} />
+        {ctaLabel} <ChevronRight size={16} />
       </button>
     </div>
   </div>
@@ -134,13 +173,43 @@ interface MyVitalsProps {
 
 const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
   const { data: checkIns, isLoading } = useSelfCheckIns(CURRENT_GRADUATE_ID, 5);
+  const { data: graduate } = useGraduate(CURRENT_GRADUATE_ID);
+  const currentWeek = graduate?.week_number ?? 0;
+  const { data: insight, isLoading: insightLoading } = useWeeklyInsight(
+    CURRENT_GRADUATE_ID,
+    currentWeek,
+  );
 
   const dimensions = useMemo(() => computeDimensions(checkIns ?? []), [checkIns]);
+
+  const payload = (insight?.payload ?? null) as
+    | { paragraphs?: string[]; call_to_action?: string }
+    | null;
+  const status = insight?.generation_status ?? null;
+  const hasUsableInsight =
+    !!payload &&
+    Array.isArray(payload.paragraphs) &&
+    payload.paragraphs.length > 0 &&
+    (status === "success" || status === "fallback");
+
+  const cardLoading = insightLoading || currentWeek === 0;
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
       {/* SECTION 1: Weekly Insight + Check-In */}
-      <WeeklyInsightCard onStartCheckIn={onStartCheckIn} />
+      <WeeklyInsightCard
+        onStartCheckIn={onStartCheckIn}
+        weekNumber={currentWeek}
+        isLoading={cardLoading}
+        paragraphs={hasUsableInsight ? payload!.paragraphs! : null}
+        ctaLabel={
+          hasUsableInsight && payload?.call_to_action
+            ? payload.call_to_action
+            : "Start this week's check-in"
+        }
+        generatedAt={hasUsableInsight ? insight?.generated_at ?? null : null}
+        isFallback={!cardLoading && !hasUsableInsight}
+      />
 
       {/* SECTION 2: Development Profile */}
       <div style={{ marginBottom: 40 }}>
