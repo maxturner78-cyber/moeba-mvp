@@ -234,61 +234,53 @@ const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
         </h3>
 
         <div className="flex flex-col" style={{ gap: 12 }}>
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8E8E8",
-              borderRadius: 10,
-              padding: "20px 20px 20px 24px",
-              position: "relative",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-            }}
-          >
+          {focusAreasLoading || currentWeek === 0 ? (
+            <>
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: "#FFFFFF",
+                    border: "1px solid #E8E8E8",
+                    borderRadius: 10,
+                    padding: "20px 20px 20px 24px",
+                    position: "relative",
+                  }}
+                >
+                  <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                  <Skeleton className="h-3 w-2/5 mb-3" />
+                  <Skeleton className="h-5 w-1/3 mb-3" />
+                  <Skeleton className="h-3 w-full mb-2" />
+                  <Skeleton className="h-3 w-11/12" />
+                </div>
+              ))}
+            </>
+          ) : !focusAreasPayload ? (
+            <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.6 }}>
+              Focus areas not yet generated.
+            </p>
+          ) : (focusAreasPayload.focus_areas ?? []).length === 0 ? (
             <div
               style={{
-                position: "absolute", left: 0, top: 12, bottom: 12,
-                width: 3, background: "#F59E0B", borderRadius: 2,
+                background: "#F0FDF4",
+                border: "1px solid #DCFCE7",
+                borderRadius: 10,
+                padding: "16px 18px",
               }}
-            />
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#B45309", marginBottom: 8 }}>
-              Curiosity & Learning
+            >
+              <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
+                No areas of concern this week — all dimensions within healthy range.
+              </p>
             </div>
-            <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-              <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
-              <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-              Your question frequency dropped from 5/week to 2. Try this: before each team meeting, write down one question you'd like to ask. Even "how did you approach that?" counts.
-            </p>
-          </div>
-
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8E8E8",
-              borderRadius: 10,
-              padding: "20px 20px 20px 24px",
-              position: "relative",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute", left: 0, top: 12, bottom: 12,
-                width: 3, background: "#F59E0B", borderRadius: 2,
-              }}
-            />
-            <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#B45309", marginBottom: 8 }}>
-              Ownership & Follow-Through
-            </div>
-            <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-              <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
-              <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
-            </div>
-            <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-              There's a growing gap between how you rate yourself and how others rate you — they're rating you higher. You may be underestimating your impact. Pay attention to the positive feedback you receive this week.
-            </p>
-          </div>
+          ) : (
+            (focusAreasPayload.focus_areas ?? []).map((area) => (
+              <FocusAreaCard
+                key={area.dimension_key}
+                area={area}
+                showManagerHelp={false}
+              />
+            ))
+          )}
         </div>
       </div>
 
