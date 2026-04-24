@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import DevelopmentBarStack, { type DimensionRow } from "@/components/vitals/DevelopmentBarStack";
-import { useSelfCheckIns, useGraduate, useWeeklyInsight } from "@/lib/queries";
+import { useSelfCheckIns, useGraduate, useWeeklyInsight, useFocusAreas } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import FocusAreaCard, { type FocusAreaPayloadItem } from "@/components/shared/FocusAreaCard";
 
 const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
 
