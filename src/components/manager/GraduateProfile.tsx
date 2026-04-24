@@ -586,6 +586,15 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   } | null;
   const graduateFirstName = graduate?.full_name?.split(" ")[0] ?? "";
 
+  const { data: focusAreasInsight, isLoading: focusAreasLoading } = useFocusAreas(
+    graduateId,
+    currentWeek,
+  );
+  const focusAreasPayload = (focusAreasInsight?.payload ?? null) as {
+    week_number?: number;
+    focus_areas?: FocusAreaPayloadItem[];
+  } | null;
+
   const chartData = React.useMemo(
     () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
     [selfCheckIns, mgrCheckIns],
