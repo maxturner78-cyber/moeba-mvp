@@ -411,7 +411,22 @@ export function useWeeklyInsight(graduateId: string, weekNumber?: number) {
 }
 
 export function useTeamBrief(managerId: string, weekNumber?: number) {
-  return useGeneratedInsight(managerId, "team_brief", weekNumber);
+  return useQuery({
+    queryKey: ["team-brief", managerId, weekNumber ?? "latest"],
+    enabled: !!managerId && weekNumber != null,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("generated_insights")
+        .select("payload, generation_status, generated_at")
+        .eq("manager_id", managerId)
+        .eq("week_number", weekNumber as number)
+        .eq("surface_type", "team_brief")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 }
 
 export function useCheckInBrief(graduateId: string, weekNumber?: number) {
