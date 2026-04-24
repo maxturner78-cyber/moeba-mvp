@@ -180,6 +180,13 @@ const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
     CURRENT_GRADUATE_ID,
     currentWeek,
   );
+  const { data: focusAreasInsight, isLoading: focusAreasLoading } = useFocusAreas(
+    CURRENT_GRADUATE_ID,
+    currentWeek,
+  );
+  const focusAreasPayload = (focusAreasInsight?.payload ?? null) as
+    | { week_number?: number; focus_areas?: FocusAreaPayloadItem[] }
+    | null;
 
   const dimensions = useMemo(() => computeDimensions(checkIns ?? []), [checkIns]);
 
