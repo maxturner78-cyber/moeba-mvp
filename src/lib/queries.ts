@@ -448,6 +448,25 @@ export function useCheckInBrief(graduateId: string, weekNumber?: number) {
   });
 }
 
+export function useFocusAreas(graduateId: string, weekNumber?: number) {
+  return useQuery({
+    queryKey: ["focus-areas", graduateId, weekNumber ?? "latest"],
+    enabled: !!graduateId && weekNumber != null,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("generated_insights")
+        .select("payload, generation_status, generated_at")
+        .eq("graduate_id", graduateId)
+        .eq("week_number", weekNumber as number)
+        .eq("surface_type", "focus_areas")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 /* ── Peer Assignments ──────────────────────────────────────────── */
 
 export function usePeerAssignedGraduates(peerId: string) {
