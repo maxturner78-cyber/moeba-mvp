@@ -430,7 +430,22 @@ export function useTeamBrief(managerId: string, weekNumber?: number) {
 }
 
 export function useCheckInBrief(graduateId: string, weekNumber?: number) {
-  return useGeneratedInsight(graduateId, "check_in_brief", weekNumber);
+  return useQuery({
+    queryKey: ["check-in-brief", graduateId, weekNumber ?? "latest"],
+    enabled: !!graduateId && weekNumber != null,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("generated_insights")
+        .select("payload, generation_status, generated_at")
+        .eq("graduate_id", graduateId)
+        .eq("week_number", weekNumber as number)
+        .eq("surface_type", "check_in_brief")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 }
 
 /* ── Peer Assignments ──────────────────────────────────────────── */
