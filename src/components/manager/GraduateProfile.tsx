@@ -9,8 +9,9 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus, useCheckInBrief } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus, useCheckInBrief, useFocusAreas } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import FocusAreaCard, { type FocusAreaPayloadItem } from "@/components/shared/FocusAreaCard";
 import { type Status } from "@/data/sampleData";
 
 /* ── Chart Data Types ── */
