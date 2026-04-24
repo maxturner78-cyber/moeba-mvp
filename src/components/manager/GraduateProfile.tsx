@@ -9,8 +9,9 @@ import {
 } from "recharts";
 import StatusBadge from "@/components/StatusBadge";
 import { statusLabels } from "@/data/teamData";
-import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus, useCheckInBrief } from "@/lib/queries";
+import { useGraduate, useSelfCheckIns, useManagerCheckIns, usePerceptionGaps, useGraduateStatus, useCheckInBrief, useFocusAreas } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import FocusAreaCard, { type FocusAreaPayloadItem } from "@/components/shared/FocusAreaCard";
 import { type Status } from "@/data/sampleData";
 
 /* ── Chart Data Types ── */
@@ -585,6 +586,15 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
   } | null;
   const graduateFirstName = graduate?.full_name?.split(" ")[0] ?? "";
 
+  const { data: focusAreasInsight, isLoading: focusAreasLoading } = useFocusAreas(
+    graduateId,
+    currentWeek,
+  );
+  const focusAreasPayload = (focusAreasInsight?.payload ?? null) as {
+    week_number?: number;
+    focus_areas?: FocusAreaPayloadItem[];
+  } | null;
+
   const chartData = React.useMemo(
     () => buildChartData(selfCheckIns ?? [], mgrCheckIns ?? []),
     [selfCheckIns, mgrCheckIns],
@@ -749,51 +759,55 @@ const GraduateProfile: React.FC<Props> = ({ graduateId, onBack }) => {
               Development Focus Areas
             </h3>
             <div className="flex flex-col" style={{ gap: 12 }}>
-              <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-              }}>
-                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  Curiosity & Learning
-                </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>4.8</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ declining 3 weeks</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-                  Her question frequency dropped from 5/week to 2. She may not feel safe asking questions right now.
+              {focusAreasLoading ? (
+                <>
+                  {[0, 1].map((i) => (
+                    <div
+                      key={i}
+                      style={{
+                        background: "#fff",
+                        border: "1px solid #E8E8E8",
+                        borderRadius: 10,
+                        padding: "20px 20px 20px 24px",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
+                      <Skeleton style={{ height: 12, width: "40%", marginBottom: 10 }} />
+                      <Skeleton style={{ height: 18, width: "30%", marginBottom: 10 }} />
+                      <Skeleton style={{ height: 12, width: "100%", marginBottom: 6 }} />
+                      <Skeleton style={{ height: 12, width: "92%", marginBottom: 12 }} />
+                      <Skeleton style={{ height: 12, width: "45%", marginBottom: 6 }} />
+                      <Skeleton style={{ height: 12, width: "88%" }} />
+                    </div>
+                  ))}
+                </>
+              ) : !focusAreasPayload ? (
+                <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.6 }}>
+                  Focus areas not yet generated.
                 </p>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-                  How You Can Help
+              ) : (focusAreasPayload.focus_areas ?? []).length === 0 ? (
+                <div
+                  style={{
+                    background: "#F0FDF4",
+                    border: "1px solid #DCFCE7",
+                    borderRadius: 10,
+                    padding: "16px 18px",
+                  }}
+                >
+                  <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.6, margin: 0 }}>
+                    No areas of concern this week — all dimensions within healthy range.
+                  </p>
                 </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  Proactively ask "What questions do you have?" at the start of your 1-on-1 rather than waiting for Sarah to raise them.
-                </p>
-              </div>
-
-              <div style={{
-                background: "#fff", border: "1px solid #E8E8E8", borderRadius: 10, padding: "20px 20px 20px 24px",
-                position: "relative", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-              }}>
-                <div style={{ position: "absolute", left: 0, top: 12, bottom: 12, width: 3, background: "#F59E0B", borderRadius: 2 }} />
-                <div style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#D97706", marginBottom: 8 }}>
-                  Ownership & Follow-Through
-                </div>
-                <div className="flex items-baseline gap-2" style={{ marginBottom: 8 }}>
-                  <span className="font-mono-data" style={{ fontSize: 20, fontWeight: 600, color: "#0F0F0F" }}>5.2</span>
-                  <span style={{ fontSize: 12, color: "#EF4444" }}>↓ gap widening</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 12 }}>
-                  There's a growing gap between how she rates herself and how you rate her — you're rating her significantly higher.
-                </p>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#15803D", marginBottom: 6 }}>
-                  How You Can Help
-                </div>
-                <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-                  When giving positive feedback, be specific about exactly what she did well. Generic praise ("great job") doesn't close a perception gap. Specific evidence ("the way you structured the risk section was excellent") does.
-                </p>
-              </div>
+              ) : (
+                (focusAreasPayload.focus_areas ?? []).map((area) => (
+                  <FocusAreaCard
+                    key={area.dimension_key}
+                    area={area}
+                    showManagerHelp={true}
+                  />
+                ))
+              )}
             </div>
           </div>
 
