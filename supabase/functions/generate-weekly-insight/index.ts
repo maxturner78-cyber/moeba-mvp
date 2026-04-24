@@ -14,7 +14,7 @@ const corsHeaders = {
 // Inlined Claude client (mirrors src/lib/claude.ts verbatim)
 // ============================================================================
 
-const CLAUDE_MODEL = "claude-sonnet-4-5";
+const CLAUDE_MODEL = "claude-sonnet-4-6";
 const DEFAULT_MAX_TOKENS = 2000;
 const DEFAULT_TEMPERATURE = 0.7;
 

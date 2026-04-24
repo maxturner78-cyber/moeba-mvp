@@ -1,5 +1,5 @@
 // Claude model ID to use for all generation
-export const CLAUDE_MODEL = "claude-sonnet-4-5";
+export const CLAUDE_MODEL = "claude-sonnet-4-6";
 
 // Standard generation config
 export const DEFAULT_MAX_TOKENS = 2000;
