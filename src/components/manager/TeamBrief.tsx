@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { statusColors } from "@/data/teamData";
 import StatusBadge from "@/components/StatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGraduates, useGraduateStatusBatch } from "@/lib/queries";
+import { useGraduates, useGraduateStatusBatch, useTeamBrief } from "@/lib/queries";
 import { type Status } from "@/data/sampleData";
 
 interface TeamBriefProps {
@@ -21,9 +21,34 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
   const graduateIds = React.useMemo(() => (graduates ?? []).map((g) => g.id), [graduates]);
   const { data: statusMap } = useGraduateStatusBatch(graduateIds);
 
+  // Compute current week as the max week across the manager's team
+  const currentWeek = React.useMemo(() => {
+    if (!graduates || graduates.length === 0) return undefined;
+    return Math.max(...graduates.map((g) => g.week_number ?? 1));
+  }, [graduates]);
+
+  const { data: brief, isLoading: briefLoading } = useTeamBrief(
+    CURRENT_MANAGER_ID,
+    currentWeek,
+  );
+
+  const briefPayload = brief?.payload as
+    | {
+        week_number?: number;
+        headline?: string;
+        narrative_paragraphs?: string[];
+        flagged_graduates?: Array<{ graduate_id: string; name: string; reason: string; cta: string }>;
+      }
+    | undefined;
+
+  const hasBrief =
+    briefPayload &&
+    Array.isArray(briefPayload.narrative_paragraphs) &&
+    briefPayload.narrative_paragraphs.length > 0;
+
   return (
     <div>
-      {/* SECTION 1: Team Summary (hardcoded narrative — replaced in Phase 7) */}
+      {/* SECTION 1: Team Summary (live from generated_insights) */}
       <div
         style={{
           background: "#F0FDF4",
@@ -55,48 +80,63 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           </span>
         </div>
         <div style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 16 }}>
-          Monday w14 · 2 items need attention
+          {currentWeek ? `Week ${currentWeek}` : "Loading"}
+          {hasBrief && briefPayload?.headline ? ` · ${briefPayload.headline}` : ""}
         </div>
 
-        <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7 }}>
-          <p style={{ marginBottom: 12 }}>Two people need your attention this week.</p>
-          <p style={{ marginBottom: 12 }}>
-            <span style={{ fontWeight: 500 }}>Sarah Chen</span> — her perception gap hit{" "}
-            <span className="font-mono-data" style={{ fontWeight: 500 }}>3.0</span> points. She rated herself 5, you rated her 8 on the Meridian audit workpapers. This gap has been widening for 3 consecutive weeks. A calibration conversation is recommended — her check-in brief has a conversation guide ready.
-          </p>
-          <p style={{ marginBottom: 12 }}>
-            <span style={{ fontWeight: 500 }}>Emily Zhang</span> — workload perception spiked to{" "}
-            <span className="font-mono-data" style={{ fontWeight: 500 }}>9/10</span> and her manager support score dropped from 7 to 4. She may feel unsupported during the current client deliverable cycle.
-          </p>
-          <p>The other 4 graduates are stable. Assessment forms are pre-populated and ready.</p>
-        </div>
+        {briefLoading ? (
+          <div className="flex flex-col gap-3" style={{ marginTop: 8 }}>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-10/12" />
+          </div>
+        ) : hasBrief ? (
+          <>
+            <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.7 }}>
+              {briefPayload!.narrative_paragraphs!.map((p, idx) => (
+                <p
+                  key={idx}
+                  style={{
+                    marginBottom:
+                      idx < briefPayload!.narrative_paragraphs!.length - 1 ? 12 : 0,
+                  }}
+                >
+                  {p}
+                </p>
+              ))}
+            </div>
 
-        <div className="flex items-center gap-2" style={{ marginTop: 20 }}>
-          {[
-            { label: "Open Sarah's brief →", id: "g1" },
-            { label: "Open Emily's brief →", id: "g6" },
-          ].map((btn) => (
-            <button
-              key={btn.id}
-              onClick={() => onSelectGraduate(btn.id)}
-              style={{
-                padding: "8px 18px",
-                background: "#22C55E",
-                color: "#FFFFFF",
-                fontSize: 13,
-                fontWeight: 600,
-                border: "none",
-                borderRadius: 100,
-                cursor: "pointer",
-                transition: "background 150ms ease",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
-            >
-              {btn.label}
-            </button>
-          ))}
-        </div>
+            {briefPayload!.flagged_graduates && briefPayload!.flagged_graduates.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 20 }}>
+                {briefPayload!.flagged_graduates.map((fg) => (
+                  <button
+                    key={fg.graduate_id}
+                    onClick={() => onSelectGraduate(fg.graduate_id)}
+                    style={{
+                      padding: "8px 18px",
+                      background: "#22C55E",
+                      color: "#FFFFFF",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      border: "none",
+                      borderRadius: 100,
+                      cursor: "pointer",
+                      transition: "background 150ms ease",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
+                  >
+                    {fg.cta} →
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ fontSize: 14, color: "#6B7280", lineHeight: 1.6 }}>
+            Your team brief is being prepared.
+          </div>
+        )}
       </div>
 
       {/* SECTION 2: Graduate List (live from DB) */}
