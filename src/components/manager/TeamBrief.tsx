@@ -2,8 +2,14 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { statusColors } from "@/data/teamData";
 import StatusBadge from "@/components/StatusBadge";
+import { MissedCheckInBadge } from "@/components/shared/MissedCheckInBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGraduates, useGraduateStatusBatch, useTeamBrief } from "@/lib/queries";
+import {
+  useGraduates,
+  useGraduateStatusBatch,
+  useTeamBrief,
+  useCheckInCompletionBatch,
+} from "@/lib/queries";
 import { type Status } from "@/data/sampleData";
 
 interface TeamBriefProps {
@@ -20,6 +26,7 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
   const { data: graduates, isLoading, error } = useGraduates(CURRENT_MANAGER_ID);
   const graduateIds = React.useMemo(() => (graduates ?? []).map((g) => g.id), [graduates]);
   const { data: statusMap } = useGraduateStatusBatch(graduateIds);
+  const { data: completionMap } = useCheckInCompletionBatch(graduateIds);
 
   // Compute current week as the max week across the manager's team
   const currentWeek = React.useMemo(() => {
@@ -177,6 +184,8 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
           const status: Status = computed ?? "steady";
           const awaiting = !computed;
           const sc = statusColors[status];
+          const completion = completionMap?.[g.id];
+          const showMissed = completion?.missed_self === true;
           return (
             <div
               key={g.id}
@@ -213,7 +222,7 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
               </div>
 
               <div style={{ width: 130, flexShrink: 0 }}>
-                <StatusBadge status={status} />
+                {showMissed ? <MissedCheckInBadge /> : <StatusBadge status={status} />}
               </div>
 
               <div
