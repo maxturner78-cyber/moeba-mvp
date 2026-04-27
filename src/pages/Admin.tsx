@@ -79,7 +79,7 @@ const PasswordGate: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#FAFAF9",
+        background: "#FAFAFA",
         padding: 16,
       }}
     >
