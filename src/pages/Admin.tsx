@@ -183,7 +183,7 @@ const CreateUserPanel: React.FC<{
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const pwd: string | undefined = data?.temp_password;
+      const pwd: string | undefined = data?.temporary_password;
       if (pwd) setTempPassword(pwd);
       toast.success("User created");
       reset();
@@ -375,7 +375,7 @@ const ExistingUsersPanel: React.FC<{
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const pwd: string | undefined = data?.temp_password;
+      const pwd: string | undefined = data?.temporary_password;
       if (pwd) {
         setResetResult({ id: userId, password: pwd });
         try {
