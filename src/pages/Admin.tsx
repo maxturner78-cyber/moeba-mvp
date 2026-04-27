@@ -79,7 +79,7 @@ const PasswordGate: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#FAFAF9",
+        background: "#FAFAFA",
         padding: 16,
       }}
     >
@@ -166,6 +166,7 @@ const CreateUserPanel: React.FC<{
         "create-pilot-user",
         {
           body: {
+            admin_password: ADMIN_PASSWORD,
             email: email.trim(),
             full_name: fullName.trim(),
             role,
@@ -182,7 +183,7 @@ const CreateUserPanel: React.FC<{
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const pwd: string | undefined = data?.temp_password;
+      const pwd: string | undefined = data?.temporary_password;
       if (pwd) setTempPassword(pwd);
       toast.success("User created");
       reset();
@@ -369,12 +370,12 @@ const ExistingUsersPanel: React.FC<{
     try {
       const { data, error } = await supabase.functions.invoke(
         "reset-pilot-password",
-        { body: { user_id: userId } },
+        { body: { admin_password: ADMIN_PASSWORD, user_id: userId } },
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const pwd: string | undefined = data?.temp_password;
+      const pwd: string | undefined = data?.temporary_password;
       if (pwd) {
         setResetResult({ id: userId, password: pwd });
         try {
@@ -500,7 +501,7 @@ const AdminContent: React.FC<{ onSignOut: () => void }> = ({ onSignOut }) => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAF9" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
       <header
         style={{
           padding: "16px 32px",
