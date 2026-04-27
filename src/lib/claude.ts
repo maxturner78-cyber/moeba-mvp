@@ -26,6 +26,10 @@ export interface ClaudeResponse {
   usage?: { input_tokens: number; output_tokens: number };
 }
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Extract JSON from text, handling ```json fences.
  * Returns null if parsing fails.
@@ -66,17 +70,33 @@ export async function callClaude(options: ClaudeCallOptions): Promise<ClaudeResp
   }
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    // Retry only on 429 (rate limit) and 529 (overloaded). 2 retries after the
+    // initial attempt (3 total), with backoff of 1s then 3s.
+    const RETRY_DELAYS_MS = [1000, 3000];
+    let response: Response;
+    let responseBody: string;
+    let attempt = 0;
 
-    const responseBody = await response.text();
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      responseBody = await response.text();
+
+      const isRetryable = response.status === 429 || response.status === 529;
+      if (!isRetryable || attempt >= RETRY_DELAYS_MS.length) {
+        break;
+      }
+      await sleep(RETRY_DELAYS_MS[attempt]);
+      attempt += 1;
+    }
 
     if (!response.ok) {
       return {
