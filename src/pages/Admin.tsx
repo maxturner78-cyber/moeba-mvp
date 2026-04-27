@@ -166,6 +166,7 @@ const CreateUserPanel: React.FC<{
         "create-pilot-user",
         {
           body: {
+            admin_password: ADMIN_PASSWORD,
             email: email.trim(),
             full_name: fullName.trim(),
             role,
@@ -369,7 +370,7 @@ const ExistingUsersPanel: React.FC<{
     try {
       const { data, error } = await supabase.functions.invoke(
         "reset-pilot-password",
-        { body: { user_id: userId } },
+        { body: { admin_password: ADMIN_PASSWORD, user_id: userId } },
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
