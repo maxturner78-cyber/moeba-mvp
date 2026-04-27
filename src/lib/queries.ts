@@ -665,3 +665,39 @@ export function usePreparedCheckIn(
     },
   });
 }
+
+/* ── Check-in completion log ───────────────────────────────────── */
+
+export function useCheckInCompletionBatch(graduateIds: string[]) {
+  return useQuery({
+    queryKey: ["checkInCompletion", [...graduateIds].sort().join(",")],
+    queryFn: async () => {
+      if (graduateIds.length === 0) return {} as Record<string, {
+        graduate_id: string;
+        week_number: number;
+        self_submitted: boolean;
+        manager_submitted: boolean;
+        missed_self: boolean;
+        missed_manager: boolean;
+      }>;
+
+      const { data, error } = await supabase
+        .from("check_in_completion_log")
+        .select("graduate_id, week_number, self_submitted, manager_submitted, missed_self, missed_manager")
+        .in("graduate_id", graduateIds)
+        .order("week_number", { ascending: false });
+
+      if (error) throw error;
+
+      const byGraduate: Record<string, NonNullable<typeof data>[number]> = {};
+      for (const row of data ?? []) {
+        if (!byGraduate[row.graduate_id]) {
+          byGraduate[row.graduate_id] = row;
+        }
+      }
+      return byGraduate;
+    },
+    enabled: graduateIds.length > 0,
+    staleTime: 30_000,
+  });
+}
