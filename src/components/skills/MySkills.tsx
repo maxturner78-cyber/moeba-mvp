@@ -55,6 +55,9 @@ const MySkills: React.FC = () => {
   const notStarted = allNodes.filter((n) => n.proficiency === 0 && !n.promotionRequired).length;
   const promoRequired = allNodes.filter((n) => n.promotionRequired).length;
 
+  if (userLoading) return null;
+  if (!user) return null;
+
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 112px)" }}>
       {/* Header */}
