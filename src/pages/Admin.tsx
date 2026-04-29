@@ -489,27 +489,18 @@ const AdminContent: React.FC<{ onSignOut: () => void }> = ({ onSignOut }) => {
 };
 
 const Admin: React.FC = () => {
-  const [unlocked, setUnlocked] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(SESSION_KEY) === "true";
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Moeba Admin";
   }, []);
 
-  if (!unlocked) {
-    return <PasswordGate onUnlock={() => setUnlocked(true)} />;
-  }
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
-  return (
-    <AdminContent
-      onSignOut={() => {
-        localStorage.removeItem(SESSION_KEY);
-        setUnlocked(false);
-      }}
-    />
-  );
+  return <AdminContent onSignOut={handleSignOut} />;
 };
 
 export default Admin;
