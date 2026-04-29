@@ -164,7 +164,7 @@ const AssessTeam: React.FC = () => {
 
   /* ── Loading / empty states ────────────────────────────────── */
 
-  if (isLoading) {
+  if (userLoading || isLoading) {
     return (
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <Skeleton className="h-8 w-48 mb-4" />
