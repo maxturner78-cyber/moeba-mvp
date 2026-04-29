@@ -128,6 +128,9 @@ const WeeklyCheckIn: React.FC = () => {
     });
   };
 
+  if (userLoading) return null;
+  if (!user) return null;
+
   const handleSubmit = async () => {
     if (!graduate || !prepared || submitting) return;
     setSubmitting(true);
