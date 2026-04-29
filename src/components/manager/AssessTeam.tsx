@@ -12,8 +12,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
 import { buildCarriedDimensionScores } from "@/lib/carryForward";
-
-const CURRENT_MANAGER_ID = "dddd0001-0000-0000-0000-000000000001"; // David Liu
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const REASON_LABEL: Record<NonNullable<AdaptiveQuestion["reason"]>, string> = {
   baseline: "Baseline",
@@ -26,6 +25,8 @@ const REASON_LABEL: Record<NonNullable<AdaptiveQuestion["reason"]>, string> = {
 
 const AssessTeam: React.FC = () => {
   const queryClient = useQueryClient();
+  const { user, loading: userLoading } = useCurrentUser();
+  const CURRENT_MANAGER_ID = user?.id ?? "";
   const { data: graduates = [], isLoading } = useGraduates(CURRENT_MANAGER_ID);
   const [selectedIdx, setSelectedIdx] = useState(0);
 
@@ -163,7 +164,7 @@ const AssessTeam: React.FC = () => {
 
   /* ── Loading / empty states ────────────────────────────────── */
 
-  if (isLoading) {
+  if (userLoading || isLoading) {
     return (
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <Skeleton className="h-8 w-48 mb-4" />

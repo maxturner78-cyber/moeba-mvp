@@ -2,15 +2,16 @@ import React, { useState, useMemo } from "react";
 import SkillsGraph from "@/components/skills/SkillsGraph";
 import { useSkillProficiency, useSkillEdges } from "@/lib/queries";
 import type { SkillNode, SkillEdge } from "@/data/skillsData";
-
-const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
-const CURRENT_COMPANY_ID = "11111111-1111-1111-1111-111111111111"; // Swan Group
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const MySkills: React.FC = () => {
   const [month, setMonth] = useState(3);
+  const { user, loading: userLoading } = useCurrentUser();
+  const graduateId = user?.id ?? "";
+  const companyId = user?.company_id ?? "";
 
-  const { data: profRows, isLoading: profLoading } = useSkillProficiency(CURRENT_GRADUATE_ID);
-  const { data: edgeRows, isLoading: edgesLoading } = useSkillEdges(CURRENT_COMPANY_ID);
+  const { data: profRows, isLoading: profLoading } = useSkillProficiency(graduateId);
+  const { data: edgeRows, isLoading: edgesLoading } = useSkillEdges(companyId);
 
   const isLoading = profLoading || edgesLoading;
 
@@ -53,6 +54,9 @@ const MySkills: React.FC = () => {
   const developing = allNodes.filter((n) => n.proficiency > 0 && n.proficiency <= 6).length;
   const notStarted = allNodes.filter((n) => n.proficiency === 0 && !n.promotionRequired).length;
   const promoRequired = allNodes.filter((n) => n.promotionRequired).length;
+
+  if (userLoading) return null;
+  if (!user) return null;
 
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 112px)" }}>

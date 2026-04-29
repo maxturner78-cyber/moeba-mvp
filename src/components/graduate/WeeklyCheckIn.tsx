@@ -12,9 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
 import { buildCarriedDimensionScores } from "@/lib/carryForward";
-
-const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
-const COMPANY_ID = "11111111-1111-1111-1111-111111111111";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const CLUSTER_LABELS: Record<string, string> = {
   core: "Core",
@@ -33,6 +31,9 @@ const CARD_STYLE: React.CSSProperties = {
 };
 
 const WeeklyCheckIn: React.FC = () => {
+  const { user, loading: userLoading } = useCurrentUser();
+  const CURRENT_GRADUATE_ID = user?.id ?? "";
+  const COMPANY_ID = user?.company_id ?? "";
   const { data: graduate } = useGraduate(CURRENT_GRADUATE_ID);
   const { data: skillGroups } = useSkillNodesGrouped(COMPANY_ID);
   const { data: proficiencyData } = useSkillProficiency(CURRENT_GRADUATE_ID);
@@ -126,6 +127,9 @@ const WeeklyCheckIn: React.FC = () => {
       return next;
     });
   };
+
+  if (userLoading) return null;
+  if (!user) return null;
 
   const handleSubmit = async () => {
     if (!graduate || !prepared || submitting) return;

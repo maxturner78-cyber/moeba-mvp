@@ -8,10 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AdaptiveQuestion } from "@/lib/adaptive";
 import { buildCarriedDimensionScores } from "@/lib/carryForward";
-
-const CURRENT_PEER_ID = 'bbbb0001-0000-0000-0000-000000000001'; // Alex Wright
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const PeerCheckIn: React.FC = () => {
+  const { user, loading: userLoading } = useCurrentUser();
+  const CURRENT_PEER_ID = user?.id ?? "";
   const { data: assignedGrads = [], isLoading } = usePeerAssignedGraduates(CURRENT_PEER_ID);
   const [selectedGradId, setSelectedGradId] = useState<string | null>(null);
   const [scores, setScores] = useState<Record<string, number>>({});
@@ -129,7 +130,7 @@ const PeerCheckIn: React.FC = () => {
     setSubmitting(false);
   };
 
-  if (isLoading) {
+  if (userLoading || isLoading) {
     return (
       <div className="flex justify-center" style={{ paddingTop: 8 }}>
         <div style={{ maxWidth: 560, width: "100%" }}>
