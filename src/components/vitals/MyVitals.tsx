@@ -4,8 +4,7 @@ import DevelopmentBarStack, { type DimensionRow } from "@/components/vitals/Deve
 import { useSelfCheckIns, useGraduate, useWeeklyInsight, useFocusAreas } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import FocusAreaCard, { type FocusAreaPayloadItem } from "@/components/shared/FocusAreaCard";
-
-const CURRENT_GRADUATE_ID = "cccc0001-0000-0000-0000-000000000001"; // Sarah Chen
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const DIMENSION_KEYS = [
   { key: "ownershipFollowThrough", label: "Ownership & Follow-Through" },
@@ -173,17 +172,23 @@ interface MyVitalsProps {
 }
 
 const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
-  const { data: checkIns, isLoading } = useSelfCheckIns(CURRENT_GRADUATE_ID, 5);
-  const { data: graduate } = useGraduate(CURRENT_GRADUATE_ID);
+  const { user, loading: userLoading } = useCurrentUser();
+  const graduateId = user?.id ?? "";
+  const { data: checkIns, isLoading } = useSelfCheckIns(graduateId, 5);
+  const { data: graduate } = useGraduate(graduateId);
   const currentWeek = graduate?.week_number ?? 0;
   const { data: insight, isLoading: insightLoading } = useWeeklyInsight(
-    CURRENT_GRADUATE_ID,
+    graduateId,
     currentWeek,
   );
   const { data: focusAreasInsight, isLoading: focusAreasLoading } = useFocusAreas(
-    CURRENT_GRADUATE_ID,
+    graduateId,
     currentWeek,
   );
+
+  if (userLoading) return null;
+  if (!user) return null;
+
   const focusAreasPayload = (focusAreasInsight?.payload ?? null) as
     | { week_number?: number; focus_areas?: FocusAreaPayloadItem[] }
     | null;
