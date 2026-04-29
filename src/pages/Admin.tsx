@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,11 +32,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-
-const ADMIN_PASSWORD =
-  (import.meta.env.VITE_ADMIN_PASSWORD as string | undefined) ||
-  "moeba-admin-2026";
-const SESSION_KEY = "moeba_admin_session";
 
 type Role = "graduate" | "manager" | "peer" | "admin";
 
