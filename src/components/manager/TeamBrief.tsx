@@ -54,6 +54,9 @@ const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
     Array.isArray(briefPayload.narrative_paragraphs) &&
     briefPayload.narrative_paragraphs.length > 0;
 
+  if (userLoading) return null;
+  if (!user) return null;
+
   return (
     <div>
       {/* SECTION 1: Team Summary (live from generated_insights) */}
