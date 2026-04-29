@@ -130,7 +130,7 @@ const PeerCheckIn: React.FC = () => {
     setSubmitting(false);
   };
 
-  if (isLoading) {
+  if (userLoading || isLoading) {
     return (
       <div className="flex justify-center" style={{ paddingTop: 8 }}>
         <div style={{ maxWidth: 560, width: "100%" }}>
