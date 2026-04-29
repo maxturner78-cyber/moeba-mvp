@@ -11,18 +11,19 @@ import {
   useCheckInCompletionBatch,
 } from "@/lib/queries";
 import { type Status } from "@/data/sampleData";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface TeamBriefProps {
   onSelectGraduate: (id: string) => void;
 }
-
-const CURRENT_MANAGER_ID = "dddd0001-0000-0000-0000-000000000001"; // David Liu
 
 function getInitials(name: string): string {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
 const TeamBrief: React.FC<TeamBriefProps> = ({ onSelectGraduate }) => {
+  const { user, loading: userLoading } = useCurrentUser();
+  const CURRENT_MANAGER_ID = user?.id ?? "";
   const { data: graduates, isLoading, error } = useGraduates(CURRENT_MANAGER_ID);
   const graduateIds = React.useMemo(() => (graduates ?? []).map((g) => g.id), [graduates]);
   const { data: statusMap } = useGraduateStatusBatch(graduateIds);
