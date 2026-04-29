@@ -185,15 +185,15 @@ const MyVitals: React.FC<MyVitalsProps> = ({ onStartCheckIn }) => {
     graduateId,
     currentWeek,
   );
-
-  if (userLoading) return null;
-  if (!user) return null;
-
   const focusAreasPayload = (focusAreasInsight?.payload ?? null) as
     | { week_number?: number; focus_areas?: FocusAreaPayloadItem[] }
     | null;
 
   const dimensions = useMemo(() => computeDimensions(checkIns ?? []), [checkIns]);
+
+  if (userLoading) return null;
+  if (!user) return null;
+
 
   const payload = (insight?.payload ?? null) as
     | { paragraphs?: string[]; call_to_action?: string }
