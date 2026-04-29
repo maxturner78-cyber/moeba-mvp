@@ -52,63 +52,6 @@ interface ManagerOption {
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-// ---------- Password Gate ----------
-
-const PasswordGate: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem(SESSION_KEY, "true");
-      onUnlock();
-    } else {
-      setError("Incorrect password");
-    }
-  };
-
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#FAFAFA",
-        padding: 16,
-      }}
-    >
-      <Card style={{ width: 400 }}>
-        <CardHeader>
-          <CardTitle style={{ fontSize: 20 }}>Moeba Admin</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <Label htmlFor="admin-password">Password</Label>
-            <Input
-              id="admin-password"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError(null);
-              }}
-              autoFocus
-            />
-            {error && (
-              <div style={{ fontSize: 13, color: "#DC2626" }}>{error}</div>
-            )}
-            <Button type="submit" style={{ marginTop: 4 }}>
-              Continue
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
 // ---------- Create User Form ----------
 
 const CreateUserPanel: React.FC<{
@@ -162,7 +105,6 @@ const CreateUserPanel: React.FC<{
         "create-pilot-user",
         {
           body: {
-            admin_password: ADMIN_PASSWORD,
             email: email.trim(),
             full_name: fullName.trim(),
             role,
@@ -366,7 +308,7 @@ const ExistingUsersPanel: React.FC<{
     try {
       const { data, error } = await supabase.functions.invoke(
         "reset-pilot-password",
-        { body: { admin_password: ADMIN_PASSWORD, user_id: userId } },
+        { body: { user_id: userId } },
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
